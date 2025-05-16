@@ -1,0 +1,6 @@
+@BC.PAYMENT.API_HostAddress = http://localhost:5162
+
+GET {{BC.PAYMENT.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

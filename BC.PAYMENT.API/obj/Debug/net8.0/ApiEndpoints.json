@@ -1,0 +1,803 @@
+[
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.AnalysisAccountsController",
+    "Method": "GetAllAccountCode",
+    "RelativePath": "api/analysisaccounts/accountcodes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Accounting.AccountCode, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.AnalysisAccountsController",
+    "Method": "GetAllAccountCode",
+    "RelativePath": "api/analysisaccounts/accountcodespaged",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Accounting.AccountCode, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.AnalysisAccountsController",
+    "Method": "GetAllAnalysisByDetail",
+    "RelativePath": "api/analysisaccounts/alldetails",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.Dictionary\u00602[[System.String, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e],[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Accounting.AnalysisCode, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.AnalysisAccountsController",
+    "Method": "GetAnalysisType",
+    "RelativePath": "api/analysisaccounts/analysistypes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Accounting.AnalysisCodeType, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.AnalysisAccountsController",
+    "Method": "GetAnalysisByDetail",
+    "RelativePath": "api/analysisaccounts/details",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "analysisCodeDto",
+        "Type": "BC.PAYMENT.CORE.DTO.Accounting.AnalysisCodeDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Accounting.AnalysisCode, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.BranchesController",
+    "Method": "GetLoginBranch",
+    "RelativePath": "api/branches/dbcodes",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "username",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "appCode",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.DTO.General.BranchDTO, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.CustomersController",
+    "Method": "GetCustomer",
+    "RelativePath": "api/customers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.General.Customer, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.DeliveriesController",
+    "Method": "GetDelivery",
+    "RelativePath": "api/deliveries",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.General.Delivery, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.DeliveriesController",
+    "Method": "GetDeliveryImage",
+    "RelativePath": "api/deliveries/image/{deliveryId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deliveryId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetChangeFixInvoice",
+    "RelativePath": "api/invoices/change-fix",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Filter.FilterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.ChangeInvoice, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetLocalChangeFixInvoice",
+    "RelativePath": "api/invoices/change-fix/local",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Filter.FilterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.ChangeInvoice, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "SaveFixInvoice",
+    "RelativePath": "api/invoices/change-fix/save",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Invoice.SaveInvoiceDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetInvoiceByInvoiceCode",
+    "RelativePath": "api/invoices/new/download",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "newInvoiceRequest",
+        "Type": "BC.PAYMENT.CORE.DTO.Invoice.NewInvoicesRequestDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Invoice.InvoicesModel, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetOldInvoice",
+    "RelativePath": "api/invoices/old",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Invoice.OldInvoiceRequestDto",
+        "IsRequired": true
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.OldInvoicesModel, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "UpdateAndGetOldInvoice",
+    "RelativePath": "api/invoices/old/{transactionCode}/verify",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "transactionCode",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "transactionCode",
+        "Type": "",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.OldInvoicesModel, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "UpdateInvoiceStatus",
+    "RelativePath": "api/invoices/old/{transactionCode}/verify-status",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "transactionCode",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetOldInvoiceByStatus",
+    "RelativePath": "api/invoices/old/invoice-by-status",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.OldInvoicesModel, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "SaveOldInvoices",
+    "RelativePath": "api/invoices/old/save",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.DTO.Invoice.OldInvoiceDTO, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetReturnInvoice",
+    "RelativePath": "api/invoices/returns",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Filter.FilterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.ReturnInvoice, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "SaveReturnInvoice",
+    "RelativePath": "api/invoices/returns/save",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Invoice.SaveInvoiceDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.InvoicesController",
+    "Method": "GetTodayReturnInvoice",
+    "RelativePath": "api/invoices/returns/today",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "pageNumber",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pagesize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.ReturnInvoice, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.IssuranceInvoicesController",
+    "Method": "GetDividedDelivery",
+    "RelativePath": "api/issuranceinvoices/divided-delivery/filter",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.General.Delivery, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.IssuranceInvoicesController",
+    "Method": "GetDividedInvoice",
+    "RelativePath": "api/issuranceinvoices/divided-invoice",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "deliveryId",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Invoice.Invoices, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.IssuranceInvoicesController",
+    "Method": "GetDividedInvoiceSummary",
+    "RelativePath": "api/issuranceinvoices/divided-invoice/summary",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Invoice.DividedInvoiceSummary, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.IssuranceInvoicesController",
+    "Method": "GetInvoices",
+    "RelativePath": "api/issuranceinvoices/invoices",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Filter.IssueInvoiceFilterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.Invoices, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.IssuranceInvoicesController",
+    "Method": "GetInvoicesExclusion",
+    "RelativePath": "api/issuranceinvoices/invoices/exclude",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BC.PAYMENT.CORE.DTO.Filter.IssueInvoiceExclusionFilterDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.API.Models.PaginatedResponse\u00601[[BC.PAYMENT.CORE.Entities.Invoice.Invoices, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], BC.PAYMENT.API, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.IssuranceInvoicesController",
+    "Method": "SaveDivideInvoices",
+    "RelativePath": "api/issuranceinvoices/invoices/save",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.DTO.Invoice.IssueInvoiceDTO, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.MarketController",
+    "Method": "GetMarket",
+    "RelativePath": "api/market",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.General.Market, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.MarketController",
+    "Method": "GetMarketImage",
+    "RelativePath": "api/market/image/{marketId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "marketId",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.PaymentsController",
+    "Method": "GetDeliveryPaidInvoice",
+    "RelativePath": "api/payments",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "date",
+        "Type": "System.DateTime",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[System.Collections.Generic.List\u00601[[BC.PAYMENT.CORE.Entities.Invoice.DividedInvoiceSummary, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BC.PAYMENT.API.Controllers.UsersController",
+    "Method": "GetBcUserCredentialAsync",
+    "RelativePath": "api/users/credentials",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "requestDto",
+        "Type": "BC.PAYMENT.CORE.DTO.Login.LoginRequestDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "BC.PAYMENT.API.Models.ApiResponse\u00601[[BC.PAYMENT.CORE.DTO.Login.LoginResponseDTO, BC.PAYMENT.CORE, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  }
+]

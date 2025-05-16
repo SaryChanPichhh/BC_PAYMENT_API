@@ -1,0 +1,31 @@
+# Ignore sensitive configuration files
+appsettings.json
+appsettings.*.json
+.env
+secrets.json
+
+# Ignore other IDE-specific and system files
+.vs/
+*.user
+*.suo
+*.opendb
+*.VC.db
+*.DS_Store
+Thumbs.db
+
+# Ignore compiled code and build directories
+/bin/
+/obj/
+BC.PAYMENT.REPORT
+package-lock.json
+**/wwwroot/css/icons/dxicons.ttf
+**/wwwroot/css/icons/dxicons.woff
+**/wwwroot/css/icons/dxicons.woff2
+**/wwwroot/css/designer.part.bundle.css
+**/wwwroot/css/thirdparty.bundle.css
+**/wwwroot/css/viewer.part.bundle.css
+**/wwwroot/css/dx-reporting-skeleton-screen.css
+**/wwwroot/js/designer.part.bundle.js
+**/wwwroot/js/viewer.part.bundle.js
+**/wwwroot/js/reporting.thirdparty.bundle.js
+**/wwwroot/js/site.thirdparty.bundle.js

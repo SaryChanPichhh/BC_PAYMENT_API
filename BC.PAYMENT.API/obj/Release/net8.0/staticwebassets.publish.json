@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "nYWoaOfmH0Dl+RFMK2r+3ZTNgqXbp4JLKwPO+rS1/Tk=",
+  "Source": "BC.PAYMENT.API",
+  "BasePath": "_content/BC.PAYMENT.API",
+  "Mode": "Default",
+  "ManifestType": "Publish",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

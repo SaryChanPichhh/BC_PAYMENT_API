@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "BC.PAYMENT.APPLICATION/1.0.0": {
+        "dependencies": {
+          "BC.PAYMENT.CORE": "1.0.0"
+        },
+        "runtime": {
+          "BC.PAYMENT.APPLICATION.dll": {}
+        }
+      },
+      "BC.PAYMENT.CORE/1.0.0": {
+        "runtime": {
+          "BC.PAYMENT.CORE.dll": {
+            "assemblyVersion": "1.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BC.PAYMENT.APPLICATION/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BC.PAYMENT.CORE/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,11 @@
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\bin\Release\net8.0\BC.PAYMENT.SQL.deps.json
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\bin\Release\net8.0\BC.PAYMENT.SQL.dll
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\bin\Release\net8.0\BC.PAYMENT.SQL.pdb
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.AssemblyInfoInputs.cache
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.AssemblyInfo.cs
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.csproj.CoreCompileInputs.cache
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.dll
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\refint\BC.PAYMENT.SQL.dll
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.pdb
+D:\Project BC\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\ref\BC.PAYMENT.SQL.dll
