@@ -10,10 +10,20 @@ using System.Text;
 using System.Text.Json.Serialization;
 using BC.PAYMENT.INFRASTRUCTURE;
 using Microsoft.Data.SqlClient;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// Serilog
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()  // Set default log level
+    .Enrich.FromLogContext()  // Include contextual info like request ID
+    .WriteTo.Console()  // Log to console
+    .WriteTo.Seq("http://localhost:5341") // Optional: log to Seq
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 //Configure Log4net.
 XmlConfigurator.Configure(new FileInfo("log4net.config"));
 // Inject Connection 

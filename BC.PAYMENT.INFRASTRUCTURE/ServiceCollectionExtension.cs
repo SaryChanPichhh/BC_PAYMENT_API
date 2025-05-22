@@ -15,6 +15,7 @@ using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.HistoryApproval;
@@ -37,6 +38,7 @@ using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DailyPayment
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.ReviewReport;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.DailySubmission;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.HistoryApproval;
@@ -104,6 +106,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<IVerifyInvoiceRepository, VerifyInvoiceRepository>();
                     
                     services.AddTransient<ISaleRepresentRepository, SaleRepresentRepository>();
+                    // Provincial Payment
+                       // Review Report
+                       services.AddTransient<IReviewReportRepository, ReviewReportRepository>();
+
 
                     services.AddTransient<IUnitOfWork, UnitOfWork>();
                     services.AddTransient<IGeneratorRepository, GeneratorRepository>();

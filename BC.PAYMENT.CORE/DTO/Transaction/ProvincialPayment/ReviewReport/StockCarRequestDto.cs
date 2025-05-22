@@ -14,4 +14,10 @@ namespace BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.ReviewReport
         public int Action { get; set; }
         public DateTime Date { get; set; }
     }
+
+    public class StockCarRequestParamDto
+    {
+        public int ActionId { get; set; }
+        public List<int> RoleId { get; set; }
+    }
 }

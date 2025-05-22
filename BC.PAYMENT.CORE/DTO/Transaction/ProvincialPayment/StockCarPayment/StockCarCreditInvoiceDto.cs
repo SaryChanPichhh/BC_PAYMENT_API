@@ -24,6 +24,6 @@ namespace BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment
     public class ReviewReportCreditInvoice : InvoiceModelDto
     {
         public DateTime TransactionDate { get; set; }
-        public bool IsCheck { get; set; }
+        public string? IsCheck { get; set; }
     }
 }

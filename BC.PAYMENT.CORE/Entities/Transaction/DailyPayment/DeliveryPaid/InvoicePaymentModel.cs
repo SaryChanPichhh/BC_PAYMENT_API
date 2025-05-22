@@ -22,7 +22,7 @@ namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid
     {
         public int DividedInvoiceId { get; set; }
         public DateTime Date { get; set; }
-        public string? Delivery { get; set; }
+        public string? Delivery { get; set; } 
         public string? DeliveryId { get; set; }
         public string? TransactionCode { get; set; }
         public double InvoiceValue { get; set; }

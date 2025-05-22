@@ -11,6 +11,7 @@
     <Folder Include="DTO\Preset\ItemTransaction\" />
     <Folder Include="DTO\Preset\" />
     <Folder Include="DTO\Transaction\Audit\VerifyInvoice\" />
+    <Folder Include="DTO\Transaction\ProvincialPayment\CheckingStockCarPayment\" />
     <Folder Include="Entities\Transaction\ProvincialPayment\ReviewReport\" />
   </ItemGroup>
 
