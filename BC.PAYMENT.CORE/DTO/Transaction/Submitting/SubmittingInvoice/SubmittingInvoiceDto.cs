@@ -7,11 +7,11 @@ namespace BC.PAYMENT.CORE.DTO.Transaction.Submitting.SubmittingInvoice
     public class SubmittingInvoiceDto
     {
         public List<SubmittedInvoicePostDto> SubmittedInvoices { get; set; } = new ();
-        public List<AccountReceivableDto> AccountReceivables { get; set; } = new ();
-        public bool IsAccountsReceivableCompleted { get; set; } = false;
+        public List<AccountReceivableParameterDto> AccountReceivables { get; set; } = new ();
+        public bool IsAutoAccountsReceivable { get; set; } = false;
     }
 
-    public class AccountReceivableDto
+    public class AccountReceivableParameterDto
     {
         public string? InvoiceType { get; set; }
         public string? TransactionCode { get; set; }
@@ -33,6 +33,7 @@ namespace BC.PAYMENT.CORE.DTO.Transaction.Submitting.SubmittingInvoice
         public double InvoiceAmount { get; set; }
         public double HalfPaid { get; set; }
         public double Paid { get; set; }
+        public double PaidAmount => HalfPaid + Paid;
     }
 
 }

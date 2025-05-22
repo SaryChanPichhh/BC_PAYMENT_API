@@ -3,15 +3,21 @@ using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
 using BC.PAYMENT.APPLICATION.Interfaces.Login;
-using BC.PAYMENT.APPLICATION.Interfaces.Payment;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.StockInventoryCounting;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.AccountReceivable;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.HistoryApproval;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.InvoiceVerify;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
 using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice.IDividedInvoiceRepository;
 
@@ -19,7 +25,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
     public class UnitOfWork : IUnitOfWork
     {
-        public UnitOfWork(IUserRepository users, IBranchRepository branches, ICustomerRepository customers, IInvoiceRepository invoices, IAnalysisAccountRepository analysisAccounts, APPLICATION.Interfaces.Payment.IDividedInvoiceRepository dividedInvoices, IDeliveryRepository deliveries, IMarketRepository markets, IDistrictRepository districts, IProvinceRepository provinces, IAccountReceivablePresetRepository accountReceivablePresets, IPublicHolidayRepository publicHoliday, INewInvoiceRepository newInvoice, IChangeInvoiceRepository changeInvoice, IReturnInvoiceRepository returnInvoice, IIssuanceInvoiceRepository issuanceInvoice, IDividedInvoiceRepository dividedInvoice, IInvoiceReportRepository invoiceReport, ICheckReturnInvoiceRepository checkReturnInvoice, IDeliveryPaidRepository deliveryPaid, IDailyPaymentRepository dailyPayment, IConfirmAccountReceivableRepository confirmAccountReceivable, ISubmittingInvoiceRepository submittingInvoice, IGeneratorRepository generators, IAccountReceivableRepository accountReceivable)
+        public UnitOfWork(IUserRepository users, IBranchRepository branches, ICustomerRepository customers, IInvoiceRepository invoices, IAnalysisAccountRepository analysisAccounts, APPLICATION.Interfaces.Payment.IDividedInvoiceRepository dividedInvoices, IDeliveryRepository deliveries, IMarketRepository markets, IDistrictRepository districts, IProvinceRepository provinces, IAccountReceivablePresetRepository accountReceivablePresets, IPublicHolidayRepository publicHoliday, INewInvoiceRepository newInvoice, IChangeInvoiceRepository changeInvoice, IReturnInvoiceRepository returnInvoice, IIssuanceInvoiceRepository issuanceInvoice, IDividedInvoiceRepository dividedInvoice, IInvoiceReportRepository invoiceReport, ICheckReturnInvoiceRepository checkReturnInvoice, IDeliveryPaidRepository deliveryPaid, IDailyPaymentRepository dailyPayment, IConfirmAccountReceivableRepository confirmAccountReceivable, ISubmittingInvoiceRepository submittingInvoice, IGeneratorRepository generators, IAccountReceivableRepository accountReceivable, ISubmittingPerDeliveryRepository submittingPerDelivery, ISubmittedInvoiceRepository submittedInvoice, ISubmittedPerDeliveryRepository submittedPerDelivery, ISubmittedRejectedInvoiceRepository submittedRejectedInvoice, ISubmittedRejectedInvoicePerDeliveryRepository rejectedInvoicePerDelivery, IMonthlyInvoiceRepository invoiceVerify, ISubmissionHistoryRepository historyApproval, IDailySubmissionRepository approve, IStockInventoryCountingRepository stockInventoryCounting, IVerifyInvoiceRepository verifyInvoice, ISaleRepresentRepository saleRepresent, IReviewReportRepository reviewReport)
         {
             Users = users;
             Branches = branches;
@@ -46,6 +52,18 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
             SubmittingInvoice = submittingInvoice;
             Generators = generators;
             AccountReceivable = accountReceivable;
+            SubmittingPerDelivery = submittingPerDelivery;
+            SubmittedInvoice = submittedInvoice;
+            SubmittedPerDelivery = submittedPerDelivery;
+            RejectedInvoice = submittedRejectedInvoice;
+            RejectedInvoicePerDelivery = rejectedInvoicePerDelivery;
+            InvoiceVerify = invoiceVerify;
+            HistoryApproval = historyApproval;
+            Approve = approve;
+            StockInventoryCounting = stockInventoryCounting;
+            VerifyInvoice = verifyInvoice;
+            SaleRepresent = saleRepresent;
+            ReviewReport = reviewReport;
         }
 
 
@@ -74,6 +92,17 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
         public IConfirmAccountReceivableRepository ConfirmAccountReceivable { get; }
         public ISubmittingInvoiceRepository SubmittingInvoice { get; }
         public IAccountReceivableRepository AccountReceivable { get; }
-   
+        public ISubmittingPerDeliveryRepository SubmittingPerDelivery { get; }
+        public ISubmittedInvoiceRepository SubmittedInvoice { get; }
+        public ISubmittedPerDeliveryRepository SubmittedPerDelivery { get; }
+        public ISubmittedRejectedInvoiceRepository RejectedInvoice { get; }
+        public ISubmittedRejectedInvoicePerDeliveryRepository RejectedInvoicePerDelivery { get; }
+        public IMonthlyInvoiceRepository InvoiceVerify { get; }
+        public ISubmissionHistoryRepository HistoryApproval { get; }
+        public IDailySubmissionRepository Approve { get; set; }
+        public IStockInventoryCountingRepository StockInventoryCounting { get; }
+        public IVerifyInvoiceRepository VerifyInvoice { get; }
+        public ISaleRepresentRepository SaleRepresent { get; }
+        public IReviewReportRepository ReviewReport { get; }
     }
 }

@@ -150,7 +150,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DailyPayment
             var paidInvoice = new ApiResponse<int>();
             try
             {
-                var paidInvoiceModel = new DeliveryInvoicePaidUpdateModel()
+                var paidInvoiceModel = new DeliveryGeneralInvoicePaidUpdateModel()
                 {
                     DbCode = credential.DbCode,
                     DividedInvoiceId = model.DividedInvoiceId,

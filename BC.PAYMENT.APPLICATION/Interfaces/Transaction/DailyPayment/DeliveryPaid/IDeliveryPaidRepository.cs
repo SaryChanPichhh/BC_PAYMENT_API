@@ -10,10 +10,10 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPai
 {
     public interface IDeliveryPaidRepository
     {
-        Task<List<InvoicePaymentModel>> GetAllInvoiceByDeliveryIdAndDate(string dbCode,string deliveryId, DateTime date);
+        Task<List<GeneralInvoicePaymentModel>> GetAllInvoiceByDeliveryIdAndDate(string dbCode,string deliveryId, DateTime date);
         Task<List<DeliveryDataObject>> GetAllInvoiceByDeliveryIdAndDateDataObjectAsync(string dbCode,string deliveryId, DateTime date);
-        Task<List<InvoicePaymentModel>> LoadInvoicePaid(string dbCode,string deliveryId, DateTime date);
-        Task<int> UpdateDeliveryInvoicePaid(DeliveryInvoicePaidUpdateModel model);
+        Task<List<GeneralInvoicePaymentModel>> LoadInvoicePaid(string dbCode,string deliveryId, DateTime date);
+        Task<int> UpdateDeliveryInvoicePaid(DeliveryGeneralInvoicePaidUpdateModel model);
         Task<bool> CheckExistsPaymentHeaderByInvoiceDividendDateAndDeliveryId(DateTime invoiceDividendDate,
             string deliveryId, string dbCode);
 

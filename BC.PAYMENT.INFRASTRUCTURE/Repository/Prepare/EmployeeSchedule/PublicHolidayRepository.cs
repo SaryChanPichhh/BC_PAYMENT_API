@@ -32,7 +32,12 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.EmployeeSchedule
             var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param);
             return rowAffected;
         }
-
+        public async Task<List<PublicHolidayModel>> GetListHoliday()
+        {
+            string sql = @"SELECT HOLIDAY_CODE Code,HOLIDAY_DES [Description],START_DATE StartDate,END_DATE EndDate,REMARK Remark,ACTIVE [Status],LEFT(CAST(START_DATE AS DATE),4) [Year] FROM dbo.EMPHOLIDAY; ";
+            var execute = await _sqlDataAccess.LoadData<PublicHolidayModel, dynamic>(sql, new { });
+            return execute.ToList();
+        }
         public async Task<int> UpdateAsync(PublicHolidayModel model)
         {
             const string sql =

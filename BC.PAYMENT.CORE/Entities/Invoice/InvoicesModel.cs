@@ -3,9 +3,10 @@ using BC.PAYMENT.CORE.Enums;
 
 namespace BC.PAYMENT.CORE.Entities.Invoice
 {
-    public class InvoicesModel:Customer
+    public class InvoicesModel : Customer
     {
         public int InvoiceId { get; set; }
+        public int TemplateId { get; set; }
         public string? DbCode { get; set; }
         public string? InvoiceCode { get; set; }
         public double InvoiceAmount { get; set; }
@@ -16,5 +17,18 @@ namespace BC.PAYMENT.CORE.Entities.Invoice
         public string? EntriesCode { get; set; }
         public string? DeliveryName { get; set; }
         public string? Description { get; set; }
+        public int Period { get; set; }
+        public DateTime TransactionDate { get; set; }
+        public string? CreatedBy { get; set; }
+    }
+
+    public class StockCarInvoicesModel : Invoices
+    {
+        public int Period { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? EmployeeId { get; set; }
+        public DateTime CreateDate { get; set; }
+        public DateTime TransactionDate { get; set; }
+        public InvoiceTypes InvoiceType { get; set; }
     }
 }

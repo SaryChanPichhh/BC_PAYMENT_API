@@ -1,4 +1,5 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
+﻿using System.ComponentModel.DataAnnotations;
+using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
@@ -7,11 +8,17 @@ using BC.PAYMENT.APPLICATION.Interfaces.Payment;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.StockInventoryCounting;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.AccountReceivable;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.HistoryApproval;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.InvoiceVerify;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
 using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting;
@@ -23,11 +30,17 @@ using BC.PAYMENT.INFRASTRUCTURE.Repository.Payment;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Account;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.EmployeeSchedule;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Preset;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.InventoryCounting;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.VerifyInvoice;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.AccountReceivable;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.StockCarPayment;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.DailySubmission;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.HistoryApproval;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.InvoiceVerify;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice;
 using Microsoft.Extensions.DependencyInjection;
 using DividedInvoiceRepository = BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice.DividedInvoiceRepository;
@@ -76,7 +89,21 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<IConfirmAccountReceivableRepository, ConfirmAccountReceivableRepository>();
                     services.AddTransient<ISubmittingInvoiceRepository, SubmittingInvoiceRepository>();
                     services.AddTransient<IAccountReceivableRepository, AccountReceivableRepository>();
-
+                    services.AddTransient<ISubmittingPerDeliveryRepository, SubmittingPerDeliveryRepository>();
+                    services.AddTransient<ISubmittedInvoiceRepository, SubmittedInvoiceRepository>();
+                    services.AddTransient<ISubmittedPerDeliveryRepository, SubmittedPerDeliveryRepository>();
+                    services.AddTransient<ISubmittedRejectedInvoiceRepository, SubmittedRejectedRepository>();
+                    services.AddTransient<ISubmittedRejectedInvoicePerDeliveryRepository, SubmittedRejectedPerDeliveryRepository>();
+                    services.AddTransient<IMonthlyInvoiceRepository, MonthlyInvoiceRepository>();
+                    services.AddTransient<ISubmissionHistoryRepository, SubmissionHistoryRepository>();
+                    services.AddTransient<IDailySubmissionRepository, DailySubmissionRepository>();
+                    // Audit
+                        // Stock Inventory Counting
+                    services.AddTransient<IStockInventoryCountingRepository, StockInventoryCountingRepository>();
+                        // Verify Invoice
+                    services.AddTransient<IVerifyInvoiceRepository, VerifyInvoiceRepository>();
+                    
+                    services.AddTransient<ISaleRepresentRepository, SaleRepresentRepository>();
 
                     services.AddTransient<IUnitOfWork, UnitOfWork>();
                     services.AddTransient<IGeneratorRepository, GeneratorRepository>();

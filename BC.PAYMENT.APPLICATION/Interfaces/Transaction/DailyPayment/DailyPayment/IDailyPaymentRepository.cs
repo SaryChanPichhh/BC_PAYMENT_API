@@ -11,7 +11,7 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPaymen
         Task<List<PaidInvoiceModel>> GetPaidInvoiceByPeriodAsync(string dbCode,int month,int year);
         Task<List<PaidInvoiceModel>> GetPaidInvoiceByDateAsync(string dbCode,string fromDate,string toDate);
         Task<int> DeletePaidInvoiceAsync(int paymentId,int dividedId);
-        Task<int> UpdatePaidInvoiceAsync(DeliveryInvoicePaidUpdateModel model);
+        Task<int> UpdatePaidInvoiceAsync(DeliveryGeneralInvoicePaidUpdateModel model);
 
         // Money Control
         Task<List<ExpenseDetailModel>> GetExpenseDetailByPeriodAsync(string dbCode, int month, int year);

@@ -8,9 +8,9 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
     {
         private readonly ISqlDataAccess _sqlDataAccess;
 
-        public InvoiceClosingEntryRepository(ISqlDataAccess _sqlDataAccess)
+        public InvoiceClosingEntryRepository(ISqlDataAccess sqlDataAccess)
         {
-            this._sqlDataAccess = _sqlDataAccess;
+            _sqlDataAccess = sqlDataAccess;
         }
 
         public async Task<bool> CheckIsEntriesIsAlreadyOpenAsync(string dbCode)

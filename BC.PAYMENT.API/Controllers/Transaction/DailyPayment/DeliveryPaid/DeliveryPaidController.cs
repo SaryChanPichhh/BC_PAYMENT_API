@@ -30,7 +30,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DeliveryPaid
             var dividedInvoice = new ApiResponse<DeliveryInvoicePaidUpdateDto>();
             try
             {
-                var deliveryInvoicePaidModel = new DeliveryInvoicePaidUpdateModel
+                var deliveryInvoicePaidModel = new DeliveryGeneralInvoicePaidUpdateModel
                 {
                     DbCode = credential.DbCode,
                     CreateBy =  credential.Username,

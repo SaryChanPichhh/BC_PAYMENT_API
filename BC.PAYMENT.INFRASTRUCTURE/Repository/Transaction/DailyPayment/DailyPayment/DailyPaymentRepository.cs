@@ -113,7 +113,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DailyPay
             return 0;
         }
 
-        public async Task<int> UpdatePaidInvoiceAsync(DeliveryInvoicePaidUpdateModel model)
+        public async Task<int> UpdatePaidInvoiceAsync(DeliveryGeneralInvoicePaidUpdateModel model)
         {
             if (_dbConnection.State == ConnectionState.Closed)
                 _dbConnection.Open();

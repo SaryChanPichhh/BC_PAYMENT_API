@@ -24,7 +24,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Delivery
             _dbConnection = dbConnection;
         }
 
-        public async Task<List<InvoicePaymentModel>> GetAllInvoiceByDeliveryIdAndDate(string dbCode, string deliveryId, DateTime date)
+        public async Task<List<GeneralInvoicePaymentModel>> GetAllInvoiceByDeliveryIdAndDate(string dbCode, string deliveryId, DateTime date)
         {
              string sql =
                 @"SELECT D.DIVIDED_INVOICE_ID dividedInvoiceId,D.CREATE_DATE Date,Store,DL.DELIVERIES_KHMER Delivery,D.DIVIDED_INVOICE_ID Id, N.CUSTOMER_CODE CustomerCode,CUST.CUSTOMER_NAME CustomerName,
@@ -48,7 +48,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Delivery
                  DATE = date.ToString("yyyy-MM-dd")
              };
             
-             var execute =await _sqlDataAccess.LoadData<InvoicePaymentModel, dynamic>(sql, param);
+             var execute =await _sqlDataAccess.LoadData<GeneralInvoicePaymentModel, dynamic>(sql, param);
              return execute.ToList();
         }
 
@@ -77,7 +77,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Delivery
                 DATE = date.ToString("yyyy-MM-dd")
             };
             var query =  _dbConnection.ConnectionString;
-            var execute = await _dbConnection.QueryAsync<DeliveryDataObject,InvoicePaymentModel,DeliveryDataObject>(sql,
+            var execute = await _dbConnection.QueryAsync<DeliveryDataObject,GeneralInvoicePaymentModel,DeliveryDataObject>(sql,
                 (delivery, invoice) =>
                 {
                     if(!deliveryDict.TryGetValue(delivery.DeliveryId!, out var deliveryData))
@@ -94,7 +94,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Delivery
             return execute.Distinct().ToList();
         }
 
-        public async Task<List<InvoicePaymentModel>> LoadInvoicePaid(string dbCode, string deliveryId, DateTime date)
+        public async Task<List<GeneralInvoicePaymentModel>> LoadInvoicePaid(string dbCode, string deliveryId, DateTime date)
         {
             var sql = $@"SELECT
                               P.INVOICE_ID,P.DIVIDED_INVOICE_ID,N.TRANSACTION_REF, N.CUSTOMER_CODE, N.ACC_NAME_KH, CASE WHEN N.STATUS = 'O' THEN '1.00' END 'OLD', CASE WHEN N.STATUS = 'N' THEN '1.00' END 'NEW', CASE WHEN N.STATUS = 'C' THEN '1.00' END 'CHANGE',
@@ -128,11 +128,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Delivery
                 DELIVERYID = deliveryId,
                 DIVIDED_DATE = date.ToString("yyyy-MM-dd")
             };
-            var execute = await _sqlDataAccess.LoadData<InvoicePaymentModel, dynamic>(sql, param);
+            var execute = await _sqlDataAccess.LoadData<GeneralInvoicePaymentModel, dynamic>(sql, param);
             return execute.ToList();
         }
 
-        public async Task<int> UpdateDeliveryInvoicePaid(DeliveryInvoicePaidUpdateModel model)
+        public async Task<int> UpdateDeliveryInvoicePaid(DeliveryGeneralInvoicePaidUpdateModel model)
         {
             var afftectedRow = 0;
             var transaction = _dbConnection.BeginTransaction();

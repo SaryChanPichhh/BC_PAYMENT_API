@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <Folder Include="DTO\Inventory\" />
+    <Folder Include="DTO\Preset\ItemTransaction\" />
+    <Folder Include="DTO\Preset\" />
+    <Folder Include="DTO\Transaction\Audit\VerifyInvoice\" />
+    <Folder Include="Entities\Transaction\ProvincialPayment\ReviewReport\" />
   </ItemGroup>
 
 </Project>

@@ -9,8 +9,12 @@
         public double? Dollar { get; set; }
         public double Riel { get; set; }
         public double ExpenseRiel { get; set; }
-        public double? ExpenseDollar { get; set; }
+        public double ExpenseDollar { get; set; }
         public double Total { get; set; }
-        public double? Misaligned { get; set; } 
+        public double Misaligned { get; set; } 
+        public double ExpenseDescription { get; set; } 
+        public string? CreateBy { get; set; }
+        public string? DbCode { get; set; } 
+        public DateTime CreateDate { get; set; } 
     }
 }

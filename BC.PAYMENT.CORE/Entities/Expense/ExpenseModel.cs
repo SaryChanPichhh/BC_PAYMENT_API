@@ -1,5 +1,4 @@
 ﻿
-
 namespace BC.PAYMENT.CORE.Entities.Expense
 {
     public class ExpenseModel
@@ -21,4 +20,5 @@ namespace BC.PAYMENT.CORE.Entities.Expense
         public string? DeliveryName { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
+
 }

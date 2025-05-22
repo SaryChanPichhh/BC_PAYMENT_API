@@ -3,20 +3,11 @@ using BC.PAYMENT.CORE.Entities.General;
 
 namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid
 {
-    public class InvoicePaymentModel : Customer
+    public class GeneralInvoicePaymentModel : GeneralInvoiceModel
     {
-        public int DividedInvoiceId { get; set; }
-        public DateTime Date { get; set; }
-        public string? Delivery { get; set; }
-        public string? DeliveryId { get; set; }
-        public string? TransactionCode { get; set; }
-        public double InvoiceValue { get; set; }
         public bool IsReturn { get; set; }
         public bool IsPaid { get; set; }
-        public string? Description { get; set; }
-        public double? PaidAmount { get; set; }
         public double? Total => InvoiceValue - PaidAmount;
-        public string? Status { get; set; }
         public string InvoiceStatus => IsReturn ? "ត្រឡប់" : IsPaid ? "ទូទាត់" : "ឥណទាន";
         public string InvoiceType => Status switch
         {
@@ -27,6 +18,18 @@ namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid
         };
     }
 
+    public class GeneralInvoiceModel : Customer
+    {
+        public int DividedInvoiceId { get; set; }
+        public DateTime Date { get; set; }
+        public string? Delivery { get; set; }
+        public string? DeliveryId { get; set; }
+        public string? TransactionCode { get; set; }
+        public double InvoiceValue { get; set; }
+        public string? Description { get; set; }
+        public double PaidAmount { get; set; }
+        public string? Status { get; set; }
+    }
     public class PaymentInvoiceHeaderModel
     {
         public int Id { get; set; }
@@ -38,7 +41,7 @@ namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid
         public string? CreatedBy { get; set; }
         public string? CreatedDate { get; set; }
     }
-    public class DeliveryInvoicePaidUpdateModel : InvoicePaymentModel
+    public class DeliveryGeneralInvoicePaidUpdateModel : GeneralInvoicePaymentModel
     {
         public double OldAmount { get; set; }
         public double NewAmount { get; set; }
@@ -59,6 +62,6 @@ namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid
         {
             public byte[]? Image { get; set; }
         }
-        public List<InvoicePaymentModel> InvoicePayments { get; set; } = new ();
+        public List<GeneralInvoicePaymentModel> InvoicePayments { get; set; } = new ();
     }
 }
