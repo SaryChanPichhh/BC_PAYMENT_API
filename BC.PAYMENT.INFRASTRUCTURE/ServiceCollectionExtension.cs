@@ -3,6 +3,7 @@ using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Items;
 using BC.PAYMENT.APPLICATION.Interfaces.Login;
 using BC.PAYMENT.APPLICATION.Interfaces.Payment;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
@@ -15,6 +16,9 @@ using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationRFID;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationStock;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.CheckingStockCarApproval;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
@@ -26,6 +30,7 @@ using BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.General;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Generator;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Items;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Login;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Payment;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Account;
@@ -38,6 +43,9 @@ using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DailyPayment
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationRFID;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationStock;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.CheckingStockCarPayment;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.ReviewReport;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.DailySubmission;
@@ -109,9 +117,14 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     // Provincial Payment
                        // Review Report
                        services.AddTransient<IReviewReportRepository, ReviewReportRepository>();
+                       services.AddTransient<IVerificationStockRepository, VerificationStockRepository>();
+                       services.AddTransient<IVerificationRFIDRepository, VerificationRFIDRepository>();
+                       services.AddTransient<ICheckingStockCarPaymentRepository, CheckingStockCarPaymentRepository>();
 
 
                     services.AddTransient<IUnitOfWork, UnitOfWork>();
+                    services.AddTransient<IWarehouseRepository, WarehouseRepository>();
+                    services.AddTransient<IItemRepository, ItemRepository>();
                     services.AddTransient<IGeneratorRepository, GeneratorRepository>();
         }
     }

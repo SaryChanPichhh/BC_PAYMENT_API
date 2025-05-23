@@ -13,7 +13,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Che
             _sqlDataAccess = sqlDataAccess;
         }
 
-        public async Task<List<CheckingStockSubmittingInvoiceModel>> GetAllSubmittingInvoiceByPeriodAsync(string dbCode,
+        public async Task<List<CheckingStockSubmittingInvoiceModel>> GetAllStockCarSubmittingInvoiceByPeriodAsync(string dbCode,
             int month, int year)
         {
             var sql =
@@ -33,7 +33,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Che
             return execute.ToList();
         }
 
-        public async Task<List<CheckingStockSubmittingInvoiceModel>> GetAllSubmittingInvoiceByDateAsync(string dbCode, DateTime fromDate, DateTime toDate,bool status)
+        public async Task<List<CheckingStockSubmittingInvoiceModel>> GetAllStockCarSubmittingInvoiceByDateAsync(string dbCode, DateTime fromDate, DateTime toDate,bool status)
         {
             var sql = $@"SELECT 
                     D.SUBMIT_ID, 

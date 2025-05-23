@@ -15,8 +15,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
 
         #region Submitting
 
-        [HttpGet]
-        [Route("getsubmittinginvoice")]
+
             
 
         #endregion

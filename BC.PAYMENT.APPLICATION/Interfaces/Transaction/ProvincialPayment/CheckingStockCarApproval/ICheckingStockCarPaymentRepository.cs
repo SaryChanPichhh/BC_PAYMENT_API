@@ -4,10 +4,17 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.Checki
 {
     public interface ICheckingStockCarPaymentRepository
     {
-        #region Submitting
-        Task<List<CheckingStockSubmittingInvoiceModel>> GetAllSubmittingInvoiceByPeriodAsync(string dbCode,int month,int year);
-        Task<List<CheckingStockSubmittingInvoiceModel>> GetAllSubmittingInvoiceByDateAsync(string dbCode,DateTime fromDate,DateTime toDate,bool status);
+        #region Submitted
+        Task<List<CheckingStockSubmittingInvoiceModel>> GetAllStockCarSubmittingInvoiceByPeriodAsync(string dbCode,int month,int year);
+        Task<List<CheckingStockSubmittingInvoiceModel>> GetAllStockCarSubmittingInvoiceByDateAsync(string dbCode,DateTime fromDate,DateTime toDate,bool status);
 
+
+        #region Total Amount of Collection
+
+        
+
+
+        #endregion
         #endregion
     }
 }

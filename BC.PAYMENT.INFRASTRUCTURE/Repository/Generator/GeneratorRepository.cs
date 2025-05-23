@@ -30,5 +30,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
             var results = await _sqlDataAccess.LoadSingleData<SaleAnalysisDto,dynamic>(sql, param);
             return results;
         }
+
+        public Task<string> GenerateAdjRefCode(string movType, string recType)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

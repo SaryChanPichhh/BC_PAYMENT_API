@@ -1,6 +1,7 @@
 ﻿using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Items;
 using BC.PAYMENT.APPLICATION.Interfaces.Login;
 using BC.PAYMENT.APPLICATION.Interfaces.Payment;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
@@ -13,6 +14,9 @@ using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationRFID;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationStock;
+using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.CheckingStockCarApproval;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
@@ -36,6 +40,9 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         Payment.IDividedInvoiceRepository DividedInvoices { get; }
         IDeliveryRepository Deliveries { get; }
         IMarketRepository Markets { get; }
+        IWarehouseRepository Warehouses { get; }
+        IItemRepository Items { get; }
+
         // Prepare
         IDistrictRepository Districts { get; }
         IProvinceRepository Provinces { get; }
@@ -72,6 +79,11 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         // Provincial Payment
         ISaleRepresentRepository SaleRepresent { get; }
         IReviewReportRepository ReviewReport { get; }
+        ICheckingStockCarPaymentRepository CheckingStockCarPayment { get; }
+
+        // Inventory
+        IVerificationStockRepository VerificationStock { get; }
+        IVerificationRFIDRepository VerificationRFID { get; }
 
     }
 }
