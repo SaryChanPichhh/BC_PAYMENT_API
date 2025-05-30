@@ -9,6 +9,7 @@ using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
 using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
 using Dapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using String = System.String;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationStock
 {
@@ -290,6 +291,48 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
             var execute = await _sqlDataAccess.LoadData<VerificationStockReportDto, dynamic>(sql, param);
             return execute.ToList();
         }
+
+        public async Task<List<CheckingStockByBranch>> GetCheckingStockByBranchAsync(CheckingStockByBranchDto model)
+        {
+            var lsItem = new List<CheckingStockByBranch>();
+            var procedure = $@"BCSTOCKCONTROLL";
+            var param = new
+            {
+                MOV_PRD = model.Period,
+                LOCATION = model.Location,
+                REC_TYPE = model.RecType,
+                DATE_FROM = model.FromDate,
+                DATE_TO = model.ToDate,
+                DATE = model.ByAccountPeriod ? 0 : 1,
+                ITEM_FROM = model.FromItemCode,
+                ITEM_TO = model.ToItemCode,
+            };
+            var executeProcedure =
+                await _dbConnection.QueryAsync<dynamic>(procedure,param);
+            foreach (var item in executeProcedure)
+            {
+                var dict = (IDictionary<string, object>)item;
+                var checkingStock = new CheckingStockByBranch();
+                foreach (var row in dict.ToDictionary(x => x.Key, x => x.Value))
+                {
+                    if (row.Key == "ITEM_CODE")
+                    {
+                        checkingStock.ItemCode = row.Value?.ToString();
+                    }
+                    else if (row.Key == "TOTAL")
+                    {
+                        checkingStock.Total = Convert.ToDouble(row.Value??0);
+                    }
+                    else
+                    {
+                        checkingStock.Values[row.Key] = Convert.ToDouble(row.Value??0);
+                    }
+                }
+                lsItem.Add(checkingStock);
+            }
+            return lsItem;
+        }
+
         #endregion
 
     }

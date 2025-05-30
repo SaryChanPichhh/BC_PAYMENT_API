@@ -26,5 +26,12 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationSt
         Task<List<VerificationStockReportDto>> GetVerificationStockReportByPeriod(string dbCode, int month,int year);
 
         #endregion
+
+
+        #region Checking Stock By Branch
+
+        Task<List<CheckingStockByBranch>> GetCheckingStockByBranchAsync(CheckingStockByBranchDto model);
+
+        #endregion
     }
 }

@@ -13,6 +13,8 @@
     <Folder Include="DTO\Transaction\Audit\VerifyInvoice\" />
     <Folder Include="DTO\Transaction\Inventory\VerificationRFID\" />
     <Folder Include="DTO\Transaction\ProvincialPayment\CheckingStockCarPayment\" />
+    <Folder Include="Entities\CommondityExchange\Invoices\" />
+    <Folder Include="Entities\CommondityExchange\Repairer\" />
     <Folder Include="Entities\Transaction\Inventory\VerificationRFID\" />
     <Folder Include="Entities\Transaction\ProvincialPayment\ReviewReport\" />
   </ItemGroup>

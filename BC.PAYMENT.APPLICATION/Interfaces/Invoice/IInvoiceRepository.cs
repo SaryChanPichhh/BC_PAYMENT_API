@@ -43,5 +43,18 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Invoice
         Task<bool> PostPrintInvoiceAsync(string transactionInvoice, RequestType type, string dbCode,string period,string userName);
 
         #endregion
+
+        Task<List<SaleDetailsDto>> GetItemExpiredDates(string dbCode,
+            Dictionary<string, List<string>> itemCodeAndExpireDate, string wareHouse);
+
+        Task<int> CreateInvoiceSaleAsync(string dbCode,SaleHeaderDto saleHeader, List<SaleDetailsDto> detailsDtos);
+
+        Task<int> InsertRecordInvoice(string dbCode, string userName, string transaction, string customerCode, string customerName,
+            double value, DateTime date, string entryCode);
+
+        Task<int> CreateInvoice(CreateInvoiceDto createInvoiceDto,
+            List<CreateInvoiceDetailDto> createInvoiceDetailDto);
+
+        Task<InvoiceDetailDto> GetInvoiceByCustomerCode(string dbCode, string customerCode);
     }
 }

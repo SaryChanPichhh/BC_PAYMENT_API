@@ -1,9 +1,12 @@
 ﻿using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
+using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.DailyRefundItems;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Repairer;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
 using BC.PAYMENT.APPLICATION.Interfaces.Items;
 using BC.PAYMENT.APPLICATION.Interfaces.Login;
-using BC.PAYMENT.APPLICATION.Interfaces.Payment;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
@@ -85,5 +88,18 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         IVerificationStockRepository VerificationStock { get; }
         IVerificationRFIDRepository VerificationRFID { get; }
 
+        // Cash Flow Data
+        ICashFlowDataRepository CashFlowData { get; }
+        ICashFlowDataReportRepository CashFlowDataReport { get; }
+        ICashFlowSubmittedRepository CashFlowSubmitted { get; }
+        ICashFlowAuditSubmittedRepository CashFlowAuditSubmitted { get; }
+        ICashFlowAuditReportRepository CashFlowAuditReport { get; }
+
+        // Commodity Exchange
+
+        IDailyRefundItemRepository DailyRefundItem { get; }
+        IRepairGoodsRepository RepairGoods { get; }
+        IRepairerRepository Repairer { get; }
+        ICompletedRepairRepository CompletedRepair { get; }
     }
 }

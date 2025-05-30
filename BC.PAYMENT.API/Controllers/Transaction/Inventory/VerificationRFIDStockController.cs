@@ -34,7 +34,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                 {
                     var sequence = await _unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
                     var movTypes = await _unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!, item.StatusType);
-                    var movRef = await _unitOfWork.Generators.GenerateAdjRefCode(credential.DbCode!, movTypes.RecType);
+                    var movRef = await _unitOfWork.Generators.GenerateAdjRefCode(credential.DbCode!,movTypes.MovType, movTypes.RecType);
                     var itemCost = await _unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, item.ItemCode);
                     var inventory = new InventoryAdjustmentModel
                     {

@@ -1,5 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
+using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.DailyRefundItems;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Repairer;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
@@ -27,6 +31,10 @@ using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.InvoiceVerify;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
 using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.CashFlow.CashFlowData;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundItems;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.Repairer;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.RepairItem;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.General;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Generator;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice;
@@ -120,7 +128,18 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                        services.AddTransient<IVerificationStockRepository, VerificationStockRepository>();
                        services.AddTransient<IVerificationRFIDRepository, VerificationRFIDRepository>();
                        services.AddTransient<ICheckingStockCarPaymentRepository, CheckingStockCarPaymentRepository>();
+                    // Cash Flow
+                    services.AddTransient<ICashFlowDataRepository,CashFlowDataRepository>();
+                    services.AddTransient<ICashFlowDataReportRepository, CashFlowDataReportRepository>();
+                    services.AddTransient<ICashFlowSubmittedRepository, CashFlowSubmittedRepository>();
+                    services.AddTransient<ICashFlowAuditSubmittedRepository, CashFlowAuditSubmittedRepository>();
+                    services.AddTransient<ICashFlowAuditReportRepository, CashFlowAuditReportRepository>();
 
+                    // Commodity Exchange
+                    services.AddTransient<IDailyRefundItemRepository, DailyRefundItemsRepository>();
+                    services.AddTransient<IRepairGoodsRepository, RepairGoodsRepository>();
+                    services.AddTransient<IRepairerRepository, RepairerRepository>();
+                    services.AddTransient<ICompletedRepairRepository, RepairerRepository>();
 
                     services.AddTransient<IUnitOfWork, UnitOfWork>();
                     services.AddTransient<IWarehouseRepository, WarehouseRepository>();

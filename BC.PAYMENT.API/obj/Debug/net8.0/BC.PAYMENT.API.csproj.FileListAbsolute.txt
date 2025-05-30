@@ -186,3 +186,4 @@ D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.API\bin\Debug\net8.0\Serilog.Si
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.API\bin\Debug\net8.0\Serilog.Sinks.Debug.dll
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.API\bin\Debug\net8.0\Serilog.Sinks.File.dll
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.API\bin\Debug\net8.0\Serilog.Sinks.Seq.dll
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.API\bin\Debug\net8.0\System.Security.Permissions.dll

@@ -79,7 +79,7 @@ namespace BC.PAYMENT.API.Helper
                     ? currentDate
                     : DateTime.Now,
                 InvoiceEntryCode = user.FindFirst("InvoiceEntryCode")?.Value ?? string.Empty,
-                Period = user.FindFirst("Period")?.Value ?? string.Empty
+                Period = user.FindFirst("Period")?.Value ?? $"{DateTime.Now.Year}{DateTime.Now.Month:D2}"
             };
         }
 

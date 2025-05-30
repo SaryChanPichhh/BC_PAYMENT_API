@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BC.PAYMENT.SQL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7f9c165bb56dbaf79a11d1bde73f37b0ed11cd20")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+15f875de2ce7a459cb111adbc16851121a8e9ab1")]
 [assembly: System.Reflection.AssemblyProductAttribute("BC.PAYMENT.SQL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BC.PAYMENT.SQL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

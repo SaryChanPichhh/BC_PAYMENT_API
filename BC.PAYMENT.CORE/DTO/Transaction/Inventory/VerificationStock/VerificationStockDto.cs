@@ -66,4 +66,23 @@ namespace BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock
     {
         public string Location { get; set; } = string.Empty;
     }
+
+    public class CheckingStockByBranch 
+    {
+        public string ItemCode { get; set; }
+        public Dictionary<string, dynamic> Values { get; set; } = new();
+        public double Total { get; set; }
+
+    }
+    public class CheckingStockByBranchDto
+    {
+        public int? Period { get; set; }
+        public string Location { get; set; }
+        public string RecType { get; set; }
+        public string? FromDate { get; set; }
+        public string? ToDate { get; set; }
+        public string FromItemCode { get; set; }
+        public string ToItemCode { get; set; }
+        public bool ByAccountPeriod { get; set; }
+    }
 }
