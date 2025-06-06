@@ -13,5 +13,7 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
 
         Task<List<Customer>> GetCustomer();
 
+        Task<List<Customer>> GetCustomerByMarketCodeAsync(string dbCode,List<string> marketCode ,List<string> saleTypes );
+
     }
 }

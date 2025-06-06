@@ -1,6 +1,8 @@
 ﻿using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
 using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
 using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.DailyRefundItems;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.ExchangeItem;
+using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Invoices;
 using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Repairer;
 using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem;
 using BC.PAYMENT.APPLICATION.Interfaces.Generator;
@@ -10,6 +12,12 @@ using BC.PAYMENT.APPLICATION.Interfaces.Login;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
 using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
+using BC.PAYMENT.APPLICATION.Interfaces.Preset.AnnualPurchase;
+using BC.PAYMENT.APPLICATION.Interfaces.Preset.DailyAnalysis;
+using BC.PAYMENT.APPLICATION.Interfaces.Preset.ExchangeItemAnalysis;
+using BC.PAYMENT.APPLICATION.Interfaces.Preset.ItemTransaction;
+using BC.PAYMENT.APPLICATION.Interfaces.Preset.OwedInvoice;
+using BC.PAYMENT.APPLICATION.Interfaces.Preset.StockPrice;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.StockInventoryCounting;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice;
 using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.AccountReceivable;
@@ -101,5 +109,15 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         IRepairGoodsRepository RepairGoods { get; }
         IRepairerRepository Repairer { get; }
         ICompletedRepairRepository CompletedRepair { get; }
+        ICheckingInvoiceRepository CheckingInvoice { get; }
+        IExchangeItemRepository ExchangeItem { get; }
+
+        // Preset 
+        IItemTransactionAnalysisRepository ItemTransactionAnalysis { get; }
+        IExchangeItemAnalysisRepository ExchangeItemAnalysis { get; }
+        IAnnualPurchaseRepository AnnualPurchase { get; }
+        IOwedInvoiceRepository OwedInvoice { get; }
+        IInventoryValueRepository InventoryValue { get; }
+        IDailyAnalysisRepository DailyAnalysis { get; }
     }
 }

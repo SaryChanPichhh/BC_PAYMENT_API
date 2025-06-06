@@ -9,4 +9,12 @@ namespace BC.PAYMENT.CORE.Enums
         [Description("ផ្លាស់ប្តូរ")] Exchange,
         [Description("បោះពុម្ភវិក្ក័យបត្រ័")] Invoice
     }
+
+    public enum InvoiceType
+    {
+        [Description("Repair")]
+        Repair,
+        [Description("Exchange")]
+        Exchange,
+    }
 }

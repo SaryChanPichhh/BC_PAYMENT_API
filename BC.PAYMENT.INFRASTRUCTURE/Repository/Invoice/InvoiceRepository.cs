@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
 using BC.PAYMENT.CORE.DTO.Filter;
@@ -799,10 +800,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice
 
         public async Task<int> CreateInvoice(CreateInvoiceDto createInvoiceDto, List<CreateInvoiceDetailDto> createInvoiceDetailDto)
         {
+            var connection = new SqlConnection(_configuration.GetConnectionString("DBConnection"));
             var affectedRow = 0;
-            if (_dbConnection.State == ConnectionState.Closed)
-                _dbConnection.Open();
-            using var transaction = _dbConnection.BeginTransaction();
+            if (connection.State == ConnectionState.Closed)
+                connection.Open();
+            using var transaction = connection.BeginTransaction();
 
             try
             {
@@ -829,7 +831,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice
                 OUTPUT Inserted.REQUEST_REPAIR_ID
                 VALUES (@INVOICE_ID,@TRANS_REF,@REPAIR_COMPLETED_ID,@QUANTITY,@UNIT_PRICE,@TOTAL,@REQUEST_REPAIR_ID)";
 
-                affectedRow += await _dbConnection.ExecuteAsync(sqlMaster, paramMaster, transaction);
+                affectedRow += await connection.ExecuteAsync(sqlMaster, paramMaster, transaction);
                 foreach (var invoiceDetailDto in createInvoiceDetailDto)
                 {
                     var paramDetail = new
@@ -842,20 +844,20 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice
                         TOTAL = invoiceDetailDto.Total,
                         REQUEST_REPAIR_ID = invoiceDetailDto.RequestRepairId,
                     };
-                    var requestDeetailId = await _dbConnection.ExecuteScalarAsync<int>(sqlDetails, paramDetail, transaction);
-                    affectedRow += await _dbConnection.ExecuteAsync(
+                    var requestDeetailId = await connection.ExecuteScalarAsync<int>(sqlDetails, paramDetail, transaction);
+                    affectedRow += await connection.ExecuteAsync(
                        "UPDATE TB_BC_CHANGEINVOICE_DETAIL SET IS_RECEIVED = 'Completed' WHERE ID = (SELECT ID FROM TB_BC_CHANGEINVOICE_DETAIL WHERE CHANGE_INVOICE_ID = @RequestDetailId)",
                        new { RequestDetailId = requestDeetailId }, transaction);
 
                     // update to completed
                     var updateRepairCompleted = $@"UPDATE TB_BC_CHANGEINVOICE_REPAIR_COMPLETED SET STATUS = 'Completed' WHERE ID = @RepairCompletedId";
-                    affectedRow += await _dbConnection.ExecuteAsync(updateRepairCompleted,
+                    affectedRow += await connection.ExecuteAsync(updateRepairCompleted,
                         new { RepairCompletedId = invoiceDetailDto.RepairCompletedId },transaction);
                     var updateRepairMaster = $@"UPDATE TB_BC_CHANGEINVOICE SET IS_RECEIVED = 'Completed',COMPLETED = @COMPLETED_DATE FROM TB_BC_CHANGEINVOICE HEADER INNER JOIN TB_BC_CHANGEINVOICE_DETAIL DETAIL ON DETAIL.CHANGE_INVOICE_ID = HEADER.ID
                         INNER JOIN TB_BC_CHANGEINVOICE_RECEIVED RECEIVED ON RECEIVED.CHANGE_INVOICE_DETAIL_ID = DETAIL.ID
                         INNER JOIN TB_BC_CHANGEINVOICE_REPAIR REPAIR ON REPAIR.RECEIVED_ID = RECEIVED.ID
                         WHERE REPAIR.TRAN_REF = @TRANSACTION";
-                    affectedRow += await _dbConnection.ExecuteAsync(updateRepairMaster,
+                    affectedRow += await connection.ExecuteAsync(updateRepairMaster,
                         new { COMPLETED_DATE = DateTime.Today, TRANSACTION = invoiceDetailDto.ItemTransaction},transaction);
                 }
 
@@ -894,6 +896,106 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice
             return await _sqlDataAccess.LoadSingleData<InvoiceDetailDto,dynamic>(sql, param);
         }
 
+        public async Task<bool> CheckStockQuantityAsync(string dbCode, string location, string itemCode, int quantityRequest)
+        {
+            var sql =
+            @$"SELECT CAST(CASE WHEN COUNT(QUANTITY) > 0 THEN 1 ELSE 0 END AS BIT) FROM 
+	   (SELECT PHYSICAL-TAB5.ON_ORDER AS QUANTITY 
+			FROM (SELECT TAB3.LOCATION,TAB3.ITEM_CODE,TAB3.ITEM_DESC,TAB3.UNIT_STOCK,TAB3.PHYSICAL,ISNULL(TAB4.HOLD_SALE,0) ON_ORDER 
+			  FROM (SELECT TAB1.LOCATION,TAB1.ITEM_CODE,TAB2.ITEM_DESC,TAB2.UNIT_STOCK,PHYSICAL 
+				FROM (SELECT LOCATION,ITEM_CODE,ISNULL(SUM(QUANTITY),0) PHYSICAL FROM {dbCode}SIINVMOV WHERE IR_STAT='I' AND STATUS='80'AND ALLOC_REF=''  GROUP BY LOCATION,ITEM_CODE) AS TAB1 
+				  LEFT JOIN (SELECT ITEM_CODE,ITEM_DESC,UNIT_STOCK FROM SIITEMS WHERE DB_CODE=@DB_CODE) AS TAB2 ON TAB1.ITEM_CODE=TAB2.ITEM_CODE) AS TAB3 
+					LEFT JOIN (SELECT LOCATION,ITEM_CODE,SUM(CASE WHEN STK_QTY_VALUE=1 THEN VALUE_1 WHEN STK_QTY_VALUE=2 THEN VALUE_2 WHEN STK_QTY_VALUE=3 THEN VALUE_3 WHEN STK_QTY_VALUE=4
+							   THEN VALUE_4 WHEN STK_QTY_VALUE=5 THEN VALUE_5 WHEN STK_QTY_VALUE=6 THEN VALUE_6 WHEN STK_QTY_VALUE=7 THEN VALUE_7 WHEN STK_QTY_VALUE=8 THEN VALUE_8 WHEN STK_QTY_VALUE=9 THEN VALUE_9 WHEN
+							   STK_QTY_VALUE=10 THEN VALUE_10 WHEN STK_QTY_VALUE=11 THEN VALUE_11 WHEN STK_QTY_VALUE=12 THEN VALUE_12 WHEN STK_QTY_VALUE=13 THEN VALUE_13 WHEN STK_QTY_VALUE=14 THEN VALUE_14 WHEN
+							   STK_QTY_VALUE=15 THEN VALUE_15 WHEN STK_QTY_VALUE=16 THEN VALUE_16 WHEN STK_QTY_VALUE=17 THEN VALUE_17 WHEN STK_QTY_VALUE=18 THEN VALUE_18 WHEN STK_QTY_VALUE=19 THEN VALUE_19 WHEN
+							   STK_QTY_VALUE=20 THEN VALUE_20 ELSE 0 END) HOLD_SALE 
+							   FROM {dbCode}SISODET WHERE REC_TYPE='D' AND STATUS<'80' AND CREDIT_STATUS='' GROUP BY LOCATION,ITEM_CODE) AS TAB4 ON TAB3.LOCATION=TAB4.LOCATION AND TAB3.ITEM_CODE=TAB4.ITEM_CODE) AS TAB5 
+					   LEFT JOIN (SELECT LOCATION,ITEM_CODE,SUM(QUANTITY) PICK_QTY 
+								FROM {dbCode}SIINVMOVH WHERE  IR_STAT<>'I' AND STATUS='10' GROUP BY LOCATION,ITEM_CODE) 
+						        AS TAB6 ON TAB5.LOCATION=TAB6.LOCATION AND TAB5.ITEM_CODE=TAB6.ITEM_CODE WHERE TAB5.LOCATION=@LOCATION AND TAB5.ITEM_CODE= @ITEM_CODE) AS TAB7 WHERE QUANTITY >= @QUANTITYREQUEST";
+            var param = new
+            {
+                DB_CODE = dbCode,
+                LOCATION = location,
+                ITEM_CODE = itemCode,
+                QUANTITYREQUEST = quantityRequest,
+
+            };
+            var results = await _sqlDataAccess.LoadSingleData<bool,dynamic>(sql, param);
+            return results;
+        }
+
+        public async Task UpdateStatusExchangeReceivedToCredit(int id, int status)
+        {
+            const string sql = "UPDATE TB_BC_CHANGEINVOICE_RECEIVED SET STATUS = @STATUS WHERE ID = @ID";
+            var param = new
+            {
+                ID = id,
+                STATUS = status
+            };
+            await _sqlDataAccess.ExecuteAsync(sql, param);
+        }
+
+        public async Task UpdateStatusRequestExchangeDetails(int id, ExchangeStatus exchangeStatus)
+        {
+            const string sql = @"UPDATE TB_BC_CHANGEINVOICE_DETAIL SET IS_RECEIVED = @STATUS WHERE ID = @ID";
+            var param = new
+            {
+                STATUS = Enum.GetName(typeof(ExchangeStatus), exchangeStatus),
+                ID = id
+            };
+            await _sqlDataAccess.ExecuteAsync(sql, param);
+        }
+
+        public async Task SaveRecordItemExchanged(string dbCode,string userName,string transaction, string itemCode, int quantity, double unitPrice)
+        {
+            const string sql =
+                @"INSERT INTO TB_BC_CHANGEINVOICE_ITEM_EXCHANGED([TRANSACTION],ITEM_CODE,QUANTITY,CREATED_DATE,CREATED_BY,UNIT_PRICE,DB_CODE)
+                VALUES (@TRANSACTION,@ITEM_CODE,@QUANTITY,@CREATED_DATE,@CREATED_BY,@UNIT_PRICE,@DB_CODE)";
+            var param = new
+            {
+                TRANSACTION = transaction,
+                ITEM_CODE = itemCode,
+                QUANTITY = quantity,
+                CREATED_DATE = DateTime.Today,
+                CREATED_BY = userName,
+                UNIT_PRICE = unitPrice,
+                DB_CODE = dbCode
+            };
+            await _sqlDataAccess.ExecuteAsync(sql, param);
+        }
+
+        public async Task<bool> IsAllItemRequestCompletedByRequestIdAsync(int requestId)
+        {
+            const string sql = @"SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) 
+                FROM TB_BC_CHANGEINVOICE_DETAIL WHERE CHANGE_INVOICE_ID = @REQUEST_ID AND (IS_RECEIVED <> 'Completed' OR (TYPE = 'EXCHANGE' AND IS_RECEIVED <> 'Completed'))
+                ";
+            var param = new
+            {
+                REQUEST_ID = requestId
+            };
+            var result = await _sqlDataAccess.LoadSingleData<bool,dynamic>(sql, param);
+            return result;
+        }
+
+        public async Task<bool> UpdateReceivedToCompletedByIdAsync(String dbCode,int requestId)
+        {
+            const string sql =
+                @"UPDATE TB_BC_CHANGEINVOICE SET IS_RECEIVED = 'Completed' WHERE ID = @REQUEST_ID AND DB_CODE = @DB_CODE";
+            var param = new
+            {
+                REQUEST_ID = requestId,
+                DB_CODE = dbCode
+            };
+            var result = await _sqlDataAccess.ExecuteAsync(sql, param);
+            return result == 1;
+        }
+
+        public Task<int> UpdateValue6ToZero(List<(string newTransaction, string TransLine, string itemCode, string oldTransaction)> tupleValues)
+        {
+            throw new NotImplementedException();
+        }
 
         #endregion
 

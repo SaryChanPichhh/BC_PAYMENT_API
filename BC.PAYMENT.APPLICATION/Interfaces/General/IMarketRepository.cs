@@ -11,5 +11,6 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
     {
         Task<List<Market>> GetMarket(string dbCode);
         Task<Market.MarketImage> GetDeliveryImage(string deliveryId);
+        Task<List<Market>> LoadMarketBySaleTypesAsync(string dbCode, List<string> saleTypes,int fromMov,int toMov);
     }
 }

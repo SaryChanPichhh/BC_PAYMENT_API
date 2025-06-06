@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BC.PAYMENT.LOGGING")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+15f875de2ce7a459cb111adbc16851121a8e9ab1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+691446bd76b739080b109567ae4a95792cae5950")]
 [assembly: System.Reflection.AssemblyProductAttribute("BC.PAYMENT.LOGGING")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BC.PAYMENT.LOGGING")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

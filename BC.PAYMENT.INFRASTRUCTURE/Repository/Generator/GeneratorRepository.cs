@@ -120,6 +120,34 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
             return generateId;
         }
 
+        public async Task<string> PostCreditNoteAutoNumberAsync(string dbCode, string saleType)
+        {
+
+            const string sql =
+                @"SELECT SI_DATA FROM SIDATA WHERE SI_TYPE = 'AUTON' AND CODE = @SaleType AND DB_CODE = @DB_CODE";
+            var result =
+                await _sqlDataAccess.LoadSingleData<string,dynamic>(sql,
+                    new { DB_CODE = dbCode, SaleType = saleType });
+            
+            if (string.IsNullOrEmpty(result)) return result;
+            var prefix = result.Substring(96, 10).Trim();
+            var suffix = result.Substring(106, 10).Trim();
+            var interval = result.Substring(116, 5);
+            var length = result.Substring(121, 2).Trim();
+            var start = result.Substring(123, 5).Trim();
+            var prefixResult = string.IsNullOrEmpty(prefix) ? "" : Prefix(prefix);
+            var suffixResult = string.IsNullOrEmpty(suffix) ? "" : Prefix(suffix);
+            var generateId =
+                GenerateId($"SELECT MAX(TRANS_REF) FROM dbo.{dbCode}SISOHDR WHERE REC_TYPE='C' AND " +
+                           "LEFT(TRANS_REF," + prefixResult.Length + ")='" + prefixResult +
+                           "' AND RIGHT(TRANS_REF," + suffixResult.Length + ")='"
+                           + suffixResult + "'", int.Parse(length) -
+                                                 (prefixResult.Length + suffixResult.Length),
+                    prefixResult, suffixResult,
+                    int.Parse(start), int.Parse(interval));
+            return generateId;
+        }
+
         public async Task<List<string>> GetSaleCodeAsync(string dbCode)
         {
             const string sql = @"SELECT CODE FROM SIDATA WHERE SI_TYPE = 'AUTON' AND DB_CODE = @DB_CODE";

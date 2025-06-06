@@ -1,19 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.CommondityExchange.RepairItem;
 using BC.PAYMENT.CORE.DTO.General;
 using BC.PAYMENT.CORE.DTO.Invoice;
-using BC.PAYMENT.CORE.DTO.Items;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
 {
@@ -65,7 +59,7 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         }
         [HttpDelete]
         [Route("deletereceivedrepair/{receivedId}/{detailId}")]
-        public async Task<ApiResponse<int>> GetReceivedRepairGoodByBranchAsync([Required] int receivedId, [Required] int detailId)
+        public async Task<ApiResponse<int>> DeleteReceivedRepairGoodAsync([Required] int receivedId, [Required] int detailId)
         {
             var response = new ApiResponse<int>();
             try
@@ -427,7 +421,7 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
             return response;
         }
         /// <summary>
-        /// sample param
+        // sample param
          /*
           {
              "oldInvoiceIssuance": [

@@ -41,7 +41,7 @@ namespace BC.PAYMENT.CORE.DTO.CommondityExchange.RepairItem
     public class IssuanceParamDto
     {
         public List<IssuanceInvoiceDto> OldInvoiceIssuance { get; set; }
-        public NewRepairInvoiceCompletedDto NewInvoiceIssuance { get; set; }
+        public NewInvoiceCompletedDto NewInvoiceIssuance { get; set; }
         public CustomerRespondDto CustomerWhoRepairGoods { get; set; }
     }
     public class IssuanceInvoiceDto
@@ -56,7 +56,7 @@ namespace BC.PAYMENT.CORE.DTO.CommondityExchange.RepairItem
         public decimal? UnitPrice { get; set; }
         public string ItemTransaction { get; set; }
     }
-    public class NewRepairInvoiceCompletedDto
+    public class NewInvoiceCompletedDto
     {
         public string TransactionCode { get;  set; }
         public string SaleType { get;  set; }

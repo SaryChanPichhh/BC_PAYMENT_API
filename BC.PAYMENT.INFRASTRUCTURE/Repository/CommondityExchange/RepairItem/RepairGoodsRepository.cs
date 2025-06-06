@@ -304,7 +304,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.RepairItem
             return 0;
         }
 
-        public Task<int> IssuanceRepairGoodCompletedInvoiceAsync(List<IssuanceInvoiceDto> model,NewRepairInvoiceCompletedDto newRepairInvoiceCompleted)
+        public Task<int> IssuanceRepairGoodCompletedInvoiceAsync(List<IssuanceInvoiceDto> model,NewInvoiceCompletedDto newInvoiceCompleted)
         {
 
             throw new NotImplementedException();

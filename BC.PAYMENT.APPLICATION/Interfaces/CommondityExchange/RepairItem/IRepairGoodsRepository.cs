@@ -22,7 +22,7 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem
         Task<List<CustomerDto>> GetAllCustomerHasCompletedRepair(string dbCode);
         Task<List<ItemRepairCompletedDto>> GetAllItemHasCompletedRepairByCustomerCode(string dbCode,string customerCode);
         Task<int> SwitchItemType(string dbCode, string userName, int id, string description, string fromType, string toType);
-        Task<int> IssuanceRepairGoodCompletedInvoiceAsync(List<IssuanceInvoiceDto> model, NewRepairInvoiceCompletedDto newRepairInvoiceCompleted);
+        Task<int> IssuanceRepairGoodCompletedInvoiceAsync(List<IssuanceInvoiceDto> model, NewInvoiceCompletedDto newInvoiceCompleted);
         Task<int> PaidRepairItemAsync(string createBy,double totalPrice,int repairCompletedId);
 
         #endregion

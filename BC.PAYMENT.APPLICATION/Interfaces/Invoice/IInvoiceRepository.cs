@@ -56,5 +56,13 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Invoice
             List<CreateInvoiceDetailDto> createInvoiceDetailDto);
 
         Task<InvoiceDetailDto> GetInvoiceByCustomerCode(string dbCode, string customerCode);
+        Task<bool> CheckStockQuantityAsync(string dbCode,string location, string itemCode, int quantityRequest);
+        Task UpdateStatusExchangeReceivedToCredit(int id, int status);
+        Task UpdateStatusRequestExchangeDetails( int id, ExchangeStatus exchangeStatus);
+        Task SaveRecordItemExchanged(string dbCode, string userName, string transaction, string itemCode, int quantity, double unitPrice);
+        Task<bool> IsAllItemRequestCompletedByRequestIdAsync(int requestId);
+        Task<bool> UpdateReceivedToCompletedByIdAsync(string dbCode,int requestId);
+        Task<int> UpdateValue6ToZero(
+            List<(string newTransaction, string TransLine, string itemCode, string oldTransaction)> tupleValues);
     }
 }

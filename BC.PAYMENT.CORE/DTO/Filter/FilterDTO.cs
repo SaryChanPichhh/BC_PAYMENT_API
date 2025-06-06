@@ -24,6 +24,11 @@ namespace BC.PAYMENT.CORE.DTO.Filter
         public int PageSize { get; set; }
     }
 
+    public class PeriodPagedRequestDto : PaginatedDto
+    {
+        public int FromPeriod { get; set; }
+        public int ToPeriod { get; set; }
+    }
     public class ByPeriodDto : PaginatedDto
     {
         public int Year { get; set; }
