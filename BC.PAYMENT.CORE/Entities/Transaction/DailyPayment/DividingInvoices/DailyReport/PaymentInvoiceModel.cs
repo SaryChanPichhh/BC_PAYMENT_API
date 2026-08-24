@@ -1,6 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.Entities.Invoice;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.DailyReport
 {
     public class PaymentInvoiceModel : InvoicesModel

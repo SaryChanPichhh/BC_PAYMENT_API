@@ -1,7 +1,3 @@
-﻿using System.ComponentModel;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-
 namespace BC.PAYMENT.CORE.Enums;
 
 public class EnumDescriptionConverter<T> : JsonConverter<T> where T : struct, Enum

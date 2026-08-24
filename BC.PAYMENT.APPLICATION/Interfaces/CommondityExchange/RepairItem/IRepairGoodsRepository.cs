@@ -1,7 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.DTO.CommondityExchange.RepairItem;
-using BC.PAYMENT.CORE.DTO.General;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem
 {
     public interface IRepairGoodsRepository

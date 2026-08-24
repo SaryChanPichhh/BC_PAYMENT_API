@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Preset.ItemTransaction;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Preset.ItemTransaction
 {
     public interface IItemTransactionAnalysisRepository

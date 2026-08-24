@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
@@ -12,58 +12,35 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.AccountReceivable
 {
-    public class ConfirmAccountReceivableController : BaseApiController
+    public class ConfirmAccountReceivableController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ConfirmAccountReceivableController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+        [HttpGet]
         [HttpGet]
         [Route("getaccountreceivable")]
         public async Task<ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalance>>> GetConfirmAccountReceivableAsync()
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalance>>();
             try
             {
-                var execute = await _unitOfWork.ConfirmAccountReceivable.GetAsync(credential.DbCode!);
-                if (execute.Count > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables fetched successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = execute;
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables fetched unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                    confirmAccountReceivable.Result = new List<ConfirmAccountReceivableModel.ConfirmBalance>();
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
-                confirmAccountReceivable.Result = new List<ConfirmAccountReceivableModel.ConfirmBalance>();
+                var credential = Common.DecodeJwt(HttpContext.User);
+                var execute = await unitOfWork.ConfirmAccountReceivable.GetAsync(credential.DbCode!);
+                
+                return ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalance>>.Builder()
+                    .WithMessage(execute.Count > 0 ? "Confirm Account Receivables fetched successfully" : "Confirm Account Receivables fetched unsuccessfully")
+                    .WithStatusCode(execute.Count > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(execute.Count > 0 ? execute : new List<ConfirmAccountReceivableModel.ConfirmBalance>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
-                confirmAccountReceivable.Result = new List<ConfirmAccountReceivableModel.ConfirmBalance>();
+                return GlobalExceptionHandler.ExceptionError<List<ConfirmAccountReceivableModel.ConfirmBalance>>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
         [HttpPost("addnewaccountreceivable")]
         public async Task<ApiResponse<ConfirmAccountReceivableDto>> AddConfirmAccountReceivableAsync(ConfirmAccountReceivableDto model)
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<ConfirmAccountReceivableDto>();
             try
             {
+                var credential = Common.DecodeJwt(HttpContext.User);
                 var confirmAccountReceivableModel = new ConfirmAccountReceivableModel.ConfirmBalance
                 {
                     DbCode = credential.DbCode,
@@ -73,73 +50,45 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.AccountReceivable
                     CreatedDate = DateTime.Now,
                     CreatedBy = credential.Username
                 };
-                var affectedRow = await _unitOfWork.ConfirmAccountReceivable.AddNewAsync(confirmAccountReceivableModel);
-                if (affectedRow > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables added successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = model;
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables added unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var affectedRow = await unitOfWork.ConfirmAccountReceivable.AddNewAsync(confirmAccountReceivableModel);
+                
+                return ApiResponse<ConfirmAccountReceivableDto>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Confirm Account Receivables added successfully" : "Confirm Account Receivables added unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? model : null)
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<ConfirmAccountReceivableDto>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
         [HttpDelete]
         [Route("deleteaccountreceivable/{id}")]
         public async Task<ApiResponse<int>> DeleteConfirmAccountReceivableAsync([Required] string id)
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.ConfirmAccountReceivable.DeleteAsync(id);
-                if (affectedRow > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables deleted successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = int.Parse(id);
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables deleted unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var credential = Common.DecodeJwt(HttpContext.User);
+                var affectedRow = await unitOfWork.ConfirmAccountReceivable.DeleteAsync(id);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Confirm Account Receivables deleted successfully" : "Confirm Account Receivables deleted unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? int.Parse(id) : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
         [HttpPut("updateaccountreceivable")]
         public async Task<ApiResponse<ConfirmAccountReceivableUpdateDto>> UpdateConfirmAccountReceivableAsync(ConfirmAccountReceivableUpdateDto model)
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<ConfirmAccountReceivableUpdateDto>();
             try
             {
+                var credential = Common.DecodeJwt(HttpContext.User);
                 var confirmAccountReceivableModel = new ConfirmAccountReceivableModel.ConfirmBalance
                 {
                     Id = model.Id,
@@ -148,76 +97,48 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.AccountReceivable
                     Participants = model.Participants,
                     Description = model.Description
                 };
-                var affectedRow = await _unitOfWork.ConfirmAccountReceivable.UpdateAsync(confirmAccountReceivableModel);
-                if (affectedRow > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables updated successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = model;
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables updated unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var affectedRow = await unitOfWork.ConfirmAccountReceivable.UpdateAsync(confirmAccountReceivableModel);
+                
+                return ApiResponse<ConfirmAccountReceivableUpdateDto>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Confirm Account Receivables updated successfully" : "Confirm Account Receivables updated unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? model : null)
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<ConfirmAccountReceivableUpdateDto>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
 
         [HttpGet]
         [Route("getconfirmaccountreceivabledetail/{page}/{pageSize}/{accountReceivableId}")]
         public async Task<ApiResponse<PaginatedResponse<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>> GetConfirmAccountReceivableDetailsAsync([Required] int accountReceivableId, [Required] int page, [Required] int pageSize)
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<PaginatedResponse<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>();
             try
             {
-                var execute = await _unitOfWork.ConfirmAccountReceivable.GetConfirmBalanceAccountReceivableDetails(credential.DbCode!, accountReceivableId);
+                var credential = Common.DecodeJwt(HttpContext.User);
+                var execute = await unitOfWork.ConfirmAccountReceivable.GetConfirmBalanceAccountReceivableDetails(credential.DbCode!, accountReceivableId);
                 var newResponds = execute.Skip((page-1)*pageSize).Take(pageSize).ToList();
-                if (execute.Count > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables fetched successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = new PaginatedResponse<ConfirmAccountReceivableModel.ConfirmBalanceDetails>(newResponds, newResponds.Count,page,pageSize);
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables fetched unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                
+                return ApiResponse<PaginatedResponse<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>.Builder()
+                    .WithMessage(execute.Count > 0 ? "Confirm Account Receivables fetched successfully" : "Confirm Account Receivables fetched unsuccessfully")
+                    .WithStatusCode(execute.Count > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(execute.Count > 0 ? new PaginatedResponse<ConfirmAccountReceivableModel.ConfirmBalanceDetails>(newResponds, newResponds.Count,page,pageSize) : null)
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
         [HttpPut]
         [Route("updateconfirmaccountreceivabledetail")]
         public async Task<ApiResponse<ConfirmAccountReceivableDetailPutDto>> UpdateConfirmAccountReceivableDetailAsync([FromBody] ConfirmAccountReceivableDetailPutDto model)
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<ConfirmAccountReceivableDetailPutDto>();
             try
             {
+                var credential = Common.DecodeJwt(HttpContext.User);
                 var confirmAccountReceivableDetailModel = new ConfirmAccountReceivableModel.ConfirmBalanceDetails
                 {
                     ConfirmBalanceId = model.ConfirmBalanceId,
@@ -228,41 +149,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.AccountReceivable
                     Description = model.Description,
                     IsCustomerAgreed = model.IsCustomerAgreed,
                 };
-                var affectedRow = await _unitOfWork.ConfirmAccountReceivable.UpdateConfirmBalanceAccountReceivableDetails(credential.DbCode!, confirmAccountReceivableDetailModel);
-                if (affectedRow > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables Detail updated successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = model;
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables Detail updated unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var affectedRow = await unitOfWork.ConfirmAccountReceivable.UpdateConfirmBalanceAccountReceivableDetails(credential.DbCode!, confirmAccountReceivableDetailModel);
+                
+                return ApiResponse<ConfirmAccountReceivableDetailPutDto>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Confirm Account Receivables Detail updated successfully" : "Confirm Account Receivables Detail updated unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? model : null)
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<ConfirmAccountReceivableDetailPutDto>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
 
         [HttpPost]
         [Route("addnewconfirmaccountreceivabledetail")]
         public async Task<ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>> AddNewConfirmAccountReceivableDetailAsync(OldInvoiceRequestPostDto model)
         {
-            var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>();
             try
             {
+                var credential = Common.DecodeJwt(HttpContext.User);
                 var oldInvoiceParameter = new OldInvoiceRequestDto
                 {
                     DbCode = credential.DbCode,
@@ -283,7 +190,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.AccountReceivable
                     T9 = model.T9,
 
                 };
-                var oldInvoiceModels = await _unitOfWork.Invoices.GetAllOldInvoices(oldInvoiceParameter);
+                var oldInvoiceModels = await unitOfWork.Invoices.GetAllOldInvoices(oldInvoiceParameter);
                 var oldInvoices = oldInvoiceModels.Select(oldInvoiceModel => new ConfirmAccountReceivableModel.ConfirmBalanceDetails
                 {
                     CustomerCode = oldInvoiceModel.CustomerCode,
@@ -294,31 +201,18 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.AccountReceivable
                     CreatedBy = credential.Username,
                 })
                     .ToList();
-                var affectedRow = await _unitOfWork.ConfirmAccountReceivable.AddConfirmAccountReceivableDetails(model.AccountReceivableId, oldInvoices);
-                if (affectedRow > 0)
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables Detail added successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = oldInvoices;
-                }
-                else
-                {
-                    confirmAccountReceivable.Message = "Confirm Account Receivables Detail added unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var affectedRow = await unitOfWork.ConfirmAccountReceivable.AddConfirmAccountReceivableDetails(model.AccountReceivableId, oldInvoices);
+                
+                return ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Confirm Account Receivables Detail added successfully" : "Confirm Account Receivables Detail added unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? oldInvoices : null)
+                    .Build();
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
 
 

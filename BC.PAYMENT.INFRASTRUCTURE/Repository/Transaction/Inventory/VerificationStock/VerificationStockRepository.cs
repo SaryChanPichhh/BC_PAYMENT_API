@@ -1,13 +1,3 @@
-﻿using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using String = System.String;
 

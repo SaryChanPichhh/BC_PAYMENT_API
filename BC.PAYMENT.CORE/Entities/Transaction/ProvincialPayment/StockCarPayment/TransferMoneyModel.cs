@@ -1,5 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment
 {
     public class TransferMoneyModel

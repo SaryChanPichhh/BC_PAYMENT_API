@@ -1,9 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
-using BC.PAYMENT.CORE.DTO.Prepare.Account;
-using BC.PAYMENT.CORE.Entities.Prepare.Account;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Account
 {
     public  class AccountReceivablePresetRepository : IAccountReceivablePresetRepository
@@ -64,8 +58,8 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Account
                 FIELD_9 Field9,
                 CREATED_DATE CreatedDate,
                 CREATED_BY CreatedBy
-                FROM BCDATA WHERE DB_CODE = @DB_CODE AND DATA_TYPE = @DATA_TPYE";
-            var param = new { DB_CODE = dbCode, DATA_TPYE = "ACCOUNT RECEIVABLE" };
+                FROM BCDATA WHERE DB_CODE = @DB_CODE AND DATA_TYPE = @DATA_TYPE";
+            var param = new { DB_CODE = dbCode, DATA_TYPE = "ACCOUNT RECEIVABLE" };
             var results = await _sqlDataAccess.LoadData<AccountReceivablePresetModel, dynamic>(sql, param);
             return results.ToList();
         }
@@ -82,7 +76,8 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Account
             {
                 DATA_CODE = model.AccountCode,
                 DATA_NAME = model.CreditDebitType,
-                DB_CODE = model.DbCode
+                DB_CODE = model.DbCode,
+                DATA_TYPE = "ACCOUNT RECEIVABLE" // ✅ Fix: was missing, caused SQL bind error
             };
             var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;

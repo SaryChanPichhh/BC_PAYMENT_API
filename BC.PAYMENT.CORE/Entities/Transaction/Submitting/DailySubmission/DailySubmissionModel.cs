@@ -1,6 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.Submitting.DailySubmission
 {
     public class DailySubmissionModel : GeneralInvoiceModel

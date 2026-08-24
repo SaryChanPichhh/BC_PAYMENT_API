@@ -2,14 +2,14 @@
 {
     public class PagedResponse<T> : ApiResponse<T>
     {
-        public int TotalCount { get; set; }
-        public int PageSize { get; set; }
-        public int CurrentPageNumber { get; set; }
-        public int TotalPages { get; set; }
+        private int TotalCount { get; set; }
+        private int PageSize { get; set; }
+        private int CurrentPageNumber { get; set; }
+        private int TotalPages { get; set; }
         public bool HasPreviousPage { get; set; }
         public bool HasNextPage { get; set; }
 
-        public PagedResponse(int totalCount, T T, int currentPage, int pageSize)
+        public PagedResponse(int totalCount, T T, int currentPage, int pageSize) : base()
         {
             TotalCount = totalCount;
             Result = T;

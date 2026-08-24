@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.Invoice;
@@ -10,69 +10,37 @@ using BC.PAYMENT.LOGGING;
 
 namespace BC.PAYMENT.API.Controllers
 {
-    public class PaymentsController : BaseApiController
+    public class PaymentsController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : BaseApiController
     {
-        #region ===[ Private Members ]=============================================================
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
-
-        #endregion
-
-        #region ===[ Constructor ]=================================================================
-
-        /// <summary>
-        /// Initialize PaymentsController by injecting an object type of IUnitOfWork
-        /// </summary>
-        public PaymentsController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
-        {
-            this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
-        }
-
-        #endregion
 
         [HttpGet("")]
         public async Task<ApiResponse<List<DividedInvoiceSummary>>> GetDeliveryPaidInvoice([FromQuery] DateTime date)
         {
-            var apiResponse = new ApiResponse<List<DividedInvoiceSummary>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
 
-                var deliveries = await _unitOfWork.DividedInvoices.GetDividedInvoiceSummary(claim.DbCode!, date.Date);
+                var deliveries = await unitOfWork.DividedInvoices.GetDividedInvoiceSummary(claim.DbCode!, date.Date);
                 if (!deliveries.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No summary";
-                    apiResponse.Result = new List<DividedInvoiceSummary>();
-                    return apiResponse;
+                    return ApiResponse<List<DividedInvoiceSummary>>.Builder()
+                        .WithMessage("No summary")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<DividedInvoiceSummary>())
+                        .Build();
                 }
 
-                apiResponse.Success = true;
-                apiResponse.Message = "Summary fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = deliveries;
+                return ApiResponse<List<DividedInvoiceSummary>>.Builder()
+                    .WithMessage("Summary fetched successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(deliveries)
+                    .Build();
 
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<DividedInvoiceSummary>>(ex.Message);
             }
-
-            return apiResponse;
         }
     }
 }

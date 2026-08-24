@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
-using BC.PAYMENT.CORE.Entities.CashFlow.CashFlowData;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CashFlow.CashFlowData
 {
     public class CashFlowDataReportRepository : ICashFlowDataReportRepository

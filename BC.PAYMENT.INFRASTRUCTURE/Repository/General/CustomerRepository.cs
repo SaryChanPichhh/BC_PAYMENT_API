@@ -1,8 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using System.Transactions;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
     public class CustomerRepository:ICustomerRepository

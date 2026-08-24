@@ -1,0 +1,71 @@
+﻿using System.Net;
+using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Models;
+using BC.PAYMENT.APPLICATION.Interfaces.General;
+using BC.PAYMENT.CORE.Contracts.Login;
+using BC.PAYMENT.CORE.DTO.General;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+
+namespace BC.PAYMENT.API.Controllers.Auth
+{
+    [Produces("application/json")]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    [Route("api/v2/[controller]")]
+    public class AuthController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : ControllerBase
+    {
+        [HttpGet("username/exists")]
+        public async Task<ApiResponse<Dictionary<string,string>>> UsernameExists([FromQuery] string username)
+        {
+            var isExistsUserName = await unitOfWork.Users.IsExistsUserName(username);
+            return GlobalResponse.SuccessResponse(isExistsUserName,"username is exists");
+        }
+        [HttpPost("login")]
+        public async Task<ApiResponse<LoginResponseDTO>> GetBcUserCredentialAsync([FromBody] LoginRequestDTO requestDto)
+        {
+            try
+            {
+                var data = await unitOfWork.Users.GetBcUserCredential(requestDto);
+                if (BCrypt.Net.BCrypt.Verify(requestDto.Password, data.UserPass))
+                {
+                    var claimsDto = new ClaimDTO
+                    {
+                        UserId = data.UserId,
+                        Username = data.Username!,
+                        CompanyCode = requestDto.CompanyCode!,
+                        AppCode = requestDto.AppCode!,
+                        DbCode = requestDto.DbCode!,
+                        CurrectDate = data.CurrentDate,
+                        InvoiceEntryCode = data.InvoiceEntryCode ?? "",
+                    };
+                    Common.GenerateJwtToken(claimsDto, appSettings.Value);
+                    var loginResponse = new LoginResponseDTO
+                    {
+                        Token = Common.GenerateJwtToken(claimsDto, appSettings.Value),
+                        UserId = data.UserId,
+                        Username = data.Username!,
+                        DbCode = data.DbCode!,
+                    };       
+                
+                    return ApiResponse<LoginResponseDTO>.Builder()
+                        .WithMessage("User fetched successfully!")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(loginResponse)
+                        .Build();
+                }
+                else
+                {
+                    return ApiResponse<LoginResponseDTO>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Username or password is incorrect")
+                        .Build();
+                }
+            }
+            catch (Exception ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<LoginResponseDTO>(ex.Message);
+            }
+        }
+        
+    }
+}

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -13,81 +13,67 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Preset.DailySaleAnalysis
 {
-    public class DailySaleAnalysisController : BaseApiController
+    public class DailySaleAnalysisController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public DailySaleAnalysisController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpPost]
         [Route("getdailysaleanalysis")]
         public async Task<ApiResponse<List<DailySaleAnalysisModel>>> GetDailySaleAnalysisAsync([Required] int fromMov, [Required] int toMov)
         {
             var credential = Common.DecodeJwt(User);
-            var dailySaleAnalysis = new ApiResponse<List<DailySaleAnalysisModel>>();
             try
             {
-                var execute = await _unitOfWork.DailyAnalysis.GetDailySaleAnalysisAsync(fromMov.ToString(), toMov.ToString());
+                var execute = await unitOfWork.DailyAnalysis.GetDailySaleAnalysisAsync(fromMov.ToString(), toMov.ToString());
                 if (execute.Any())
                 {
-                    dailySaleAnalysis.Result = execute;
-                    dailySaleAnalysis.StatusCode = StatusCodes.Status200OK;
-                    dailySaleAnalysis.Success = true;
-                    dailySaleAnalysis.Message = "Daily sale fetched successfully";
+                    return ApiResponse<List<DailySaleAnalysisModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithSuccess(true)
+                        .WithMessage("Daily sale fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    dailySaleAnalysis.StatusCode = StatusCodes.Status400BadRequest;
-                    dailySaleAnalysis.Message = "Daily sale fetched unsuccessfully";
+                    return ApiResponse<List<DailySaleAnalysisModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Daily sale fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dailySaleAnalysis.StatusCode = StatusCodes.Status500InternalServerError;
-                dailySaleAnalysis.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                dailySaleAnalysis.StatusCode = StatusCodes.Status500InternalServerError;
-                dailySaleAnalysis.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DailySaleAnalysisModel>>(ex.Message);
             }
-            return dailySaleAnalysis;
         }
         [HttpPost]
         [Route("getdailysaleanalysisbyperiodanditemcode")]
         public async Task<ApiResponse<List<DailySaleAnalysisModel>>> GetDailySaleAnalysisByItemCodeAndPeriodAsync([FromBody] DailySaleAnalysisFilterByPeriodDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var dailySaleAnalysis = new ApiResponse<List<DailySaleAnalysisModel>>();
             try
             {
-                var execute = await _unitOfWork.DailyAnalysis.GetDailySaleAnalysisByItemCodeAndPeriodAsync(model.FromPeriod.ToString(), model.ToPeriod.ToString(),model.ItemCodes);
+                var execute = await unitOfWork.DailyAnalysis.GetDailySaleAnalysisByItemCodeAndPeriodAsync(model.FromPeriod.ToString(), model.ToPeriod.ToString(),model.ItemCodes);
                 if (execute.Any())
                 {
-                    dailySaleAnalysis.Result = execute;
-                    dailySaleAnalysis.StatusCode = StatusCodes.Status200OK;
-                    dailySaleAnalysis.Success = true;
-                    dailySaleAnalysis.Message = "Daily sale fetched successfully";
+                    return ApiResponse<List<DailySaleAnalysisModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithSuccess(true)
+                        .WithMessage("Daily sale fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    dailySaleAnalysis.StatusCode = StatusCodes.Status400BadRequest;
-                    dailySaleAnalysis.Message = "Daily sale fetched unsuccessfully";
+                    return ApiResponse<List<DailySaleAnalysisModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Daily sale fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dailySaleAnalysis.StatusCode = StatusCodes.Status500InternalServerError;
-                dailySaleAnalysis.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                dailySaleAnalysis.StatusCode = StatusCodes.Status500InternalServerError;
-                dailySaleAnalysis.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DailySaleAnalysisModel>>(ex.Message);
             }
-            return dailySaleAnalysis;
         }
         
         [HttpPost]
@@ -95,34 +81,30 @@ namespace BC.PAYMENT.API.Controllers.Preset.DailySaleAnalysis
         public async Task<ApiResponse<List<DailySaleAnalysisModel>>> GetDailySaleAnalysisByItemCodeAndDateAsync([FromBody] DailySaleAnalysisFilterByDateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var dailySaleAnalysis = new ApiResponse<List<DailySaleAnalysisModel>>();
             try
             {
-                var execute = await _unitOfWork.DailyAnalysis.GetDailySaleAnalysisByItemCodeAndDateAsync(Convert.ToDateTime(model.FromDate), Convert.ToDateTime(model.ToDate),model.ItemCodes);
+                var execute = await unitOfWork.DailyAnalysis.GetDailySaleAnalysisByItemCodeAndDateAsync(Convert.ToDateTime(model.FromDate), Convert.ToDateTime(model.ToDate),model.ItemCodes);
                 if (execute.Any())
                 {
-                    dailySaleAnalysis.Result = execute;
-                    dailySaleAnalysis.StatusCode = StatusCodes.Status200OK;
-                    dailySaleAnalysis.Success = true;
-                    dailySaleAnalysis.Message = "Daily sale fetched successfully";
+                    return ApiResponse<List<DailySaleAnalysisModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithSuccess(true)
+                        .WithMessage("Daily sale fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    dailySaleAnalysis.StatusCode = StatusCodes.Status400BadRequest;
-                    dailySaleAnalysis.Message = "Daily sale fetched unsuccessfully";
+                    return ApiResponse<List<DailySaleAnalysisModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Daily sale fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dailySaleAnalysis.StatusCode = StatusCodes.Status500InternalServerError;
-                dailySaleAnalysis.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                dailySaleAnalysis.StatusCode = StatusCodes.Status500InternalServerError;
-                dailySaleAnalysis.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DailySaleAnalysisModel>>(ex.Message);
             }
-            return dailySaleAnalysis;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Models;
+using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice;
 using Microsoft.AspNetCore.Http;
@@ -23,7 +23,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.D
         [Route("{fromDate}/{toDate}")]
         public async Task<ApiResponse<List<PaymentInvoiceModel>>> GetInvoiceReportAsync([Required] DateTime fromDate, [Required] DateTime toDate)
         {
-            var invoice = new ApiResponse<List<PaymentInvoiceModel>>();
             var credential = Common.DecodeJwt(User);
             try
             {
@@ -31,29 +30,26 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.D
                     await _unitOfWork.CheckReturnInvoice.GetAllNewAndChangeDividedInvoiceByDate(credential.DbCode!, fromDate, toDate);
                 if (execute.Any())
                 {
-                    invoice.StatusCode = (int)HttpStatusCode.OK;
-                    invoice.Message = $@"Invoice fetched successfully";
-                    invoice.Success = true;
-                    invoice.Result = execute;
+                    return ApiResponse<List<PaymentInvoiceModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage($@"Invoice fetched successfully")
+                        .WithSuccess(true)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    invoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    invoice.Message = $@"Invoice fetched unsuccessfully";
-                    invoice.Result = new();
+                    return ApiResponse<List<PaymentInvoiceModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage($@"Invoice fetched unsuccessfully")
+                        .WithResult(new())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                invoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                invoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                invoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                invoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<PaymentInvoiceModel>>(ex.Message);
             }
-            return invoice;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -12,50 +12,37 @@ using Microsoft.Data.SqlClient;
 namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
 {
 
-    public class VerificationStockReportController : BaseApiController
+    public class VerificationStockReportController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public VerificationStockReportController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpGet]
         [Route("getverificationinventorystockbydate/{fromDate}/{toDate}")]
         public async Task<ApiResponse<List<VerificationStockReportDto>>> GetVerificationInventoryStockByDate( string fromDate, string toDate)
         {
             var credential = Common.DecodeJwt(User);
-            var verificationStock = new ApiResponse<List<VerificationStockReportDto>>();
             try
             {
-                var verificationStocks = await _unitOfWork.VerificationStock.GetVerificationStockReport(credential.DbCode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate
+                var verificationStocks = await unitOfWork.VerificationStock.GetVerificationStockReport(credential.DbCode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate
                 ));
                 if (verificationStocks.Any())
                 {
-                    verificationStock.Result = verificationStocks;
-                    verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                    verificationStock.Message = "Verification Stock report fetched successfully";
-                    verificationStock.Success = true;
+                    return ApiResponse<List<VerificationStockReportDto>>.Builder()
+                        .WithResult(verificationStocks)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Verification Stock report fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "Verification Stock report fetched unsuccessfully";
+                    return ApiResponse<List<VerificationStockReportDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Verification Stock report fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockReportDto>>(ex.Message);
             }
-            return verificationStock;
         } 
         
         [HttpGet]
@@ -63,36 +50,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<List<VerificationStockReportDto>>> GetVerificationStockReportByPeriod( int year, int month)
         {
             var credential = Common.DecodeJwt(User);
-            var verificationStock = new ApiResponse<List<VerificationStockReportDto>>();
             try
             {
-                var verificationStocks = await _unitOfWork.VerificationStock.GetVerificationStockReportByPeriod(credential.DbCode,month,year);
+                var verificationStocks = await unitOfWork.VerificationStock.GetVerificationStockReportByPeriod(credential.DbCode,month,year);
                 if (verificationStocks.Any())
                 {
-                    verificationStock.Result = verificationStocks;
-                    verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                    verificationStock.Message = "Verification Stock report fetched successfully";
-                    verificationStock.Success = true;
+                    return ApiResponse<List<VerificationStockReportDto>>.Builder()
+                        .WithResult(verificationStocks)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Verification Stock report fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "Verification Stock report fetched unsuccessfully";
+                    return ApiResponse<List<VerificationStockReportDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Verification Stock report fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockReportDto>>(ex.Message);
             }
-            return verificationStock;
         }
 
     }

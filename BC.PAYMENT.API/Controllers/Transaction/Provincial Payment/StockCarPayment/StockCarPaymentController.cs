@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
+using BC.PAYMENT.CORE.DTO.Expense;
 using BC.PAYMENT.CORE.DTO.Invoice;
 using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment;
+using BC.PAYMENT.CORE.Entities.Expense;
 using BC.PAYMENT.CORE.Entities.Invoice;
 using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.CORE.Enums;
@@ -15,14 +17,8 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPayment
 {
-    public class StockCarPaymentController : BaseApiController
+    public class StockCarPaymentController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public StockCarPaymentController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         #region SaleRepresent
         [HttpGet]
@@ -30,39 +26,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<SaleRepresentModel>>> GetAllSaleRepresentAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var saleRepresent = new ApiResponse<List<SaleRepresentModel>>();
             try
             {
-                var saleRepresentList = await _unitOfWork.SaleRepresent.GetAsync(credential.DbCode!);
+                var saleRepresentList = await unitOfWork.SaleRepresent.GetAsync(credential.DbCode!);
                 if (saleRepresentList.Any())
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.OK;
-                    saleRepresent.Success = true;
-                    saleRepresent.Message = "Sale Represent fetched successfully";
-                    saleRepresent.Result = saleRepresentList;
+                    return ApiResponse<List<SaleRepresentModel>>.Builder()
+                        .WithResult(saleRepresentList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Sale Represent fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saleRepresent.Success = false;
-                    saleRepresent.Message = "Sale Represent fetched unsuccessfully";
+                    return ApiResponse<List<SaleRepresentModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Sale Represent fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<SaleRepresentModel>>(ex.Message);
             }
-            return saleRepresent;
         }
         
         [HttpPost]
@@ -70,7 +56,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<SaleRepresentDto>> AddNewSaleRepresentAsync([FromBody] SaleRepresentDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var saleRepresent = new ApiResponse<SaleRepresentDto>();
             try
             {
                 var saleRepresentModel = new SaleRepresentModel
@@ -80,75 +65,56 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     Description = model.Description,
                     DbCode = credential.DbCode
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.AddNewAsync(saleRepresentModel);
+                var affectedRow = await unitOfWork.SaleRepresent.AddNewAsync(saleRepresentModel);
                 if (affectedRow > 0 )
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.OK;
-                    saleRepresent.Success = true;
-                    saleRepresent.Message = "Sale Represent added successfully";
-                    saleRepresent.Result = model;
+                    return ApiResponse<SaleRepresentDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Sale Represent added successfully")
+                        .Build();
                 }
                 else
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saleRepresent.Success = false;
-                    saleRepresent.Message = "Sale Represent added unsuccessfully";
+                    return ApiResponse<SaleRepresentDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Sale Represent added unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<SaleRepresentDto>(ex.Message);
             }
-            return saleRepresent;
         }
         [HttpDelete]
         [Route("deletesalerepresent/{employeeId}")]
         public async Task<ApiResponse<int>> DeleteSaleRepresentAsync([Required] string employeeId)
         {
             var credential = Common.DecodeJwt(User);
-            var saleRepresent = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.SaleRepresent.DeleteAsync(employeeId);
+                var affectedRow = await unitOfWork.SaleRepresent.DeleteAsync(employeeId);
                 if (affectedRow > 0 )
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.NoContent;
-                    saleRepresent.Success = true;
-                    saleRepresent.Message = "Sale Represent added successfully";
-                    saleRepresent.Result = affectedRow;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithMessage("Sale Represent added successfully")
+                        .Build();
                 }
                 else
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saleRepresent.Success = false;
-                    saleRepresent.Message = "Sale Represent added unsuccessfully";
+                    return ApiResponse<int>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Sale Represent added unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return saleRepresent;
         }
         
         [HttpPut]
@@ -156,7 +122,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<SaleRepresentUpdateDto>> UpdateSaleRepresentAsync([FromBody] SaleRepresentUpdateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var saleRepresent = new ApiResponse<SaleRepresentUpdateDto>();
             try
             {
                 var saleRepresentModel = new SaleRepresentModel
@@ -167,36 +132,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     DbCode = credential.DbCode,
                     Id  = model.TemplateId
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.UpdateAsync(saleRepresentModel);
+                var affectedRow = await unitOfWork.SaleRepresent.UpdateAsync(saleRepresentModel);
                 if (affectedRow > 0 )
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.OK;
-                    saleRepresent.Success = true;
-                    saleRepresent.Message = "Sale Represent updated successfully";
-                    saleRepresent.Result = model;
+                    return ApiResponse<SaleRepresentUpdateDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Sale Represent updated successfully")
+                        .Build();
                 }
                 else
                 {
-                    saleRepresent.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saleRepresent.Success = false;
-                    saleRepresent.Message = "Sale Represent updated unsuccessfully";
+                    return ApiResponse<SaleRepresentUpdateDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Sale Represent updated unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                saleRepresent.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saleRepresent.Success = false;
-                saleRepresent.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<SaleRepresentUpdateDto>(ex.Message);
             }
-            return saleRepresent;
         }
 
 
@@ -208,39 +164,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<StockCarInvoicesModel>>> GetNewInvoiceAsync([Required] InvoiceTypes invoiceTypes , [Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var stockCarInvoice = new ApiResponse<List<StockCarInvoicesModel>>();
             try
             {
-                var stockCarInvoiceList = await _unitOfWork.SaleRepresent.GetAllInvoiceByInvoiceTypeAsync(credential.DbCode!,invoiceTypes,templateId);
+                var stockCarInvoiceList = await unitOfWork.SaleRepresent.GetAllInvoiceByInvoiceTypeAsync(credential.DbCode!,invoiceTypes,templateId);
                 if (stockCarInvoiceList.Any())
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    stockCarInvoice.Success = true;
-                    stockCarInvoice.Message = "Stock Car Invoice fetched successfully";
-                    stockCarInvoice.Result = stockCarInvoiceList;
+                    return ApiResponse<List<StockCarInvoicesModel>>.Builder()
+                        .WithResult(stockCarInvoiceList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Stock Car Invoice fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    stockCarInvoice.Success = false;
-                    stockCarInvoice.Message = "Stock Car Invoice fetched unsuccessfully";
+                    return ApiResponse<List<StockCarInvoicesModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Stock Car Invoice fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<StockCarInvoicesModel>>(ex.Message);
             }
-            return stockCarInvoice;
         }
 
         #region All Invoice
@@ -249,39 +195,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetNewInvoiceAsync([FromBody] NewInvoiceGetDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var stockCarInvoice = new ApiResponse<List<OldInvoiceResponeDto>>();
             try
             {
-                var stockCarInvoiceList = await _unitOfWork.SaleRepresent.GetAllInvoiceAsync(credential.DbCode!, model.FromSaleCode!, model.ToSaleCode!, Convert.ToDateTime(model.FromDate), Convert.ToDateTime(model.ToDate));
+                var stockCarInvoiceList = await unitOfWork.SaleRepresent.GetAllInvoiceAsync(credential.DbCode!, model.FromSaleCode!, model.ToSaleCode!, Convert.ToDateTime(model.FromDate), Convert.ToDateTime(model.ToDate));
                 if (stockCarInvoiceList.Any())
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    stockCarInvoice.Success = true;
-                    stockCarInvoice.Message = "All invoices fetched successfully";
-                    stockCarInvoice.Result = stockCarInvoiceList;
+                    return ApiResponse<List<OldInvoiceResponeDto>>.Builder()
+                        .WithResult(stockCarInvoiceList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("All invoices fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    stockCarInvoice.Success = false;
-                    stockCarInvoice.Message = "All invoices fetched unsuccessfully";
+                    return ApiResponse<List<OldInvoiceResponeDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("All invoices fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<OldInvoiceResponeDto>>(ex.Message);
             }
-            return stockCarInvoice;
         }
         #endregion
 
@@ -290,45 +226,34 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<int>> DeleteInvoiceAsync([Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var stockCarInvoice = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.SaleRepresent.DeleteInvoiceByIdAsync(templateId);
+                var affectedRow = await unitOfWork.SaleRepresent.DeleteInvoiceByIdAsync(templateId);
                 if (affectedRow > 0)
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.NoContent;
-                    stockCarInvoice.Success = true;
-                    stockCarInvoice.Message = "Stock Car Invoice deleted successfully";
-                    stockCarInvoice.Result = affectedRow;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithMessage("Stock Car Invoice deleted successfully")
+                        .Build();
                 }
                 else
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    stockCarInvoice.Success = false;
-                    stockCarInvoice.Message = "Stock Car Invoice deleted unsuccessfully";
+                    return ApiResponse<int>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Stock Car Invoice deleted unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return stockCarInvoice;
         }
         [HttpPut]
         [Route("updateinvoice")]
         public async Task<ApiResponse<int>> UpdateInvoiceAsync([FromBody] InvoiceModelDto model)
         {
-            var stockCarInvoice = new ApiResponse<int>();
             try
             {
                 var stockCarInvoiceModel = new StockCarInvoicesModel
@@ -338,36 +263,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     CustomerCode = model.CustomerCode,
                     CustomerName = model.CustomerName,
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.UpdateInvoiceByIdAsync(stockCarInvoiceModel);
+                var affectedRow = await unitOfWork.SaleRepresent.UpdateInvoiceByIdAsync(stockCarInvoiceModel);
                 if (affectedRow > 0)
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.NoContent;
-                    stockCarInvoice.Success = true;
-                    stockCarInvoice.Message = "Stock Car Invoice updated successfully";
-                    stockCarInvoice.Result = affectedRow;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithMessage("Stock Car Invoice updated successfully")
+                        .Build();
                 }
                 else
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    stockCarInvoice.Success = false;
-                    stockCarInvoice.Message = "Stock Car Invoice deleted unsuccessfully";
+                    return ApiResponse<int>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Stock Car Invoice deleted unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return stockCarInvoice;
         }
 
         #region OldInvoice
@@ -376,39 +292,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetOldInvoiceByAllAsync([FromBody] OldInvoiceRequestDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var stockCarInvoice = new ApiResponse<List<OldInvoiceResponeDto>>();
             try
             {
-                var stockCarInvoiceList = await _unitOfWork.SaleRepresent.GetOldInvoiceByAllAsync(model);
+                var stockCarInvoiceList = await unitOfWork.SaleRepresent.GetOldInvoiceByAllAsync(model);
                 if (stockCarInvoiceList.Any())
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    stockCarInvoice.Success = true;
-                    stockCarInvoice.Message = "Old invoices by all fetched successfully";
-                    stockCarInvoice.Result = stockCarInvoiceList;
+                    return ApiResponse<List<OldInvoiceResponeDto>>.Builder()
+                        .WithResult(stockCarInvoiceList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Old invoices by all fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    stockCarInvoice.Success = false;
-                    stockCarInvoice.Message = "Old invoices by all fetched unsuccessfully";
+                    return ApiResponse<List<OldInvoiceResponeDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Old invoices by all fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<OldInvoiceResponeDto>>(ex.Message);
             }
-            return stockCarInvoice;
         }
         
         [HttpPost]
@@ -416,39 +322,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetOldInvoiceByRangeAsync([FromBody] OldInvoiceRequestDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var stockCarInvoice = new ApiResponse<List<OldInvoiceResponeDto>>();
             try
             {
-                var stockCarInvoiceList = await _unitOfWork.SaleRepresent.GetOldInvoiceByRangeAsync(model);
+                var stockCarInvoiceList = await unitOfWork.SaleRepresent.GetOldInvoiceByRangeAsync(model);
                 if (stockCarInvoiceList.Any())
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    stockCarInvoice.Success = true;
-                    stockCarInvoice.Message = "Old invoices by range fetched successfully";
-                    stockCarInvoice.Result = stockCarInvoiceList;
+                    return ApiResponse<List<OldInvoiceResponeDto>>.Builder()
+                        .WithResult(stockCarInvoiceList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Old invoices by range fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    stockCarInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    stockCarInvoice.Success = false;
-                    stockCarInvoice.Message = "Old invoices by range fetched unsuccessfully";
+                    return ApiResponse<List<OldInvoiceResponeDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Old invoices by range fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                stockCarInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                stockCarInvoice.Success = false;
-                stockCarInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<OldInvoiceResponeDto>>(ex.Message);
             }
-            return stockCarInvoice;
         }
 
         #endregion
@@ -460,39 +356,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<TransferMoneyModel>>> GetTransferMoneyByTemplateIdAsync([Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var transferMoney = new ApiResponse<List<TransferMoneyModel>>();
             try
             {
-                var transferMoneyList = await _unitOfWork.SaleRepresent.GetTransferMoneyByTemplateIdAsync(credential.DbCode!, templateId);
+                var transferMoneyList = await unitOfWork.SaleRepresent.GetTransferMoneyByTemplateIdAsync(credential.DbCode!, templateId);
                 if (transferMoneyList.Any())
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.OK;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Transfer Money fetched successfully";
-                    transferMoney.Result = transferMoneyList;
+                    return ApiResponse<List<TransferMoneyModel>>.Builder()
+                        .WithResult(transferMoneyList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Transfer Money fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Transfer Money fetched unsuccessfully";
+                    return ApiResponse<List<TransferMoneyModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Transfer Money fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<TransferMoneyModel>>(ex.Message);
             }
-            return transferMoney;
         }
         
         [HttpPost]
@@ -500,7 +386,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<TransferMoneyDto>> AddNewTransferMoneyAsync([FromBody] TransferMoneyDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var transferMoney = new ApiResponse<TransferMoneyDto>();
             try
             {
                 var transferMoneyModel = new TransferMoneyModel
@@ -519,36 +404,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     EmployeeId = model.EmployeeId,
                     TemplateId = model.TemplateId
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.AddNewTransferMoneyAsync(transferMoneyModel);
+                var affectedRow = await unitOfWork.SaleRepresent.AddNewTransferMoneyAsync(transferMoneyModel);
                 if (affectedRow > 0 )
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.OK;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Transfer Money added successfully";
-                    transferMoney.Result = model;
+                    return ApiResponse<TransferMoneyDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Transfer Money added successfully")
+                        .Build();
                 }
                 else
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Transfer Money added unsuccessfully";
+                    return ApiResponse<TransferMoneyDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Transfer Money added unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<TransferMoneyDto>(ex.Message);
             }
-            return transferMoney;
         }
 
         [HttpPut]
@@ -556,7 +432,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<TransferMoneyUpdateDto>> UpdateTransferMoneyAsync([FromBody] TransferMoneyUpdateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var transferMoney = new ApiResponse<TransferMoneyUpdateDto>();
             try
             {
                 var transferMoneyModel = new TransferMoneyModel
@@ -576,75 +451,56 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     TemplateId = model.TemplateId,
                     Id = model.Id
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.UpdateTransferMoneyAsync(transferMoneyModel);
+                var affectedRow = await unitOfWork.SaleRepresent.UpdateTransferMoneyAsync(transferMoneyModel);
                 if (affectedRow > 0 )
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.OK;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Transfer Money updated successfully";
-                    transferMoney.Result = model;
+                    return ApiResponse<TransferMoneyUpdateDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Transfer Money updated successfully")
+                        .Build();
                 }
                 else
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Transfer Money updated unsuccessfully";
+                    return ApiResponse<TransferMoneyUpdateDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Transfer Money updated unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<TransferMoneyUpdateDto>(ex.Message);
             }
-            return transferMoney;
         }
         
         [HttpDelete]
         [Route("deletetransfermoney/{transferId}")]
         public async Task<ApiResponse<int>> DeleteTransferMoneyAsync([Required] int transferId)
         {
-            var transferMoney = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.SaleRepresent.DeleteTransferMoneyAsync(transferId);
+                var affectedRow = await unitOfWork.SaleRepresent.DeleteTransferMoneyAsync(transferId);
                 if (affectedRow > 0 )
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.NoContent;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Transfer Money deleted successfully";
-                    transferMoney.Result = affectedRow;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithMessage("Transfer Money deleted successfully")
+                        .Build();
                 }
                 else
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Transfer Money deleted unsuccessfully";
+                    return ApiResponse<int>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Transfer Money deleted unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return transferMoney;
         }
 
         #endregion
@@ -653,108 +509,79 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
 
         [HttpGet]
         [Route("getexpensebytemplateid/{templateId}")]
-        public async Task<ApiResponse<List<StockCarExpenseModel>>> GetExpenseByTemplateIdAsync([Required] int templateId)
+        public async Task<ApiResponse<List<ExpenseModel>>> GetExpenseByTemplateIdAsync([Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var expense = new ApiResponse<List<StockCarExpenseModel>>();
             try
             {
-                var execute = await _unitOfWork.SaleRepresent.GetExpenseByTemplateIdAsync(credential.DbCode!, templateId);
+                var execute = await unitOfWork.SaleRepresent.GetExpenseByTemplateIdAsync(credential.DbCode!, templateId);
                 if (execute.Any())
                 {
-                    expense.StatusCode = (int)HttpStatusCode.OK;
-                    expense.Success = true;
-                    expense.Message = "Stock car expense fetched successfully";
-                    expense.Result = execute;
+                    return ApiResponse<List<ExpenseModel>>.Builder()
+                        .WithResult([])
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Expense fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    expense.StatusCode = (int)HttpStatusCode.BadRequest;
-                    expense.Success = false;
-                    expense.Message = "Stock car expense fetched successfully";
+                    return ApiResponse<List<ExpenseModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Expense fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                expense.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expense.Success = false;
-                expense.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                expense.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expense.Success = false;
-                expense.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<ExpenseModel>>(ex.Message);
             }
-            return expense;
         }
 
-        [HttpPost]
-        [Route("addnewexpense")]
-        public async Task<ApiResponse<StockCarExpenseDto>> AddNewExpenseAsync([FromBody] StockCarExpenseDto model)
-        {
-            var credential = Common.DecodeJwt(User);
-            var transferMoney = new ApiResponse<StockCarExpenseDto>();
-            try
-            {
-                var transferMoneyModel = new StockCarExpenseModel
-                {
-                    Employee = model.Employee,
-                    ExpenseTypeId = model.ExpenseTypeId,
-                    ProvinceId = model.ProvinceId,
-                    ExpenseDate = model.ExpenseDate,
-                    Quantity = model.Quantity,
-                    UnitPrice = model.UnitPrice,
-                    AmountDollar = model.AmountDollar,
-                    AmountRiel = model.AmountRiel,
-                    ExchangeRate = model.ExchangeRate,
-                    ExpenseType = model.ExpenseType,
-                    ProvinceName = model.ProvinceName,
-                    CreateBy = credential.Username,
-                    DbCode = credential.DbCode,
-                    EmployeeId = model.EmployeeId,
-                    TemplateId = model.TemplateId
-                };
-                var affectedRow = await _unitOfWork.SaleRepresent.AddNewExpenseAsync(transferMoneyModel);
-                if (affectedRow > 0)
-                {
-                    transferMoney.StatusCode = (int)HttpStatusCode.OK;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Expense added successfully";
-                    transferMoney.Result = model;
-                }
-                else
-                {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Expense added unsuccessfully";
-                }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
-            }
-            catch (Exception ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
-            }
-            return transferMoney;
-        }
+        // [HttpPost]
+        // [Route("addnewexpense")]
+        // public async Task<ApiResponse<ExpensePostDto>> AddNewExpenseAsync([FromBody] StockCarExpenseDto model)
+        // {
+        //     var credential = Common.DecodeJwt(User);
+        //     try
+        //     {
+        //         var expenseModel = new ExpenseModel
+        //         {
+        //             ExpenseDate = model.ExpenseDate,
+        //             Description = model.Description,
+        //             TotalExpense = model.TotalExpense,
+        //             CreatedBy = credential.Username,
+        //             DbCode = credential.DbCode,
+        //             EmployeeId = model.EmployeeId,
+        //             TemplateId = model.TemplateId
+        //         };
+        //         var affectedRow = await unitOfWork.SaleRepresent.AddNewExpenseAsync(expenseModel);
+        //         if (affectedRow > 0 )
+        //         {
+        //             return ApiResponse<ExpensePostDto>.Builder()
+        //                 .WithResult(model)
+        //                 .WithStatusCode((int)HttpStatusCode.OK)
+        //                 .WithMessage("Expense added successfully")
+        //                 .Build();
+        //         }
+        //         else
+        //         {
+        //             return ApiResponse<ExpensePostDto>.Builder()
+        //                 .WithStatusCode((int)HttpStatusCode.BadRequest)
+        //                 .WithMessage("Expense added unsuccessfully")
+        //                 .Build();
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return GlobalExceptionHandler.ExceptionError<ExpensePostDto>(ex.Message);
+        //     }
+        // }
 
         [HttpPut]
         [Route("updateexpense")]
         public async Task<ApiResponse<StockCarExpenseUpdateDto>> UpdateExpenseAsync([FromBody] StockCarExpenseUpdateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var transferMoney = new ApiResponse<StockCarExpenseUpdateDto>();
             try
             {
                 var transferMoneyModel = new StockCarExpenseModel
@@ -776,75 +603,56 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     TemplateId = model.TemplateId,
                     Id = model.Id
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.UpdateExpenseAsync(transferMoneyModel);
+                var affectedRow = await unitOfWork.SaleRepresent.UpdateExpenseAsync(transferMoneyModel);
                 if (affectedRow > 0)
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.OK;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Expense updated successfully";
-                    transferMoney.Result = model;
+                    return ApiResponse<StockCarExpenseUpdateDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Expense updated successfully")
+                        .Build();
                 }
                 else
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Expense updated unsuccessfully";
+                    return ApiResponse<StockCarExpenseUpdateDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Expense updated unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<StockCarExpenseUpdateDto>(ex.Message);
             }
-            return transferMoney;
         }
 
         [HttpDelete]
         [Route("deleteexpense/{expenseId}")]
         public async Task<ApiResponse<int>> DeleteExpenseAsync([Required] int expenseId)
         {
-            var transferMoney = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.SaleRepresent.DeleteExpenseAsync(expenseId);
+                var affectedRow = await unitOfWork.SaleRepresent.DeleteExpenseAsync(expenseId);
                 if (affectedRow > 0)
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.NoContent;
-                    transferMoney.Success = true;
-                    transferMoney.Message = "Expense deleted successfully";
-                    transferMoney.Result = affectedRow;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithMessage("Expense deleted successfully")
+                        .Build();
                 }
                 else
                 {
-                    transferMoney.StatusCode = (int)HttpStatusCode.BadRequest;
-                    transferMoney.Success = false;
-                    transferMoney.Message = "Expense deleted unsuccessfully";
+                    return ApiResponse<int>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Expense deleted unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                transferMoney.StatusCode = (int)HttpStatusCode.InternalServerError;
-                transferMoney.Success = false;
-                transferMoney.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return transferMoney;
         }
 
         #endregion
@@ -856,39 +664,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<PaymentInvoiceDto>>> GetPaymentInvoicesByTemplateIdAsync([Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var paymentInvoice = new ApiResponse<List<PaymentInvoiceDto>>();
             try
             {
-                var execute = await _unitOfWork.SaleRepresent.GetPaymentInvoicesByTemplateIdAsync(credential.DbCode!, templateId);
+                var execute = await unitOfWork.SaleRepresent.GetPaymentInvoicesByTemplateIdAsync(credential.DbCode!, templateId);
                 if (execute.Any())
                 {
-                    paymentInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    paymentInvoice.Success = true;
-                    paymentInvoice.Message = "Payment invoices fetched successfully";
-                    paymentInvoice.Result = execute;
+                    return ApiResponse<List<PaymentInvoiceDto>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Payment invoices fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    paymentInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    paymentInvoice.Success = false;
-                    paymentInvoice.Message = "Payment invoices fetched successfully";
+                    return ApiResponse<List<PaymentInvoiceDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Payment invoices fetched successfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                paymentInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentInvoice.Success = false;
-                paymentInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                paymentInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentInvoice.Success = false;
-                paymentInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<PaymentInvoiceDto>>(ex.Message);
             }
-            return paymentInvoice;
         }
 
         [HttpPost]
@@ -896,7 +694,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<PaymentInvoicePostDto>> AddNewPaymentInvoiceAsync([FromBody] PaymentInvoicePostDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var paymentInvoice = new ApiResponse<PaymentInvoicePostDto>();
             try
             {
                 var paymentInvoiceModel = new PaymentInvoiceDto
@@ -904,36 +701,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     InvoiceId = model.InvoiceId,
                     AmountPaid = model.AmountPaid,
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.InsertPaymentInvoiceAsync(paymentInvoiceModel);
+                var affectedRow = await unitOfWork.SaleRepresent.InsertPaymentInvoiceAsync(paymentInvoiceModel);
                 if (affectedRow > 0)
                 {
-                    paymentInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    paymentInvoice.Success = true;
-                    paymentInvoice.Message = "Payment invoice added successfully";
-                    paymentInvoice.Result = model;
+                    return ApiResponse<PaymentInvoicePostDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Payment invoice added successfully")
+                        .Build();
                 }
                 else
                 {
-                    paymentInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    paymentInvoice.Success = false;
-                    paymentInvoice.Message = "Payment invoice added unsuccessfully";
+                    return ApiResponse<PaymentInvoicePostDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Payment invoice added unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                paymentInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentInvoice.Success = false;
-                paymentInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                paymentInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentInvoice.Success = false;
-                paymentInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<PaymentInvoicePostDto>(ex.Message);
             }
-            return paymentInvoice;
         }
 
         #endregion
@@ -945,39 +733,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<ReturningInvoiceDto>>> GetReturningInvoicesByTemplateIdAsync([Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var returningInvoice = new ApiResponse<List<ReturningInvoiceDto>>();
             try
             {
-                var execute = await _unitOfWork.SaleRepresent.GetReturningInvoicesByTemplateIdAsync(credential.DbCode!, templateId);
+                var execute = await unitOfWork.SaleRepresent.GetReturningInvoicesByTemplateIdAsync(credential.DbCode!, templateId);
                 if (execute.Any())
                 {
-                    returningInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    returningInvoice.Success = true;
-                    returningInvoice.Message = "Returning invoices fetched successfully";
-                    returningInvoice.Result = execute;
+                    return ApiResponse<List<ReturningInvoiceDto>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Returning invoices fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    returningInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    returningInvoice.Success = false;
-                    returningInvoice.Message = "Returning invoices fetched successfully";
+                    return ApiResponse<List<ReturningInvoiceDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Returning invoices fetched successfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returningInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returningInvoice.Success = false;
-                returningInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                returningInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returningInvoice.Success = false;
-                returningInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<ReturningInvoiceDto>>(ex.Message);
             }
-            return returningInvoice;
         }
 
         [HttpPost]
@@ -985,7 +763,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<ReturningInvoicePostDto>> AddNewReturningInvoiceAsync([FromBody] ReturningInvoicePostDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var returningInvoice = new ApiResponse<ReturningInvoicePostDto>();
             try
             {
                 var returningInvoiceModel = new ReturningInvoiceDto()
@@ -993,36 +770,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                     InvoiceId = model.InvoiceId,
                     Description = model.Description,
                 };
-                var affectedRow = await _unitOfWork.SaleRepresent.AddNewReturningInvoiceAsync(returningInvoiceModel);
+                var affectedRow = await unitOfWork.SaleRepresent.AddNewReturningInvoiceAsync(returningInvoiceModel);
                 if (affectedRow > 0)
                 {
-                    returningInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    returningInvoice.Success = true;
-                    returningInvoice.Message = "Returning invoice added successfully";
-                    returningInvoice.Result = model;
+                    return ApiResponse<ReturningInvoicePostDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Returning invoice added successfully")
+                        .Build();
                 }
                 else
                 {
-                    returningInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    returningInvoice.Success = false;
-                    returningInvoice.Message = "Returning invoice added unsuccessfully";
+                    return ApiResponse<ReturningInvoicePostDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Returning invoice added unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returningInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returningInvoice.Success = false;
-                returningInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                returningInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returningInvoice.Success = false;
-                returningInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<ReturningInvoicePostDto>(ex.Message);
             }
-            return returningInvoice;
         }
 
         #endregion
@@ -1033,77 +801,57 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getpaymentreportbytemplateid/{templateId}")]
         public async Task<ApiResponse<List<PaymentModel>>> GetPaymentByTemplateIdAsync([Required] int templateId)
         {
-            var paymentReport = new ApiResponse<List<PaymentModel>>();
             try
             {
-                var execute = await _unitOfWork.SaleRepresent.GetPaymentByTemplateIdAsync(templateId);
+                var execute = await unitOfWork.SaleRepresent.GetPaymentByTemplateIdAsync(templateId);
                 if (execute.Any())
                 {
-                    paymentReport.StatusCode = (int)HttpStatusCode.OK;
-                    paymentReport.Success = true;
-                    paymentReport.Message = "Payment's report fetched successfully";
-                    paymentReport.Result = execute;
+                    return ApiResponse<List<PaymentModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Payment's report fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    paymentReport.StatusCode = (int)HttpStatusCode.BadRequest;
-                    paymentReport.Success = false;
-                    paymentReport.Message = "Payment's report fetched successfully";
+                    return ApiResponse<List<PaymentModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Payment's report fetched successfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                paymentReport.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentReport.Success = false;
-                paymentReport.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                paymentReport.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentReport.Success = false;
-                paymentReport.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<PaymentModel>>(ex.Message);
             }
-            return paymentReport;
         }
         [HttpGet]
         [Route("gettotalcollectionbytemplateid/{templateId}")]
         public async Task<ApiResponse<List<CollectionPaymentModel>>> GetAllTotalCollectionByTemplateIdAsync([Required] int templateId)
         {
-            var paymentReport = new ApiResponse<List<CollectionPaymentModel>>();
             try
             {
-                var execute = await _unitOfWork.SaleRepresent.GetAllTotalCollectionByTemplateIdAsync(templateId);
+                var execute = await unitOfWork.SaleRepresent.GetAllTotalCollectionByTemplateIdAsync(templateId);
                 if (execute.Any())
                 {
-                    paymentReport.StatusCode = (int)HttpStatusCode.OK;
-                    paymentReport.Success = true;
-                    paymentReport.Message = "Total collection report fetched successfully";
-                    paymentReport.Result = execute;
+                    return ApiResponse<List<CollectionPaymentModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Total collection report fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    paymentReport.StatusCode = (int)HttpStatusCode.BadRequest;
-                    paymentReport.Success = false;
-                    paymentReport.Message = "Total collection report fetched successfully";
+                    return ApiResponse<List<CollectionPaymentModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Total collection report fetched successfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                paymentReport.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentReport.Success = false;
-                paymentReport.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                paymentReport.StatusCode = (int)HttpStatusCode.InternalServerError;
-                paymentReport.Success = false;
-                paymentReport.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<CollectionPaymentModel>>(ex.Message);
             }
-            return paymentReport;
         }
 
         #endregion
@@ -1114,39 +862,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<StockCarCreditInvoiceDto>>> GetAllCreditInvoiceByTemplateIdAsync([Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
-            var creditInvoice = new ApiResponse<List<StockCarCreditInvoiceDto>>();
             try
             {
-                var execute = await _unitOfWork.SaleRepresent.GetAllCreditInvoiceByTemplateIdAsync(credential.DbCode!,templateId);
+                var execute = await unitOfWork.SaleRepresent.GetAllCreditInvoiceByTemplateIdAsync(credential.DbCode!,templateId);
                 if (execute.Any())
                 {
-                    creditInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    creditInvoice.Success = true;
-                    creditInvoice.Message = "Credit invoice fetched successfully";
-                    creditInvoice.Result = execute;
+                    return ApiResponse<List<StockCarCreditInvoiceDto>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Credit invoice fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    creditInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    creditInvoice.Success = false;
-                    creditInvoice.Message = "Credit invoice fetched successfully";
+                    return ApiResponse<List<StockCarCreditInvoiceDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Credit invoice fetched successfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                creditInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                creditInvoice.Success = false;
-                creditInvoice.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException", ex);
             }
             catch (Exception ex)
             {
-                creditInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                creditInvoice.Success = false;
-                creditInvoice.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<StockCarCreditInvoiceDto>>(ex.Message);
             }
-            return creditInvoice;
         }
         #endregion
 

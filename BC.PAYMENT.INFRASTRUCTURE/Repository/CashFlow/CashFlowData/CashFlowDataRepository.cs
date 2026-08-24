@@ -1,11 +1,3 @@
-﻿using System.Data;
-using System.Diagnostics;
-using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
-using BC.PAYMENT.CORE.DTO.CashFlow.CashFlowData;
-using BC.PAYMENT.CORE.Entities.CashFlow.CashFlowData;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CashFlow.CashFlowData
 {
     public class CashFlowDataRepository : ICashFlowDataRepository

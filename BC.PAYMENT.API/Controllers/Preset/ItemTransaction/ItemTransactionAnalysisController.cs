@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -23,35 +23,30 @@ namespace BC.PAYMENT.API.Controllers.Preset.ItemTransaction
         public async Task<ApiResponse<List<ItemTransactionAnalysisModel>>> GetAllItemAfterRepairerReceivedAsync( [Required] string itemCode, [Required] int fromMov,[Required]int toMov)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<ItemTransactionAnalysisModel>>();
             try
             {
                 var execute = await _unitOfWork.ItemTransactionAnalysis.GetItemTransactionAsync(fromMov,toMov, itemCode);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Item transaction fetched successfully";
+                    return ApiResponse<List<ItemTransactionAnalysisModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Item transaction fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Item transaction fetched unsuccessfully";
+                    return ApiResponse<List<ItemTransactionAnalysisModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Item transaction fetched unsuccessfully")
+                        .Build();
                 }
 
             }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
-            }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<ItemTransactionAnalysisModel>>(ex.Message);
             }
-            return itemTransaction;
         }
         
         [HttpPost]
@@ -59,34 +54,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.ItemTransaction
         public async Task<ApiResponse<List<string>>> GetItemByPeriodAndItemsAsync( [Required] List<string> itemCode, [Required] int fromMov,[Required]int toMov)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<string>>();
             try
             {
                 var execute = await _unitOfWork.ItemTransactionAnalysis.GetItemByPeriodAndItemsAsync(credential.DbCode,fromMov,toMov, itemCode);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Items fetched successfully";
+                    return ApiResponse<List<string>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<string>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<string>>(ex.Message);
             }
-            return itemTransaction;
         }
         
         [HttpPost]
@@ -94,34 +84,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.ItemTransaction
         public async Task<ApiResponse<List<string>>> GetAllItemByPeriodAsync( [Required] int fromMov,[Required]int toMov)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<string>>();
             try
             {
                 var execute = await _unitOfWork.ItemTransactionAnalysis.GetAllItemByPeriodAsync(credential.DbCode,fromMov,toMov);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Items fetched successfully";
+                    return ApiResponse<List<string>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<string>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<string>>(ex.Message);
             }
-            return itemTransaction;
         }
 
     }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using BC.PAYMENT.API.Helper;
@@ -13,14 +13,8 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
 {
-    public class CashFlowDataController : BaseApiController
+    public class CashFlowDataController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CashFlowDataController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         #region Cash Flow Header
 
@@ -28,39 +22,21 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
         [Route("getcashflowheader")]
         public async Task<ApiResponse<List<CashFlowDataHeader>>> GetCashFlowHeaderAsync()
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowHeader = new ApiResponse<List<CashFlowDataHeader>>() { Timestamp = DateTime.Today };
             try
             {
-                var execute = await _unitOfWork.CashFlowData.GetCashFlowHeaderAsync(credential.DbCode);
-    
-                if (execute.Any())
-                {
-                    cashFlowHeader.Result = execute;
-                    cashFlowHeader.Message = $"Cash flow header fetched successfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status200OK;
-                    cashFlowHeader.Success = true;
-                }
-                else
-                {
-                    cashFlowHeader.Result = new List<CashFlowDataHeader>();
-                    cashFlowHeader.Message = $"Cash flow header fetched unsuccessfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowHeader.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var execute = await unitOfWork.CashFlowData.GetCashFlowHeaderAsync(credential.DbCode);
+                
+                return ApiResponse<List<CashFlowDataHeader>>.Builder()
+                    .WithMessage(execute.Any() ? "Cash flow header fetched successfully" : "Cash flow header fetched unsuccessfully")
+                    .WithStatusCode(execute.Any() ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(execute.Any() ? execute : new List<CashFlowDataHeader>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowHeader.Message = $@"Error Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<CashFlowDataHeader>>(ex.Message);
             }
-
-            return cashFlowHeader;
         }
         /// <summary>
         /// 
@@ -72,10 +48,9 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
         [Route("addnewcashflowheader/{date}")]
         public async Task<ApiResponse<string>> AddNewCashFlowHeaderAsync([Required] string date)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowHeader = new ApiResponse<string>() { Timestamp = DateTime.Today };
             try
             {
+                var credential = Common.DecodeJwt(User);
                 var cashFlowHeaderModel = new CashFlowDataModel
                 {
                     Date = Convert.ToDateTime(date),
@@ -83,144 +58,80 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
                     CreateBy = credential.Username,
                     Period = credential.InvoiceEntryCode,
                 };
-                var affectedRow = await _unitOfWork.CashFlowData.AddNewCashFlowHeaderAsync(cashFlowHeaderModel);
-                if (affectedRow > 0)
-                {
-                    cashFlowHeader.Result = date;
-                    cashFlowHeader.Message = $"Cash flow header added successfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status200OK;
-                    cashFlowHeader.Success = true;
-                }
-                else
-                {
-                    cashFlowHeader.Message = $"Cash flow header added unsuccessfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowHeader.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var affectedRow = await unitOfWork.CashFlowData.AddNewCashFlowHeaderAsync(cashFlowHeaderModel);
+                
+                return ApiResponse<string>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Cash flow header added successfully" : "Cash flow header added unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(affectedRow > 0 ? date : null)
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowHeader.Message = $@"Error Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<string>(ex.Message);
             }
-
-            return cashFlowHeader;
         }
 
         [HttpPut]
         [Route("cancelcashflowheader/{headerId}")]
         public async Task<ApiResponse<int>> CancelCashFlowHeaderAsync([Required] int headerId)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowHeader = new ApiResponse<int>() { Timestamp = DateTime.Today };
             try
             {
-
-                var affectedRow = await _unitOfWork.CashFlowData.CancelCashFlowHeaderAsync(headerId);
-                if (affectedRow > 0)
-                {
-                    cashFlowHeader.Result = headerId;
-                    cashFlowHeader.Message = $"Cash flow header set to pending successfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status200OK;
-                    cashFlowHeader.Success = true;
-                }
-                else
-                {
-                    cashFlowHeader.Message = $"Cash flow header set to pending unsuccessfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowHeader.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var affectedRow = await unitOfWork.CashFlowData.CancelCashFlowHeaderAsync(headerId);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Cash flow header set to pending successfully" : "Cash flow header set to pending unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(affectedRow > 0 ? headerId : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowHeader.Message = $@"Error Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return cashFlowHeader;
         }
         [HttpDelete]
         [Route("deletecashflowheader/{id}")]
         public async Task<ApiResponse<int>> DeleteCashFlowHeaderAsync([Required] int id)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowHeader = new ApiResponse<int>() { Timestamp = DateTime.Today };
             try
             {
-                var affectedRow = await _unitOfWork.CashFlowData.DeleteCashFlowHeaderAsync(id);
-                if (affectedRow > 0)
-                {
-                    cashFlowHeader.Result = id;
-                    cashFlowHeader.Message = $"Cash flow header deleted successfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status200OK;
-                    cashFlowHeader.Success = true;
-                }
-                else
-                {
-                    cashFlowHeader.Message = $"Cash flow header deleted unsuccessfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowHeader.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var affectedRow = await unitOfWork.CashFlowData.DeleteCashFlowHeaderAsync(id);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Cash flow header deleted successfully" : "Cash flow header deleted unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(affectedRow > 0 ? id : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowHeader.Message = $@"Error Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return cashFlowHeader;
         }
 
         [HttpPut]
         [Route("updatecashflowheader/{id}/{date}")]
         public async Task<ApiResponse<int>> UpdateCashFlowHeaderAsync([Required] int id, [Required] string date)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowHeader = new ApiResponse<int>() { Timestamp = DateTime.Today };
             try
             {
-                var affectedRow = await _unitOfWork.CashFlowData.UpdateCashFlowHeaderAsync(id, date);
-                if (affectedRow > 0)
-                {
-                    cashFlowHeader.Result = id;
-                    cashFlowHeader.Message = $"Cash flow header updated successfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status200OK;
-                    cashFlowHeader.Success = true;
-                }
-                else
-                {
-                    cashFlowHeader.Message = $"Cash flow header updated unsuccessfully";
-                    cashFlowHeader.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowHeader.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var affectedRow = await unitOfWork.CashFlowData.UpdateCashFlowHeaderAsync(id, date);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Cash flow header updated successfully" : "Cash flow header updated unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(affectedRow > 0 ? id : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowHeader.Message = $@"Error Exception : {ex.Message}";
-                cashFlowHeader.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return cashFlowHeader;
         }
         #endregion
 
@@ -230,208 +141,85 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
         [Route("getcashflowdetailbyheaderid/{id}")]
         public async Task<ApiResponse<List<CashFlowDataDetailModel>>> GetPaymentCashFlowDetailByIdAsync([Required] int id)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowDetail = new ApiResponse<List<CashFlowDataDetailModel>>() { Timestamp = DateTime.Today };
             try
             {
-                var execute = await _unitOfWork.CashFlowData.GetPaymentCashFlowDetailByIdAsync(credential.DbCode, id);
-                if (execute.Any())
-                {
-                    cashFlowDetail.Result = execute;
-                    cashFlowDetail.Message = $"Cash flow detail fetched successfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status200OK;
-                    cashFlowDetail.Success = true;
-                }
-                else
-                {
-                    cashFlowDetail.Message = $"Cash flow detail fetched unsuccessfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowDetail.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var execute = await unitOfWork.CashFlowData.GetPaymentCashFlowDetailByIdAsync(credential.DbCode, id);
+                
+                return ApiResponse<List<CashFlowDataDetailModel>>.Builder()
+                    .WithMessage(execute.Any() ? "Cash flow detail fetched successfully" : "Cash flow detail fetched unsuccessfully")
+                    .WithStatusCode(execute.Any() ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(execute.Any() ? execute : new List<CashFlowDataDetailModel>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowDetail.Message = $@"Error Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<CashFlowDataDetailModel>>(ex.Message);
             }
-
-            return cashFlowDetail;
         }
         
         [HttpDelete]
         [Route("deletecashflowdetail/{id}")]
         public async Task<ApiResponse<int>> DeleteCashFlowDetailAsync([Required] int id)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowDetail = new ApiResponse<int>() { Timestamp = DateTime.Today };
             try
             {
-                var affectedRow = await _unitOfWork.CashFlowData.DeleteCashFlowDetailAsync( id);
-                if (affectedRow > 0)
-                {
-                    cashFlowDetail.Result = id;
-                    cashFlowDetail.Message = $"Cash flow detail deleted successfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status200OK;
-                    cashFlowDetail.Success = true;
-                }
-                else
-                {
-                    cashFlowDetail.Message = $"Cash flow detail deleted unsuccessfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowDetail.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var affectedRow = await unitOfWork.CashFlowData.DeleteCashFlowDetailAsync( id);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Cash flow detail deleted successfully" : "Cash flow detail deleted unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(affectedRow > 0 ? id : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowDetail.Message = $@"Error Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return cashFlowDetail;
         }
         
         [HttpGet]
         [Route("getdescriptioncashflowdetail")]
         public async Task<ApiResponse<List<string>>> GetDescriptionCashFlowDetailAsync()
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowDetail = new ApiResponse<List<string>>() { Timestamp = DateTime.Today };
             try
             {
-                var execute = await _unitOfWork.CashFlowData.GetDescriptionCashFlowDetailAsync( credential.DbCode);
-                if (execute.Any())
-                {
-                    cashFlowDetail.Result = execute;
-                    cashFlowDetail.Message = $"Cash flow detail fetched successfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status200OK;
-                    cashFlowDetail.Success = true;
-                }
-                else
-                {
-                    cashFlowDetail.Message = $"Cash flow detail fetched unsuccessfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowDetail.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                var execute = await unitOfWork.CashFlowData.GetDescriptionCashFlowDetailAsync( credential.DbCode);
+                
+                return ApiResponse<List<string>>.Builder()
+                    .WithMessage(execute.Any() ? "Cash flow detail fetched successfully" : "Cash flow detail fetched unsuccessfully")
+                    .WithStatusCode(execute.Any() ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(execute.Any() ? execute : new List<string>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowDetail.Message = $@"Error Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<string>>(ex.Message);
             }
-
-            return cashFlowDetail;
         }
-
-        [HttpPut]
-        [Route("updatecashflowdetail")]
-        public async Task<ApiResponse<PaymentCashFlowDto>> UpdateCashFlowDetailAsync([FromBody] PaymentCashFlowUpdateDto model)
-        {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowDetail = new ApiResponse<PaymentCashFlowDto>() { Timestamp = DateTime.Today };
-            try
-            {
-                var cashFlowDetailModel = new CashFlowDataDetailModel
-                {
-                    DbCode = credential.DbCode,
-                    Name = model.Name,
-                    Date = model.Date,
-                    Amount = model.Amount,
-                    CurrencyFormat = model.CurrencyFormat.GetDescription(),
-                    ExchangeRate = model.ExchangeRate,
-                    CreatedBy = credential.Username,
-                    Id = model.Id,
-
-                };
-                var affectedRow = await _unitOfWork.CashFlowData.UpdateCashFlowDetailAsync(cashFlowDetailModel);
-                if (affectedRow > 0 )
-                {
-                    cashFlowDetail.Result = model;
-                    cashFlowDetail.Message = $"Cash flow detail updated successfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status200OK;
-                    cashFlowDetail.Success = true;
-                }
-                else
-                {
-                    cashFlowDetail.Message = $"Cash flow detail updated unsuccessfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowDetail.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-
-            }
-            catch (Exception ex)
-            {
-                cashFlowDetail.Message = $@"Error Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-            }
-
-            return cashFlowDetail;
-        }
-        [HttpPost]
+        
+            [HttpPost]
         [Route("addnewcashflowdetail")]
-        public async Task<ApiResponse<PaymentCashFlowDto>> UpdateCashFlowDetailAsync([FromBody] PaymentCashFlowPostDto model)
+        public async Task<ApiResponse<int>> AddNewCashFlowDetailAsync(CashFlowDataDetailModel data)
         {
-            var credential = Common.DecodeJwt(User);
-            var cashFlowDetail = new ApiResponse<PaymentCashFlowDto>() { Timestamp = DateTime.Today };
             try
             {
-                var cashFlowDetailModel = new CashFlowDataDetailModel
-                {
-                    DbCode = credential.DbCode,
-                    Name = model.Name,
-                    Date = model.Date,
-                    Amount = model.Amount,
-                    CurrencyFormat = model.CurrencyFormat.GetDescription(),
-                    ExchangeRate = model.ExchangeRate,
-                    CreatedBy = credential.Username,
-                    HeaderId = model.HeaderId
-
-                };
-                var affectedRow = await _unitOfWork.CashFlowData.AddNewCashFlowDetailAsync(cashFlowDetailModel);
-                if (affectedRow > 0 )
-                {
-                    cashFlowDetail.Result = model;
-                    cashFlowDetail.Message = $"Cash flow detail added successfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status200OK;
-                    cashFlowDetail.Success = true;
-                }
-                else
-                {
-                    cashFlowDetail.Message = $"Cash flow detail added unsuccessfully";
-                    cashFlowDetail.StatusCode = StatusCodes.Status400BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                cashFlowDetail.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-
+                var credential = Common.DecodeJwt(User);
+                // data.CreateBy = credential.Username;
+                var affectedRow = await unitOfWork.CashFlowData.AddNewCashFlowDetailAsync(data);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage(affectedRow > 0 ? "Cash flow detail added successfully" : "Cash flow detail added unsuccessfully")
+                    .WithStatusCode(affectedRow > 0 ? StatusCodes.Status200OK : StatusCodes.Status400BadRequest)
+                    .WithResult(affectedRow > 0 ? affectedRow : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                cashFlowDetail.Message = $@"Error Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return cashFlowDetail;
         }
         
         
@@ -456,7 +244,7 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
                     Id = x.Id
                 }).ToList();
           
-                var affectedRow = await _unitOfWork.CashFlowData.AddNewCashFlowSubmittedAsync(lsCashFlowDetailModel);
+                var affectedRow = await unitOfWork.CashFlowData.AddNewCashFlowSubmittedAsync(lsCashFlowDetailModel);
                 if (affectedRow > 0 )
                 {
                     cashFlowDetail.Result = model;
@@ -470,16 +258,9 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
                     cashFlowDetail.StatusCode = StatusCodes.Status400BadRequest;
                 }
             }
-            catch (SqlException ex)
-            {
-                cashFlowDetail.Message = $@"Sql Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
-
-            }
             catch (Exception ex)
             {
-                cashFlowDetail.Message = $@"Error Exception : {ex.Message}";
-                cashFlowDetail.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<SubmittedCashFlowPostDto>>(ex.Message);
             }
 
             return cashFlowDetail;
@@ -488,4 +269,5 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
         #endregion
 
     }
+            
 }

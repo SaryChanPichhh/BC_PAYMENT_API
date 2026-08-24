@@ -1,7 +1,3 @@
-﻿
-
-using BC.PAYMENT.CORE.Entities.CommondityExchange.RepairItem;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Repairer
 {
     public interface IRepairerRepository

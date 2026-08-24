@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -10,51 +10,36 @@ using Microsoft.Data.SqlClient;
 namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
 {
 
-    public class RejectedInvoiceController : BaseApiController
+    public class RejectedInvoiceController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RejectedInvoiceController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpGet]
         [Route("getrejectedinvoicebyperiod/{year}/{month}")]
         public async Task<ApiResponse<List<RejectedInvoiceModel>>> GetRejectedInvoiceByPeriod([Required] int month, [Required] int year)
         {
             var credential = Common.DecodeJwt(User);
-            var rejectedInvoice = new ApiResponse<List<RejectedInvoiceModel>>();
             try
             {
-                var rejectedInvoices = await _unitOfWork.RejectedInvoice.GetAllRejectedInvoicesByPeriodAsync(credential.DbCode!, month, year);
+                var rejectedInvoices = await unitOfWork.RejectedInvoice.GetAllRejectedInvoicesByPeriodAsync(credential.DbCode!, month, year);
                 if (rejectedInvoices.Any())
                 {
-                    rejectedInvoice.Result = rejectedInvoices;
-                    rejectedInvoice.StatusCode = StatusCodes.Status200OK;
-                    rejectedInvoice.Message = "Rejected Invoices fetched successfully";
-                    rejectedInvoice.Success = true;
+                    return ApiResponse<List<RejectedInvoiceModel>>.Builder()
+                        .WithMessage("Rejected Invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(rejectedInvoices)
+                        .Build();
                 }
                 else
                 {
-                    rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    rejectedInvoice.Message = "Rejected Invoices fetched unsuccessfully";
-                    rejectedInvoice.Success = false;
+                    return ApiResponse<List<RejectedInvoiceModel>>.Builder()
+                        .WithMessage("Rejected Invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                rejectedInvoice.Message = $"Sql Exception : {e.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<RejectedInvoiceModel>>(ex.Message);
             }
-            catch(Exception e)
-            {
-                rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                rejectedInvoice.Message = $"Error Exception : {e.Message}";
-            }
-
-            return rejectedInvoice;
         }
         
         [HttpGet]
@@ -62,35 +47,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
         public async Task<ApiResponse<List<RejectedInvoiceModel>>> GetRejectedInvoiceByDate([Required] string fromDate, [Required] string toDate)
         {
             var credential = Common.DecodeJwt(User);
-            var rejectedInvoice = new ApiResponse<List<RejectedInvoiceModel>>();
             try
             {
-                var rejectedInvoices = await _unitOfWork.RejectedInvoice.GetAllRejectedInvoicesByDateAsync(credential.DbCode!, fromDate, toDate);
+                var rejectedInvoices = await unitOfWork.RejectedInvoice.GetAllRejectedInvoicesByDateAsync(credential.DbCode!, fromDate, toDate);
                 if (rejectedInvoices.Any())
                 {
-                    rejectedInvoice.Result = rejectedInvoices;
-                    rejectedInvoice.StatusCode = StatusCodes.Status200OK;
-                    rejectedInvoice.Message = "Rejected Invoices fetched successfully";
-                    rejectedInvoice.Success = true;
+                    return ApiResponse<List<RejectedInvoiceModel>>.Builder()
+                        .WithMessage("Rejected Invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(rejectedInvoices)
+                        .Build();
                 }
                 else
                 {
-                    rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    rejectedInvoice.Message = "Rejected Invoices fetched unsuccessfully";
-                    rejectedInvoice.Success = false;
+                    return ApiResponse<List<RejectedInvoiceModel>>.Builder()
+                        .WithMessage("Rejected Invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                rejectedInvoice.Message = $"Sql Exception : {e.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<RejectedInvoiceModel>>(ex.Message);
             }
-            catch(Exception e)
-            {
-                rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                rejectedInvoice.Message = $"Error Exception : {e.Message}";
-            }
-            return rejectedInvoice;
         } 
         
         [HttpPut]
@@ -98,35 +77,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
         public async Task<ApiResponse<int>> UpdateSubmittedInvoiceFromRejectToCancel([Required] string transactionCode, [Required] string submittedId)
         {
             var credential = Common.DecodeJwt(User);
-            var rejectedInvoice = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.RejectedInvoice.UpdateSubmittedInvoiceFromRejectToCancel(credential.DbCode!, transactionCode, submittedId);
+                var affectedRow = await unitOfWork.RejectedInvoice.UpdateSubmittedInvoiceFromRejectToCancel(credential.DbCode!, transactionCode, submittedId);
                 if (affectedRow > 0 )
                 {
-                    rejectedInvoice.Result = affectedRow;
-                    rejectedInvoice.StatusCode = StatusCodes.Status200OK;
-                    rejectedInvoice.Message = "Rejected Invoices updated successfully";
-                    rejectedInvoice.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Rejected Invoices updated successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    rejectedInvoice.Message = "Rejected Invoices updated unsuccessfully";
-                    rejectedInvoice.Success = false;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Rejected Invoices updated unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                rejectedInvoice.Message = $"Sql Exception : {e.Message}";
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            catch(Exception e)
-            {
-                rejectedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                rejectedInvoice.Message = $"Error Exception : {e.Message}";
-            }
-            return rejectedInvoice;
         } 
     }
 }

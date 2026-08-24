@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
-using System.Threading.Tasks;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationRFID
 {
     public interface IVerificationRFIDRepository

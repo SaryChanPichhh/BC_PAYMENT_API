@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Models;
+using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.General;
 using Microsoft.AspNetCore.Http;
@@ -31,34 +31,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.TotalAnnualPurchase
         public async Task<ApiResponse<List<AnnualPurchaseModel>>> GetSalesReportListAsync([Required] List<int> years, [Required] int page, [Required] int pageSize)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<AnnualPurchaseModel>>();
             try
             {
                 var execute = await _unitOfWork.AnnualPurchase.GetSalesReportListAsync(credential.DbCode, years, page, pageSize);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Items fetched successfully";
+                    return ApiResponse<List<AnnualPurchaseModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<AnnualPurchaseModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<AnnualPurchaseModel>>(ex.Message);
             }
-            return itemTransaction;
         }
 
         [HttpPost]
@@ -66,34 +61,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.TotalAnnualPurchase
         public async Task<ApiResponse<List<AnnualPurchaseModel>>> GetAllReportSalesPerYearsAsync(ReportSaleBySaleType model)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<AnnualPurchaseModel>>();
             try
             {
                 var execute = await _unitOfWork.AnnualPurchase.GetAllReportSalesPerYearsAsync(credential.DbCode, model.Markets, model.CustomerCode, model.SaleTypes);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Items fetched successfully";
+                    return ApiResponse<List<AnnualPurchaseModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<AnnualPurchaseModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<AnnualPurchaseModel>>(ex.Message);
             }
-            return itemTransaction;
         }
         #endregion
         
@@ -102,106 +92,91 @@ namespace BC.PAYMENT.API.Controllers.Preset.TotalAnnualPurchase
         public async Task<ApiResponse<List<Customer>>> GetCustomerByMarketCodeAsync([FromForm]List<string> markets, [FromForm] List<string> saleTypes)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<Customer>>();
             try
             {
                 var execute = await _unitOfWork.Customers.GetCustomerByMarketCodeAsync(credential.DbCode, markets, saleTypes);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Customer fetched successfully";
+                    return ApiResponse<List<Customer>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Customer fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Customer fetched unsuccessfully";
+                    return ApiResponse<List<Customer>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Customer fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<Customer>>(ex.Message);
             }
-            return itemTransaction;
         }
         [HttpPost]
         [Route("getmarketbysaletypes" )]
         public async Task<ApiResponse<List<MarketDto>>> GetCustomerByMarketCodeAsync([FromBody] MarketFilterDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<MarketDto>>();
             try
             {
                 var execute = await _unitOfWork.Markets.LoadMarketBySaleTypesAsync(credential.DbCode, model.SaleTypes, model.FromMov, model.ToMov);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute.Select(x=> new MarketDto()
-                    {
-                        MarketName = x.MarketName,
-                        MarketNameKhmer = x.MarketNameKhmer
-                    }).ToList();
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Market fetched successfully";
+                    return ApiResponse<List<MarketDto>>.Builder()
+                        .WithResult(execute.Select(x=> new MarketDto()
+                        {
+                            MarketName = x.MarketName,
+                            MarketNameKhmer = x.MarketNameKhmer
+                        }).ToList())
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Market fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Market fetched unsuccessfully";
+                    return ApiResponse<List<MarketDto>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Market fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<MarketDto>>(ex.Message);
             }
-            return itemTransaction;
         }
         [HttpGet]
         [Route("getsaletype")]
         public async Task<ApiResponse<List<string>>> GetSalesReportListAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<string>>();
             try
             {
                 var execute = await _unitOfWork.AnnualPurchase.SaleCodesAsync(credential.DbCode);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Items fetched successfully";
+                    return ApiResponse<List<string>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<string>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<string>>(ex.Message);
             }
-            return itemTransaction;
         }
 
         #region Sale Of The Day
@@ -211,34 +186,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.TotalAnnualPurchase
         public async Task<ApiResponse<List<DailySaleReportValueModel>>> GetDailySaleReportValueAsync([FromBody] DailySaleReportValueDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<DailySaleReportValueModel>>();
             try
             {
                 var execute = await _unitOfWork.AnnualPurchase.GetDailySaleReportValueAsync(model.Date,model.Branches);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Daily sale report fetched successfully";
+                    return ApiResponse<List<DailySaleReportValueModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Daily sale report fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Daily sale report fetched unsuccessfully";
+                    return ApiResponse<List<DailySaleReportValueModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Daily sale report fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DailySaleReportValueModel>>(ex.Message);
             }
-            return itemTransaction;
         }
         
         [HttpGet]
@@ -246,34 +216,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.TotalAnnualPurchase
         public async Task<ApiResponse<List<DailySaleReportValueDetailsModel>>> GetDailySaleReportDetailsValueAsync([Required] string date, [Required] string branchCode)
         {
             var credential = Common.DecodeJwt(User);
-            var itemTransaction = new ApiResponse<List<DailySaleReportValueDetailsModel>>();
             try
             {
                 var execute = await _unitOfWork.AnnualPurchase.GetDailySaleReportDetailsValueAsync(Convert.ToDateTime(date), branchCode);
                 if (execute.Any())
                 {
-                    itemTransaction.Result = execute;
-                    itemTransaction.StatusCode = StatusCodes.Status200OK;
-                    itemTransaction.Success = true;
-                    itemTransaction.Message = "Daily sale report detail fetched successfully";
+                    return ApiResponse<List<DailySaleReportValueDetailsModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Daily sale report detail fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemTransaction.StatusCode = StatusCodes.Status400BadRequest;
-                    itemTransaction.Message = "Daily sale report detail fetched unsuccessfully";
+                    return ApiResponse<List<DailySaleReportValueDetailsModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Daily sale report detail fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                itemTransaction.StatusCode = StatusCodes.Status500InternalServerError;
-                itemTransaction.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DailySaleReportValueDetailsModel>>(ex.Message);
             }
-            return itemTransaction;
         }
 
         #endregion

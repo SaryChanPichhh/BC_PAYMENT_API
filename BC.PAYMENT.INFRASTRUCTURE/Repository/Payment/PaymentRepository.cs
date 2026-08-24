@@ -1,11 +1,3 @@
-﻿using System.Data;
-using BC.PAYMENT.APPLICATION.Interfaces.Payment;
-using BC.PAYMENT.CORE.DTO.Payment;
-using BC.PAYMENT.CORE.Entities.Payment;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using BC.PAYMENT.INFRASTRUCTURE.Helper;
-using Dapper;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
 {
     public class PaymentRepository:IPaymentRepository

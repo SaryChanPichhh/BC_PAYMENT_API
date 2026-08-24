@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.General;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice
 {
     public class ChangeInvoiceModel : Customer

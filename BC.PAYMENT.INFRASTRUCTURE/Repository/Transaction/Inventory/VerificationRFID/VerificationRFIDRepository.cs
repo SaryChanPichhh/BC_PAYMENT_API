@@ -1,10 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationRFID;
-using BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationRFID
 {
     internal class VerificationRFIDRepository : IVerificationRFIDRepository

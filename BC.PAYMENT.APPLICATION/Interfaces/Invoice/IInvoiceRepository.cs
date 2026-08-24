@@ -1,7 +1,4 @@
-﻿using BC.PAYMENT.CORE.DTO.Filter;
-using BC.PAYMENT.CORE.DTO.Invoice;
-using BC.PAYMENT.CORE.Entities.Invoice;
-using BC.PAYMENT.CORE.Enums;
+using NewInvoiceModel = BC.PAYMENT.CORE.Entities.Invoice.NewInvoiceModel;
 
 namespace BC.PAYMENT.APPLICATION.Interfaces.Invoice
 {

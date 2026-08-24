@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Models;
+using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.CashFlow.CashFlowData;
 using Microsoft.AspNetCore.Http;
@@ -10,164 +10,92 @@ using BC.PAYMENT.API.Helper;
 
 namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
 {
-    public class CashFlowAuditSubmittedController : BaseApiController
+    public class CashFlowAuditSubmittedController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CashFlowAuditSubmittedController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         [HttpGet]
         [Route("getallcashflowsubmitted")]
         public async Task<ApiResponse<List<CashFlowDataHeader>>> GetCashFlowHeaderSubmittedAsync()
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<CashFlowDataHeader>>();
             try
             {
-                var result =
-                    await _unitOfWork.CashFlowAuditSubmitted.GetCashFlowHeaderSubmittedAsync(credential.DbCode!);
-                if (result.Any())
-                {
-                    response.Result = result;
-                    response.Message = "Payment cash flow submitted fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Result = new List<CashFlowDataHeader>();
-                    response.Message = "Payment cash flow submitted fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var credential = Common.DecodeJwt(User);
+                var result = await unitOfWork.CashFlowAuditSubmitted.GetCashFlowHeaderSubmittedAsync(credential.DbCode!);
+                return ApiResponse<List<CashFlowDataHeader>>.Builder()
+                    .WithMessage("Payment cash flow submitted fetched successfully")
+                    .WithStatusCode(result.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(result.Any() ? result : new List<CashFlowDataHeader>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<CashFlowDataHeader>>(ex.Message);
             }
-
-            return response;
         }
         
         [HttpPut]
         [Route("auditcashflowheadertocompleted/{headerId}")]
         public async Task<ApiResponse<int>> AuditCashFlowHeaderToCompletedAsync([Required] int headerId)
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
+                var credential = Common.DecodeJwt(User);
                 const string status = "Completed";
-                var affectedRow =
-                    await _unitOfWork.CashFlowAuditSubmitted.AuditCashFlowAsync(credential.Username!,headerId,status);
-                if (affectedRow > 0 )
-                {
-                    response.Result = affectedRow;
-                    response.Message = "Payment cash flow completed updated successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Message = "Payment cash flow completed updated successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var affectedRow = await unitOfWork.CashFlowAuditSubmitted.AuditCashFlowAsync(credential.Username!,headerId,status);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage("Payment cash flow completed updated successfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.NoContent : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? affectedRow : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return response;
         }
         
         [HttpPut]
         [Route("auditcashflowheadertorejected/{headerId}")]
         public async Task<ApiResponse<int>> AuditCashFlowHeaderToRejectedAsync([Required] int headerId)
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
+                var credential = Common.DecodeJwt(User);
                 const string status = "Rejected";
-                var affectedRow =
-                    await _unitOfWork.CashFlowAuditSubmitted.AuditCashFlowAsync(credential.Username!,headerId,status);
-                if (affectedRow > 0 )
-                {
-                    response.Result = affectedRow;
-                    response.Message = "Payment cash flow rejected updated successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Message = "Payment cash flow rejected updated successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var affectedRow = await unitOfWork.CashFlowAuditSubmitted.AuditCashFlowAsync(credential.Username!,headerId,status);
+                
+                return ApiResponse<int>.Builder()
+                    .WithMessage("Payment cash flow rejected updated successfully")
+                    .WithStatusCode(affectedRow > 0 ? (int)HttpStatusCode.NoContent : (int)HttpStatusCode.BadRequest)
+                    .WithResult(affectedRow > 0 ? affectedRow : 0)
+                    .Build();
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return response;
         }
         
         [HttpGet]
         [Route("getcashflowdetailpending/{headerId}")]
         public async Task<ApiResponse<List<PaymentCashFlowModel>>> GetCashFlowDetailPendingAsync([Required] int headerId)
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<PaymentCashFlowModel>>();
             try
             {
-                var execute =
-                    await _unitOfWork.CashFlowAuditSubmitted.GetCashFlowDetailPendingAsync(credential.DbCode!,headerId);
-                if (execute.Any())
-                {
-                    response.Result = execute;
-                    response.Message = "Payment cash flow pending fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Result = new List<PaymentCashFlowModel>();
-                    response.Message = "Payment cash flow pending fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                var credential = Common.DecodeJwt(User);
+                var execute = await unitOfWork.CashFlowAuditSubmitted.GetCashFlowDetailPendingAsync(credential.DbCode!,headerId);
+                
+                return ApiResponse<List<PaymentCashFlowModel>>.Builder()
+                    .WithMessage("Payment cash flow pending fetched successfully")
+                    .WithStatusCode(execute.Any() ? (int)HttpStatusCode.NoContent : (int)HttpStatusCode.BadRequest)
+                    .WithResult(execute.Any() ? execute : new List<PaymentCashFlowModel>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<PaymentCashFlowModel>>(ex.Message);
             }
-            return response;
         }
     }
 }

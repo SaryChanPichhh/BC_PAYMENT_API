@@ -1,7 +1,4 @@
-﻿using BC.PAYMENT.CORE.DTO;
-using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.CORE.DTO.Login;
-using BC.PAYMENT.CORE.Entities.Login;
+using BC.PAYMENT.CORE.Contracts.Login;
 
 namespace BC.PAYMENT.APPLICATION.Interfaces.Login
 {
@@ -9,6 +6,7 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.Login
     {
         public Task<User> GetBcUserCredential(LoginRequestDTO requestDto);
         public Task<User> GetUserByIdAsync(ContextDTO contextDto);
-
+        public Task<string> GetUserForOTP(string username);
+        public Task<Dictionary<string, string>> IsExistsUserName(string username);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.Net;
 using BC.PAYMENT.API.Helper;
@@ -13,23 +13,15 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DeliveryPaid
 {
-    public class DeliveryPaidController : BaseApiController
+    public class DeliveryPaidController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public DeliveryPaidController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpPost]
         [Route("updatedividedinvoice")]
         public async Task<ApiResponse<DeliveryInvoicePaidUpdateDto>> UpdateDividedInvoiceAsync(DeliveryInvoicePaidUpdateDto model)
         {
-            var credential = Common.DecodeJwt(User);
-            var dividedInvoice = new ApiResponse<DeliveryInvoicePaidUpdateDto>();
             try
             {
+                var credential = Common.DecodeJwt(User);
                 var deliveryInvoicePaidModel = new DeliveryGeneralInvoicePaidUpdateModel
                 {
                     DbCode = credential.DbCode,
@@ -39,44 +31,37 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DeliveryPaid
                     OldAmount = model.OldAmount,
                     Description = model.Description,
                 };
-                var affectedRow = await _unitOfWork.DeliveryPaid.UpdateDeliveryInvoicePaid(deliveryInvoicePaidModel);
+                var affectedRow = await unitOfWork.DeliveryPaid.UpdateDeliveryInvoicePaid(deliveryInvoicePaidModel);
                 if(affectedRow > 0)
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    dividedInvoice.Success = true;
-                    dividedInvoice.Message = "Delivery invoice updated successfully";
-                    dividedInvoice.Result = model;
+                    return ApiResponse<DeliveryInvoicePaidUpdateDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Delivery invoice updated successfully")
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    dividedInvoice.Success = false;
-                    dividedInvoice.Message = "Delivery invoice updated unsuccessfully";
+                    return ApiResponse<DeliveryInvoicePaidUpdateDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Delivery invoice updated unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Success = false;
-                dividedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Success = false;
-                dividedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<DeliveryInvoicePaidUpdateDto>(ex.Message);
             }
-            return dividedInvoice;
         }
+
         [HttpGet]
         [Route("getinvoicebydeliveryid/{deliveryId}/{date}")]
         public async Task<ApiResponse<List<DeliveryDataObject>>> GetAllInvoiceByDeliveryId([Required] string deliveryId, [Required] DateTime date)
         {
-            var credential = Common.DecodeJwt(User);
-            var dividedInvoice = new ApiResponse<List<DeliveryDataObject>>();
             try
             {
-                var execute = await _unitOfWork.DeliveryPaid.GetAllInvoiceByDeliveryIdAndDateDataObjectAsync(credential.DbCode!,deliveryId,date);
+                var credential = Common.DecodeJwt(User);
+                var execute = await unitOfWork.DeliveryPaid.GetAllInvoiceByDeliveryIdAndDateDataObjectAsync(credential.DbCode!,deliveryId,date);
                 execute.ForEach(x =>
                 {
                     var encryptedId = EncryptionHelper.EncryptAES(x.DeliveryId.ToString());
@@ -85,42 +70,34 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DeliveryPaid
                 });
                 if (execute.Any())
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    dividedInvoice.Success = true;
-                    dividedInvoice.Message = "Delivery invoice fetched successfully";
-                    dividedInvoice.Result = execute;
+                    return ApiResponse<List<DeliveryDataObject>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Delivery invoice fetched successfully")
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    dividedInvoice.Success = false;
-                    dividedInvoice.Message = "Delivery invoice fetched unsuccessfully";
+                    return ApiResponse<List<DeliveryDataObject>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Delivery invoice fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Success = false;
-                dividedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Success = false;
-                dividedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DeliveryDataObject>>(ex.Message);
             }
-            return dividedInvoice;
         }
 
         [HttpPost]
         [Route("payment")]
         public async Task<ApiResponse<DeliveryInvoicePaidPostDto>> CreatePaymentHeader(DeliveryInvoicePaidPostDto model)
         {
-            var credential = Common.DecodeJwt(User);
-            var payment = new ApiResponse<DeliveryInvoicePaidPostDto>();
-            var expenses = new List<ExpenseModel>();
             try
             {
+                var credential = Common.DecodeJwt(User);
+                var expenses = new List<ExpenseModel>();
                 var paymentHeader = new PaymentInvoiceHeaderModel
                 {
                     DbCode = credential.DbCode,
@@ -132,13 +109,13 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DeliveryPaid
                     InvoiceDividendDate = model.PaymentInvoiceHeader.InvoiceDividendDate,
                 };
                 var checkExists =
-                    await _unitOfWork.DeliveryPaid.CheckExistsPaymentHeaderByInvoiceDividendDateAndDeliveryId(model.PaymentInvoiceHeader.InvoiceDividendDate,model.PaymentInvoiceHeader.DeliveryId!,credential.DbCode!);
+                    await unitOfWork.DeliveryPaid.CheckExistsPaymentHeaderByInvoiceDividendDateAndDeliveryId(model.PaymentInvoiceHeader.InvoiceDividendDate,model.PaymentInvoiceHeader.DeliveryId!,credential.DbCode!);
                 int paymentHeaderId;
 
                 if (!checkExists)
-                    paymentHeaderId = await _unitOfWork.DeliveryPaid.CreatePaymentHeader(paymentHeader);
+                    paymentHeaderId = await unitOfWork.DeliveryPaid.CreatePaymentHeader(paymentHeader);
                 else
-                    paymentHeaderId = await _unitOfWork.DeliveryPaid.GetPaymentHeaderId(model.PaymentInvoiceHeader.InvoiceDividendDate, model.PaymentInvoiceHeader.DeliveryId!, credential.DbCode!);
+                    paymentHeaderId = await unitOfWork.DeliveryPaid.GetPaymentHeaderId(model.PaymentInvoiceHeader.InvoiceDividendDate, model.PaymentInvoiceHeader.DeliveryId!, credential.DbCode!);
 
                 foreach (var expense in model.Expenses)
                 {
@@ -157,37 +134,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DeliveryPaid
                     };
                     expenses.Add(expenseModel);
                 }
-                await _unitOfWork.DeliveryPaid.CreatePaymentExpense(expenses);
-
+                await unitOfWork.DeliveryPaid.CreatePaymentExpense(expenses);
 
                 var affectedRow = 1;
                 if (affectedRow > 0)
                 {
-                    payment.StatusCode = (int)HttpStatusCode.OK;
-                    payment.Success = true;
-                    payment.Message = "Payment header created successfully";
-                    payment.Result = model;
+                    return ApiResponse<DeliveryInvoicePaidPostDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Payment header created successfully")
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    payment.StatusCode = (int)HttpStatusCode.BadRequest;
-                    payment.Success = false;
-                    payment.Message = "Payment header created unsuccessfully";
+                    return ApiResponse<DeliveryInvoicePaidPostDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Payment header created unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                payment.StatusCode = (int)HttpStatusCode.InternalServerError;
-                payment.Success = false;
-                payment.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                payment.StatusCode = (int)HttpStatusCode.InternalServerError;
-                payment.Success = false;
-                payment.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<DeliveryInvoicePaidPostDto>(ex.Message);
             }
-            return payment;
         }
     }
 }

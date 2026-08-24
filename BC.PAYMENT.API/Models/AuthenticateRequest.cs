@@ -8,6 +8,8 @@ namespace BC.PAYMENT.API.Models
         public string Username { get; set; }
 
         [Required]
-        public string Password { get; set; }
+        public string Password { get; set; }[Required]
+        [RegularExpression("^[a-zA-Z0-9_]{3}")]
+        public string DbCode { get; set; }
     }
 }

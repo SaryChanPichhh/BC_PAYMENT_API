@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.Invoice;
@@ -39,7 +39,7 @@ namespace BC.PAYMENT.API.Controllers
         [HttpPost("invoices/save")]
         public async Task<ApiResponse<int>> SaveDivideInvoices([FromBody] List<IssueInvoiceDTO> dto)
         {
-            var response = new ApiResponse<int>();
+
 
             try
             {
@@ -55,34 +55,31 @@ namespace BC.PAYMENT.API.Controllers
 
                 if (result > 0)
                 {
-                    response.Success = true;
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Message = "Invoices divdied successfully.";
-                    response.Result = result;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(result)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Invoices divdied successfully.")
+                        .Build();
                 }
                 else
                 {
-                    response.Success = false;
-                    response.StatusCode = (int)HttpStatusCode.NotFound;
-                    response.Message = "No invoice was updated.";
-                    response.Result = result;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(result)
+                        .WithStatusCode((int)HttpStatusCode.NotFound)
+                        .WithMessage("No invoice was updated.")
+                        .Build();
                 }
             }
             catch (Exception ex)
             {
-                response.Success = false;
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                response.Message = "An unexpected error occurred.";
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return response;
         }
 
         [HttpPost("invoices")]
         public async Task<ApiResponse<PaginatedResponse<Invoices>>> GetInvoices([FromBody] IssueInvoiceFilterDTO dto)
         {
-            var apiResponse = new ApiResponse<PaginatedResponse<Invoices>>();
+
 
             try
             {
@@ -92,11 +89,11 @@ namespace BC.PAYMENT.API.Controllers
                 var allRecords = await _unitOfWork.DividedInvoices.GetInvoices(dto);
                 if (!allRecords.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No invoices";
-                    apiResponse.Result = new PaginatedResponse<Invoices>(new List<Invoices>(), 0, dto.Page, dto.PageSize);
-                    return apiResponse;
+                    return ApiResponse<PaginatedResponse<Invoices>>.Builder()
+                        .WithResult(new PaginatedResponse<Invoices>(new List<Invoices>(), 0, dto.Page, dto.PageSize))
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("No invoices")
+                        .Build();
                 }
 
                 // Calculate pagination details
@@ -110,33 +107,22 @@ namespace BC.PAYMENT.API.Controllers
                     .ToList();
 
                 // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Invoices fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = new PaginatedResponse<Invoices>(paginatedData, totalRecords, dto.Page, dto.PageSize);
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<PaginatedResponse<Invoices>>.Builder()
+                    .WithResult(new PaginatedResponse<Invoices>(paginatedData, totalRecords, dto.Page, dto.PageSize))
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithMessage("Invoices fetched successfully.")
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<Invoices>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpPost("invoices/exclude")]
         public async Task<ApiResponse<PaginatedResponse<Invoices>>> GetInvoicesExclusion([FromBody] IssueInvoiceExclusionFilterDTO dto)
         {
-            var apiResponse = new ApiResponse<PaginatedResponse<Invoices>>();
+
 
             try
             {
@@ -146,11 +132,11 @@ namespace BC.PAYMENT.API.Controllers
                 var allRecords = await _unitOfWork.DividedInvoices.GetInvoices(dto);
                 if (!allRecords.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No invoices";
-                    apiResponse.Result = new PaginatedResponse<Invoices>(new List<Invoices>(), 0, dto.Page, dto.PageSize);
-                    return apiResponse;
+                    return ApiResponse<PaginatedResponse<Invoices>>.Builder()
+                        .WithResult(new PaginatedResponse<Invoices>(new List<Invoices>(), 0, dto.Page, dto.PageSize))
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("No invoices")
+                        .Build();
                 }
 
                 // Calculate pagination details
@@ -164,33 +150,22 @@ namespace BC.PAYMENT.API.Controllers
                     .ToList();
 
                 // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Invoices fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = new PaginatedResponse<Invoices>(paginatedData, totalRecords, dto.Page, dto.PageSize);
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<PaginatedResponse<Invoices>>.Builder()
+                    .WithResult(new PaginatedResponse<Invoices>(paginatedData, totalRecords, dto.Page, dto.PageSize))
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithMessage("Invoices fetched successfully.")
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<Invoices>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("divided-delivery/filter")]
         public async Task<ApiResponse<List<Delivery>>> GetDividedDelivery([FromQuery] DateTime date)
         {
-            var apiResponse = new ApiResponse<List<Delivery>>();
+
 
             try
             {
@@ -199,41 +174,30 @@ namespace BC.PAYMENT.API.Controllers
                 var deliveries = await _unitOfWork.DividedInvoices.GetDividedDeliveryInfo(claim.DbCode!, date.Date);
                 if (!deliveries.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No delivery";
-                    apiResponse.Result = new List<Delivery>();
-                    return apiResponse;
+                    return ApiResponse<List<Delivery>>.Builder()
+                        .WithResult(new List<Delivery>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("No delivery")
+                        .Build();
                 }
                 
-                apiResponse.Success = true;
-                apiResponse.Message = "Deliveries fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = deliveries;
+                return ApiResponse<List<Delivery>>.Builder()
+                    .WithResult(deliveries)
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithMessage("Deliveries fetched successfully.")
+                    .Build();
 
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<Delivery>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("divided-invoice")]
         public async Task<ApiResponse<List<Invoices>>> GetDividedInvoice([FromQuery] string deliveryId, DateTime date)
         {
-            var apiResponse = new ApiResponse<List<Invoices>>();
+
 
             try
             {
@@ -242,41 +206,30 @@ namespace BC.PAYMENT.API.Controllers
                 var deliveries = await _unitOfWork.DividedInvoices.GetDividedInvoice(claim.DbCode!, deliveryId,date.Date);
                 if (!deliveries.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No invoices";
-                    apiResponse.Result = new List<Invoices>();
-                    return apiResponse;
+                    return ApiResponse<List<Invoices>>.Builder()
+                        .WithResult(new List<Invoices>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("No invoices")
+                        .Build();
                 }
 
-                apiResponse.Success = true;
-                apiResponse.Message = "Deliveries fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = deliveries;
+                return ApiResponse<List<Invoices>>.Builder()
+                    .WithResult(deliveries)
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithMessage("Deliveries fetched successfully.")
+                    .Build();
 
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<Invoices>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("divided-Invoice/summary")]
         public async Task<ApiResponse<List<DividedInvoiceSummary>>> GetDividedInvoiceSummary([FromQuery] DateTime date)
         {
-            var apiResponse = new ApiResponse<List<DividedInvoiceSummary>>();
+
 
             try
             {
@@ -285,35 +238,24 @@ namespace BC.PAYMENT.API.Controllers
                 var deliveries = await _unitOfWork.DividedInvoices.GetDividedInvoiceSummary(claim.DbCode!, date.Date);
                 if (!deliveries.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No summary";
-                    apiResponse.Result = new List<DividedInvoiceSummary>();
-                    return apiResponse;
+                    return ApiResponse<List<DividedInvoiceSummary>>.Builder()
+                        .WithResult(new List<DividedInvoiceSummary>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("No summary")
+                        .Build();
                 }
 
-                apiResponse.Success = true;
-                apiResponse.Message = "Summary fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = deliveries;
+                return ApiResponse<List<DividedInvoiceSummary>>.Builder()
+                    .WithResult(deliveries)
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithMessage("Summary fetched successfully.")
+                    .Build();
 
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<DividedInvoiceSummary>>(ex.Message);
             }
-
-            return apiResponse;
         }
         #endregion
 

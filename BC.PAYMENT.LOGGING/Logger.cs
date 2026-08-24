@@ -1,8 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces;
-using log4net;
-using System.Reflection;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-
 namespace BC.PAYMENT.LOGGING;
 
 public sealed class Logger : ILogger

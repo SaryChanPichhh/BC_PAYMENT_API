@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
@@ -12,96 +12,75 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DailyPayment
 {
-    public class ReturnChangeInvoiceController : BaseApiController 
+    public class ReturnChangeInvoiceController(IUnitOfWork unitOfWork) : BaseApiController 
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ReturnChangeInvoiceController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpPost]
         [Route("getreturnchangeinvoicebydate")]
         public async Task<ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>> GetReturnChangeInvoiceByDateAsync([FromBody] ByDateDto model)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var returnChangeInvoice = new ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>();
             try
             {
-                var execute = await _unitOfWork.DailyPayment.GetReturnChangeInvoiceByDateAsync(credential.DbCode!, Convert.ToDateTime(model.FromDate), Convert.ToDateTime(model.ToDate));
+                var execute = await unitOfWork.DailyPayment.GetReturnChangeInvoiceByDateAsync(credential.DbCode!, Convert.ToDateTime(model.FromDate), Convert.ToDateTime(model.ToDate));
                 var newReturnChangeInvoice = execute.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
                 if (newReturnChangeInvoice.Count > 0)
                 {
-                    returnChangeInvoice.Message = "Return Change Invoices fetched successfully";
-                    returnChangeInvoice.Success = true;
-                    returnChangeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(newReturnChangeInvoice, execute.Count,model.Page,model.PageSize);
+                    return ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>.Builder()
+                        .WithMessage("Return Change Invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(new PaginatedResponse<ReturnChangeInvoiceModel>(newReturnChangeInvoice, execute.Count,model.Page,model.PageSize))
+                        .Build();
                 }
                 else
                 {
-                    returnChangeInvoice.Message = "Return Change Invoices fetched unsuccessfully";
-                    returnChangeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(null,0,0,0);
+                    return ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>.Builder()
+                        .WithMessage("Return Change Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new PaginatedResponse<ReturnChangeInvoiceModel>(null,0,0,0))
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returnChangeInvoice.Message = ex.Message;
-                returnChangeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(null, 0, 0, 0);
             }
             catch (Exception ex)
             {
-                returnChangeInvoice.Message = ex.Message;
-                returnChangeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(null, 0, 0, 0);
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<ReturnChangeInvoiceModel>>(ex.Message);
             }
-            return returnChangeInvoice;
         }
         [HttpPost]
         [Route("getreturnchangeinvoicebyperiod")]
         public async Task<ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>> GetReturnChangeInvoiceByPeriodAsync([FromBody] ByPeriodDto model)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var returnChangeInvoice = new ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>();
             try
             {
-                var execute = await _unitOfWork.DailyPayment.GetReturnChangeInvoiceByPeriodAsync(credential.DbCode!, model.Month, model.Year);
+                var execute = await unitOfWork.DailyPayment.GetReturnChangeInvoiceByPeriodAsync(credential.DbCode!, model.Month, model.Year);
                 var newReturnChangeInvoice = execute.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
                 if (newReturnChangeInvoice.Count > 0)
                 {
-                    returnChangeInvoice.Message = "Return Change Invoices fetched successfully";
-                    returnChangeInvoice.Success = true;
-                    returnChangeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(newReturnChangeInvoice, execute.Count,model.Page,model.PageSize);
+                    return ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>.Builder()
+                        .WithMessage("Return Change Invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(new PaginatedResponse<ReturnChangeInvoiceModel>(newReturnChangeInvoice, execute.Count,model.Page,model.PageSize))
+                        .Build();
                 }
                 else
                 {
-                    returnChangeInvoice.Message = "Return Change Invoices fetched unsuccessfully";
-                    returnChangeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(null,0,0,0);
+                    return ApiResponse<PaginatedResponse<ReturnChangeInvoiceModel>>.Builder()
+                        .WithMessage("Return Change Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new PaginatedResponse<ReturnChangeInvoiceModel>(null,0,0,0))
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returnChangeInvoice.Message = ex.Message;
-                returnChangeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(null, 0, 0, 0);
             }
             catch (Exception ex)
             {
-                returnChangeInvoice.Message = ex.Message;
-                returnChangeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnChangeInvoice.Result = new PaginatedResponse<ReturnChangeInvoiceModel>(null, 0, 0, 0);
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<ReturnChangeInvoiceModel>>(ex.Message);
             }
-            return returnChangeInvoice;
         }
         [HttpPost]
         [Route("addnewreturnchangeinvoice")]
         public async Task<ApiResponse<ReturnChangeInvoiceDto>> AddNewReturnChangeInvoiceByPeriodAsync([FromBody] ReturnChangeInvoiceDto model)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var returnChangeInvoice = new ApiResponse<ReturnChangeInvoiceDto>();
             try
             {
                 var returnChangeInvoiceModel = new ReturnChangeInvoiceModel
@@ -109,30 +88,26 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DailyPayment
                     ReturnId = model.ReturnId,
                     CreateBy = credential.Username,
                 };
-                var affectedRow = await _unitOfWork.DailyPayment.InsertGetReturnInvoice(returnChangeInvoiceModel);
+                var affectedRow = await unitOfWork.DailyPayment.InsertGetReturnInvoice(returnChangeInvoiceModel);
                 if (affectedRow > 0)
                 {
-                    returnChangeInvoice.Message = "Return Change Invoices fetched successfully";
-                    returnChangeInvoice.Success = true;
-                    returnChangeInvoice.StatusCode = (int)HttpStatusCode.OK;
+                    return ApiResponse<ReturnChangeInvoiceDto>.Builder()
+                        .WithMessage("Return Change Invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .Build();
                 }
                 else
                 {
-                    returnChangeInvoice.Message = "Return Change Invoices fetched unsuccessfully";
-                    returnChangeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<ReturnChangeInvoiceDto>.Builder()
+                        .WithMessage("Return Change Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returnChangeInvoice.Message = ex.Message;
-                returnChangeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                returnChangeInvoice.Message = ex.Message;
-                returnChangeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<ReturnChangeInvoiceDto>(ex.Message);
             }
-            return returnChangeInvoice;
         }
     }
 }

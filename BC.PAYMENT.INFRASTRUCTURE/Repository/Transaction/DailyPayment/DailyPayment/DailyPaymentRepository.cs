@@ -1,11 +1,5 @@
-﻿using System.Data;
-using System.Diagnostics;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
+using ReturnInvoiceModel = BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment.ReturnInvoiceModel;
+
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DailyPayment

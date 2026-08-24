@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Diagnostics;
 using System.Reflection.Emit;
@@ -17,84 +17,66 @@ using Microsoft.IdentityModel.Logging;
 
 namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
 {
-    public class ExchangeItemController : BaseApiController
+    public class ExchangeItemController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ExchangeItemController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         [HttpGet]
         [Route("getallcustomerhasexchangegoods")]
         public async Task<ApiResponse<List<CustomerDto>>> GetAllCustomerHasExchangeGoodsAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<List<CustomerDto>>();
             try
             {
-                var execute = await _unitOfWork.ExchangeItem.GetAllCustomerHasExchangeGoods(credential.DbCode);
+                var execute = await unitOfWork.ExchangeItem.GetAllCustomerHasExchangeGoods(credential.DbCode);
                 if (execute.Any())
                 {
-                    respond.Result = execute;
-                    respond.Message = "Customer fetched successfully";
-                    respond.StatusCode = StatusCodes.Status200OK;
-                    respond.Success = true;
+                    return ApiResponse<List<CustomerDto>>.Builder()
+                        .WithResult(execute)
+                        .WithMessage("Customer fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .Build();
                 }
                 else
                 {
-                    respond.Message = "Customer fetched unsuccessfully";
-                    respond.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<List<CustomerDto>>.Builder()
+                        .WithMessage("Customer fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.Message = $@"Sql Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                respond.Message = $@"Error Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<CustomerDto>>(ex.Message);
             }
-
-            return respond;
         }
         [HttpGet]
         [Route("getallitemexchangebycustomercode/{masterId}")]
         public async Task<ApiResponse<List<ItemExchangeDto>>> GetAllItemExchangeByCustomerCodeAsync([Required] int masterId)
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<List<ItemExchangeDto>>();
             try
             {
-                var execute = await _unitOfWork.ExchangeItem.GetAllItemExchangeByCustomerCodeAsync(credential.DbCode, masterId);
+                var execute = await unitOfWork.ExchangeItem.GetAllItemExchangeByCustomerCodeAsync(credential.DbCode, masterId);
                 if (execute.Any())
                 {
-                    respond.Result = execute;
-                    respond.Message = "Item fetched successfully";
-                    respond.StatusCode = StatusCodes.Status200OK;
-                    respond.Success = true;
+                    return ApiResponse<List<ItemExchangeDto>>.Builder()
+                        .WithResult(execute)
+                        .WithMessage("Item fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .Build();
                 }
                 else
                 {
-                    respond.Message = "Item fetched unsuccessfully";
-                    respond.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<List<ItemExchangeDto>>.Builder()
+                        .WithMessage("Item fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.Message = $@"Sql Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                respond.Message = $@"Error Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<ItemExchangeDto>>(ex.Message);
             }
-
-            return respond;
         }
         
         [HttpGet]
@@ -102,35 +84,29 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
         public async Task<ApiResponse<List<ItemExchangeDto>>> GetAllItemCreditByCustomerCodeAsync([Required] int masterId)
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<List<ItemExchangeDto>>();
             try
             {
-                var execute = await _unitOfWork.ExchangeItem.GetAllItemCreditByCustomerCodeAsync(credential.DbCode, masterId);
+                var execute = await unitOfWork.ExchangeItem.GetAllItemCreditByCustomerCodeAsync(credential.DbCode, masterId);
                 if (execute.Any())
                 {
-                    respond.Result = execute;
-                    respond.Message = "Item fetched successfully";
-                    respond.StatusCode = StatusCodes.Status200OK;
-                    respond.Success = true;
+                    return ApiResponse<List<ItemExchangeDto>>.Builder()
+                        .WithResult(execute)
+                        .WithMessage("Item fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .Build();
                 }
                 else
                 {
-                    respond.Message = "Item fetched unsuccessfully";
-                    respond.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<List<ItemExchangeDto>>.Builder()
+                        .WithMessage("Item fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.Message = $@"Sql Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                respond.Message = $@"Error Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<ItemExchangeDto>>(ex.Message);
             }
-
-            return respond;
         }
         
         [HttpGet]
@@ -138,35 +114,29 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
         public async Task<ApiResponse<List<InvoiceForExchangeDto>>> GetInvoiceForExchangeByCustomerCodeAndItemCodeIn6MonthsAsync([Required] string customerCode,[Required]string itemCode)
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<List<InvoiceForExchangeDto>>();
             try
             {
-                var execute = await _unitOfWork.ExchangeItem.GetInvoiceForExchangeByCustomerCodeAndItemCodeIn6MonthsAsync(credential.DbCode, customerCode, itemCode);
+                var execute = await unitOfWork.ExchangeItem.GetInvoiceForExchangeByCustomerCodeAndItemCodeIn6MonthsAsync(credential.DbCode, customerCode, itemCode);
                 if (execute.Any())
                 {
-                    respond.Result = execute;
-                    respond.Message = "Item fetched successfully";
-                    respond.StatusCode = StatusCodes.Status200OK;
-                    respond.Success = true;
+                    return ApiResponse<List<InvoiceForExchangeDto>>.Builder()
+                        .WithResult(execute)
+                        .WithMessage("Item fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .Build();
                 }
                 else
                 {
-                    respond.Message = "Item fetched unsuccessfully";
-                    respond.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<List<InvoiceForExchangeDto>>.Builder()
+                        .WithMessage("Item fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.Message = $@"Sql Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                respond.Message = $@"Error Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<InvoiceForExchangeDto>>(ex.Message);
             }
-
-            return respond;
         }
         
         [HttpGet]
@@ -174,35 +144,29 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
         public async Task<ApiResponse<List<InvoiceForExchangeDto>>> GetAllItemCreditByCustomerCodeAsync([Required] string customerCode,string itemCode)
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<List<InvoiceForExchangeDto>>();
             try
             {
-                var execute = await _unitOfWork.ExchangeItem.GetInvoiceForExchangeByCustomerCodeAndItemCodeAsync(credential.DbCode, customerCode, itemCode);
+                var execute = await unitOfWork.ExchangeItem.GetInvoiceForExchangeByCustomerCodeAndItemCodeAsync(credential.DbCode, customerCode, itemCode);
                 if (execute.Any())
                 {
-                    respond.Result = execute;
-                    respond.Message = "Item fetched successfully";
-                    respond.StatusCode = StatusCodes.Status200OK;
-                    respond.Success = true;
+                    return ApiResponse<List<InvoiceForExchangeDto>>.Builder()
+                        .WithResult(execute)
+                        .WithMessage("Item fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .Build();
                 }
                 else
                 {
-                    respond.Message = "Item fetched unsuccessfully";
-                    respond.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<List<InvoiceForExchangeDto>>.Builder()
+                        .WithMessage("Item fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.Message = $@"Sql Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                respond.Message = $@"Error Exception : {ex.Message}";
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<InvoiceForExchangeDto>>(ex.Message);
             }
-
-            return respond;
         }
 
         #region Sample Input
@@ -221,7 +185,6 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
         public async Task<ApiResponse<CreditNoteItemDto>> CreateCreditNoteAsync([FromBody] CreditNoteItemDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<CreditNoteItemDto>();
             try
             {
                 CreditNoteItemModel creditNote = new()
@@ -237,35 +200,30 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
                     ReceivedId = model.ReceivedId,
                     OldTranLine = model.OldTranLine,
                 };
-                var newTransaction = await _unitOfWork.Generators.PostCreditNoteAutoNumberAsync(credential.DbCode,"SALE-EXCH");
+                var newTransaction = await unitOfWork.Generators.PostCreditNoteAutoNumberAsync(credential.DbCode,"SALE-EXCH");
                 creditNote.NewTransaction = newTransaction;
-                var affectedRow = await _unitOfWork.ExchangeItem.AddNewCreditNote(creditNote);
+                var affectedRow = await unitOfWork.ExchangeItem.AddNewCreditNote(creditNote);
                 if (affectedRow > 0 )
                 {
-                    respond.StatusCode = StatusCodes.Status204NoContent;
-                    respond.Message = $@"Credit Note added successfully";
-                    respond.Result = model;
-                    respond.Success = true;
+                    return ApiResponse<CreditNoteItemDto>.Builder()
+                        .WithResult(model)
+                        .WithMessage("Credit Note added successfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .Build();
                 }
                 else
                 {
-                    respond.StatusCode = StatusCodes.Status204NoContent;
-                    respond.Message = $@"Credit Note added unsuccessfully";
-                    respond.Result = model;
+                    return ApiResponse<CreditNoteItemDto>.Builder()
+                        .WithResult(model)
+                        .WithMessage("Credit Note added unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
-                respond.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
-                respond.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<CreditNoteItemDto>(ex.Message);
             }
-
-            return respond;
         }
         
         [HttpPost]
@@ -274,7 +232,6 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
         public async Task<ApiResponse<int>> SubmitExchangeInvoice([FromBody] ExchangeItemParamsDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var respond = new ApiResponse<int>();
             try
             {
                 bool checkifOutofStock = false;
@@ -290,7 +247,7 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
                         total = totalExchangeItems - totalRequestItems;
 
                     var saleAnalysisByCustomerCodeAsync =
-                        await _unitOfWork.Generators.GetSaleAnalysisByCustomerCodeAsync(model.Customer.CustomerCode,credential.DbCode);
+                        await unitOfWork.Generators.GetSaleAnalysisByCustomerCodeAsync(model.Customer.CustomerCode,credential.DbCode);
                     var newTransaction = model.Invoices.TransactionCode;
 
                     var saleHeaderDto = new SaleHeaderDto
@@ -324,14 +281,16 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
                     foreach (var item in model.OutBoundItems)
                     {
                         qtyAndEpd[item.ItemCode]= new List<string> { "" };
-                        var exist = await _unitOfWork.Invoices.CheckStockQuantityAsync(credential.DbCode,model.Invoices.Warehouse, item.ItemCode, item.Quantity);
+                        var exist = await unitOfWork.Invoices.CheckStockQuantityAsync(credential.DbCode,model.Invoices.Warehouse, item.ItemCode, item.Quantity);
                         if (!exist)
                         {
-                            respond.Result = 0;
-                            respond.StatusCode = StatusCodes.Status400BadRequest;
-                            respond.Message = $@"Stock of {item.ItemCode} is not available";
+                            return ApiResponse<int>.Builder()
+                                .WithResult(0)
+                                .WithMessage($@"Stock of {item.ItemCode} is not available")
+                                .WithStatusCode(StatusCodes.Status400BadRequest)
+                                .Build();
                         }
-                        return respond;
+                        return ApiResponse<int>.Builder().Build();
                     }
                     var tranLine = 0;
                     double quantityExchange = 0;
@@ -344,7 +303,7 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
                     do
                     {
                         checkingIfNotEnought = false;
-                        var execute = await _unitOfWork.Invoices.GetItemExpiredDates(credential.DbCode, qtyAndEpd, model.Invoices.Warehouse);
+                        var execute = await unitOfWork.Invoices.GetItemExpiredDates(credential.DbCode, qtyAndEpd, model.Invoices.Warehouse);
                         foreach (var item in execute)
                         {
                             checkifOutofStock = false;
@@ -437,31 +396,31 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
                                         );
                         }
                     } while (checkingIfNotEnought);
-                    await _unitOfWork.Invoices.InsertRecordInvoice(credential.DbCode,credential.Username,newTransaction, model.Customer.CustomerCode,
+                    await unitOfWork.Invoices.InsertRecordInvoice(credential.DbCode,credential.Username,newTransaction, model.Customer.CustomerCode,
                         model.Customer.CustomerName, total, model.Invoices.InvoiceDate, credential.InvoiceEntryCode);
-                    await _unitOfWork.Invoices.CreateInvoiceSaleAsync(credential.DbCode,saleHeaderDto, allDetailsDtos);
-                    var result = await _unitOfWork.ExchangeItem.CreateInvoice(credential.DbCode,credential.Username,
+                    await unitOfWork.Invoices.CreateInvoiceSaleAsync(credential.DbCode,saleHeaderDto, allDetailsDtos);
+                    var result = await unitOfWork.ExchangeItem.CreateInvoice(credential.DbCode,credential.Username,
                         model.Customer.MasterId,
                         model.Customer.CustomerCode,
                         newTransaction,
                         total,
                         model.OutBoundItems,
                         model.InBoundItems.Select(x=>x.ReceivedId).ToList());
-                    if (string.IsNullOrEmpty(result)) return respond;
+                    if (string.IsNullOrEmpty(result)) return ApiResponse<int>.Builder().Build();
                     foreach (var itemExchangeDto in model.InBoundItems)
                     {
-                        await _unitOfWork.Invoices.UpdateStatusExchangeReceivedToCredit(itemExchangeDto.ReceivedId, 2);
-                        await _unitOfWork.Invoices.UpdateStatusRequestExchangeDetails(
+                        await unitOfWork.Invoices.UpdateStatusExchangeReceivedToCredit(itemExchangeDto.ReceivedId, 2);
+                        await unitOfWork.Invoices.UpdateStatusRequestExchangeDetails(
                             itemExchangeDto.ReceivedId,
                             ExchangeStatus.Completed);
-                        _unitOfWork.Invoices.SaveRecordItemExchanged(credential.DbCode,credential.Username,newTransaction, itemExchangeDto.ItemCode,
+                        unitOfWork.Invoices.SaveRecordItemExchanged(credential.DbCode,credential.Username,newTransaction, itemExchangeDto.ItemCode,
                         itemExchangeDto.Quantity, itemExchangeDto.UnitPrice);
                     }
                     var isAllItemRequestCompletedByRequestIdAsync =
-                        await _unitOfWork.Invoices.IsAllItemRequestCompletedByRequestIdAsync(model.Customer.MasterId);
-                    await _unitOfWork.Invoices.IsAllItemRequestCompletedByRequestIdAsync(model.Customer.MasterId);
+                        await unitOfWork.Invoices.IsAllItemRequestCompletedByRequestIdAsync(model.Customer.MasterId);
+                    await unitOfWork.Invoices.IsAllItemRequestCompletedByRequestIdAsync(model.Customer.MasterId);
                     if (!isAllItemRequestCompletedByRequestIdAsync)
-                        await _unitOfWork.Invoices.UpdateReceivedToCompletedByIdAsync(credential.DbCode,model.Customer.MasterId);
+                        await unitOfWork.Invoices.UpdateReceivedToCompletedByIdAsync(credential.DbCode,model.Customer.MasterId);
                 }
                 finally
                 {
@@ -471,30 +430,25 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.ExchangeItem
                 var affectedRow = 0;
                 if (affectedRow > 0 )
                 {
-                    respond.StatusCode = StatusCodes.Status204NoContent;
-                    respond.Message = $@"Credit Note added successfully";
-                    respond.Result = affectedRow;
-                    respond.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithMessage("Credit Note added successfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .Build();
                 }
                 else
                 {
-                    respond.StatusCode = StatusCodes.Status204NoContent;
-                    respond.Message = $@"Credit Note added unsuccessfully";
-                    respond.Result = affectedRow;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithMessage("Credit Note added unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
-                respond.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                respond.StatusCode = StatusCodes.Status500InternalServerError;
-                respond.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-
-            return respond;
         }
     }
 }

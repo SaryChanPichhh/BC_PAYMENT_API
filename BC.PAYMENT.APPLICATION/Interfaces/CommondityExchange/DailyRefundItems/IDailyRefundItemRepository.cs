@@ -1,5 +1,4 @@
-﻿
-using BC.PAYMENT.CORE.Entities.CommondityExchange.DailyRefundItems;
+using ItemModel = BC.PAYMENT.CORE.Entities.CommondityExchange.DailyRefundItems.ItemModel;
 
 namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.DailyRefundItems
 {

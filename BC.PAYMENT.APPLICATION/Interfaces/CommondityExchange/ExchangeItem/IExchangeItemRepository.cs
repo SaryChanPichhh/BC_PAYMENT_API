@@ -1,11 +1,3 @@
-﻿using BC.PAYMENT.CORE.DTO.General;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BC.PAYMENT.CORE.DTO.CommondityExchange.ExchangeItem;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.ExchangeItem
 {
     public interface IExchangeItemRepository

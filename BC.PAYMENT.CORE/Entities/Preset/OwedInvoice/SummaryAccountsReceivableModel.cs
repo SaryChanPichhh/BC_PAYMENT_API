@@ -1,5 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.Entities.General;
 namespace BC.PAYMENT.CORE.Entities.Preset.OwedInvoice
 {
     public class SummaryAccountsReceivableModel 

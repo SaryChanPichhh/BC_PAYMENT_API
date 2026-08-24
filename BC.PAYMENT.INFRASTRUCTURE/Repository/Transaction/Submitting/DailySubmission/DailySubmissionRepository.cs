@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.DailySubmission;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Microsoft.Data.SqlClient;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.DailySubmission

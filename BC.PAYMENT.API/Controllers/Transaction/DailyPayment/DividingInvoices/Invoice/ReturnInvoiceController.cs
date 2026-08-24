@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Models;
+using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,50 +11,37 @@ using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice
 namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.Invoice
 {
 
-    public class ReturnInvoiceController : ControllerBase
+    public class ReturnInvoiceController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ReturnInvoiceController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpGet]
         [Route("")]
         public async Task<ApiResponse<List<ReturnInvoiceModel>>> GetReturnInvoiceAsync()
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var returnInvoice = new ApiResponse<List<ReturnInvoiceModel>>();
             try
             {
-                var execute = await _unitOfWork.ReturnInvoice.GetReturnInvoiceAsync(credential.DbCode!);
+                var execute = await unitOfWork.ReturnInvoice.GetReturnInvoiceAsync(credential.DbCode!);
                 if (execute.Count > 0)
                 {
-                    returnInvoice.Message = "Return Invoices fetched successfully";
-                    returnInvoice.Success = true;
-                    returnInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    returnInvoice.Result = execute;
+                    return ApiResponse<List<ReturnInvoiceModel>>.Builder()
+                        .WithMessage("Return Invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    returnInvoice.Message = "Return Invoices fetched unsuccessfully";
-                    returnInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    returnInvoice.Result = new List<ReturnInvoiceModel>();
+                    return ApiResponse<List<ReturnInvoiceModel>>.Builder()
+                        .WithMessage("Return Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<ReturnInvoiceModel>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returnInvoice.Message = ex.Message;
-                returnInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnInvoice.Result = new List<ReturnInvoiceModel>();
             }
             catch (Exception ex)
             {
-                returnInvoice.Message = ex.Message;
-                returnInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnInvoice.Result = new List<ReturnInvoiceModel>();
+                return GlobalExceptionHandler.ExceptionError<List<ReturnInvoiceModel>>(ex.Message);
             }
-            return returnInvoice;
         }
 
         [HttpGet]
@@ -62,37 +49,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
         public async Task<ApiResponse<List<ReturnInvoiceModel>>> GetReturnInvoiceByDateAsync([Required] DateTime fromDate, [Required] DateTime toDate)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var returnInvoice = new ApiResponse<List<ReturnInvoiceModel>>();
             try
             {
-                var execute = await _unitOfWork.ReturnInvoice.GetReturnInvoiceByDateAsync(credential.DbCode!, fromDate, toDate);
+                var execute = await unitOfWork.ReturnInvoice.GetReturnInvoiceByDateAsync(credential.DbCode!, fromDate, toDate);
                 if (execute.Count > 0)
                 {
-                    returnInvoice.Message = "Return Invoices fetched successfully";
-                    returnInvoice.Success = true;
-                    returnInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    returnInvoice.Result = execute;
+                    return ApiResponse<List<ReturnInvoiceModel>>.Builder()
+                        .WithMessage("Return Invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    returnInvoice.Message = "Return Invoices fetched unsuccessfully";
-                    returnInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    returnInvoice.Result = new List<ReturnInvoiceModel>();
+                    return ApiResponse<List<ReturnInvoiceModel>>.Builder()
+                        .WithMessage("Return Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<ReturnInvoiceModel>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                returnInvoice.Message = ex.Message;
-                returnInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnInvoice.Result = new List<ReturnInvoiceModel>();
             }
             catch (Exception ex)
             {
-                returnInvoice.Message = ex.Message;
-                returnInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                returnInvoice.Result = new List<ReturnInvoiceModel>();
+                return GlobalExceptionHandler.ExceptionError<List<ReturnInvoiceModel>>(ex.Message);
             }
-            return returnInvoice;
         }
     }
 }

@@ -1,7 +1,3 @@
-﻿
-using System.ComponentModel;
-using System.Reflection;
-
 namespace BC.PAYMENT.CORE.Enums
 {
     public static class GetEnumDescription

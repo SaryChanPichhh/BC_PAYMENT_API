@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Models;
+using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
 using Microsoft.AspNetCore.Mvc;
@@ -11,53 +11,37 @@ using BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment;
 namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DailyPayment
 {
 
-    public class ExpenseDetailController : BaseApiController
+    public class ExpenseDetailController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public ExpenseDetailController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpPost]
         [Route("getexpensedetailbydate")]
         public async Task<ApiResponse<PaginatedResponse<ExpenseDetailModel>>> GetExpenseDetailByDateAsync([FromBody] ByDateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var expenseDetail = new ApiResponse<PaginatedResponse<ExpenseDetailModel>>();
             try
             {
                 var expenseDetails =
-                    await _unitOfWork.DailyPayment.GetExpenseDetailByDateAsync(credential.DbCode!, model.FromDate, model.ToDate);
+                    await unitOfWork.DailyPayment.GetExpenseDetailByDateAsync(credential.DbCode!, model.FromDate, model.ToDate);
                 var newExpenseResponds =
                     expenseDetails.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
                 if (newExpenseResponds.Any())
                 {
-                    expenseDetail.StatusCode = (int)HttpStatusCode.OK;
-                    expenseDetail.Success = true;
-                    expenseDetail.Message = "Expense detail fetched successfully";
-                    expenseDetail.Result = new PaginatedResponse<ExpenseDetailModel>(newExpenseResponds, newExpenseResponds.Count, model.Page, model.PageSize);
+                    return ApiResponse<PaginatedResponse<ExpenseDetailModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Expense detail fetched successfully")
+                        .WithResult(new PaginatedResponse<ExpenseDetailModel>(newExpenseResponds, newExpenseResponds.Count, model.Page, model.PageSize))
+                        .Build();
                 }
-                else
-                {
-                    expenseDetail.StatusCode = (int)HttpStatusCode.BadRequest;
-                    expenseDetail.Success = false;
-                    expenseDetail.Message = "Expense detail fetched unsuccessfully";
-                }
-            }
-            catch (SqlException ex)
-            {
-                expenseDetail.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expenseDetail.Success = false;
-                expenseDetail.Message = $@"Sql Exception : {ex.Message}";
+                
+                return ApiResponse<PaginatedResponse<ExpenseDetailModel>>.Builder()
+                    .WithStatusCode((int)HttpStatusCode.BadRequest)
+                    .WithMessage("Expense detail fetched unsuccessfully")
+                    .Build();
             }
             catch (Exception ex)
             {
-                expenseDetail.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expenseDetail.Success = false;
-                expenseDetail.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<ExpenseDetailModel>>(ex.Message);
             }
-            return expenseDetail;
         }
         
         [HttpPost]
@@ -65,40 +49,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DailyPayment
         public async Task<ApiResponse<PaginatedResponse<ExpenseDetailModel>>> GetExpenseDetailByPeriodAsync([FromBody] ByPeriodDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var expenseDetail = new ApiResponse<PaginatedResponse<ExpenseDetailModel>>();
             try
             {
                 var expenseDetails =
-                    await _unitOfWork.DailyPayment.GetExpenseDetailByPeriodAsync(credential.DbCode!, model.Month, model.Year);
+                    await unitOfWork.DailyPayment.GetExpenseDetailByPeriodAsync(credential.DbCode!, model.Month, model.Year);
                 var newExpenseResponds =
                     expenseDetails.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
                 if (newExpenseResponds.Any())
                 {
-                    expenseDetail.StatusCode = (int)HttpStatusCode.OK;
-                    expenseDetail.Success = true;
-                    expenseDetail.Message = "Paid invoices fetched successfully";
-                    expenseDetail.Result = new PaginatedResponse<ExpenseDetailModel>(newExpenseResponds, newExpenseResponds.Count, model.Page, model.PageSize);
+                    return ApiResponse<PaginatedResponse<ExpenseDetailModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Paid invoices fetched successfully")
+                        .WithResult(new PaginatedResponse<ExpenseDetailModel>(newExpenseResponds, newExpenseResponds.Count, model.Page, model.PageSize))
+                        .Build();
                 }
-                else
-                {
-                    expenseDetail.StatusCode = (int)HttpStatusCode.BadRequest;
-                    expenseDetail.Success = false;
-                    expenseDetail.Message = "Paid invoices fetched unsuccessfully";
-                }
-            }
-            catch (SqlException ex)
-            {
-                expenseDetail.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expenseDetail.Success = false;
-                expenseDetail.Message = $@"Sql Exception : {ex.Message}";
+                
+                return ApiResponse<PaginatedResponse<ExpenseDetailModel>>.Builder()
+                    .WithStatusCode((int)HttpStatusCode.BadRequest)
+                    .WithMessage("Paid invoices fetched unsuccessfully")
+                    .Build();
             }
             catch (Exception ex)
             {
-                expenseDetail.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expenseDetail.Success = false;
-                expenseDetail.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<ExpenseDetailModel>>(ex.Message);
             }
-            return expenseDetail;
         }
         
         [HttpPut]
@@ -106,39 +80,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DailyPayment
         public async Task<ApiResponse<ExpenseDetailDto>> UpdateExpenseDetailByPeriodAsync([FromBody] ExpenseDetailDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var expenseDetail = new ApiResponse<ExpenseDetailDto>();
             try
             {
 
                 var affectedRow =
-                    await _unitOfWork.DailyPayment.UpdateExpenseDetailAsync(model);
+                    await unitOfWork.DailyPayment.UpdateExpenseDetailAsync(model);
                 if (affectedRow > 0 )
                 {
-                    expenseDetail.StatusCode = (int)HttpStatusCode.OK;
-                    expenseDetail.Success = true;
-                    expenseDetail.Message = "Expense detail updated successfully";
-                    expenseDetail.Result = model;
+                    return ApiResponse<ExpenseDetailDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Expense detail updated successfully")
+                        .WithResult(model)
+                        .Build();
                 }
-                else
-                {
-                    expenseDetail.StatusCode = (int)HttpStatusCode.BadRequest;
-                    expenseDetail.Success = false;
-                    expenseDetail.Message = "Expense detail updated unsuccessfully";
-                }
-            }
-            catch (SqlException ex)
-            {
-                expenseDetail.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expenseDetail.Success = false;
-                expenseDetail.Message = $@"Sql Exception : {ex.Message}";
+                
+                return ApiResponse<ExpenseDetailDto>.Builder()
+                    .WithStatusCode((int)HttpStatusCode.BadRequest)
+                    .WithMessage("Expense detail updated unsuccessfully")
+                    .Build();
             }
             catch (Exception ex)
             {
-                expenseDetail.StatusCode = (int)HttpStatusCode.InternalServerError;
-                expenseDetail.Success = false;
-                expenseDetail.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<ExpenseDetailDto>(ex.Message);
             }
-            return expenseDetail;
         }
     }
 }

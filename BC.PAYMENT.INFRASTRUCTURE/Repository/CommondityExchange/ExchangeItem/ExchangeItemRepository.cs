@@ -1,15 +1,3 @@
-﻿
-using System.Data;
-using System.Diagnostics;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.ExchangeItem;
-using BC.PAYMENT.CORE.DTO.CommondityExchange.ExchangeItem;
-using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ExchangeItem
 {
     

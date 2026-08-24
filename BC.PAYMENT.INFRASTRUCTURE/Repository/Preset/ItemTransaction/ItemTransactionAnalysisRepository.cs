@@ -1,8 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Preset.ItemTransaction;
-using BC.PAYMENT.CORE.Entities.Preset.ItemTransaction;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using System.Data;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ItemTransaction
 {
     public class ItemTransactionAnalysisRepository : IItemTransactionAnalysisRepository

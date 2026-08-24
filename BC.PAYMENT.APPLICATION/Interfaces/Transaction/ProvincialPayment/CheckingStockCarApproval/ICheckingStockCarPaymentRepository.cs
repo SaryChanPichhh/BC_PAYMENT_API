@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.CheckingStockCarPayment;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.CheckingStockCarApproval
 {
     public interface ICheckingStockCarPaymentRepository

@@ -1,5 +1,3 @@
-﻿using Microsoft.Data.SqlClient;
-
 namespace BC.PAYMENT.TEST.Helper
 {
     public static class TestConstants

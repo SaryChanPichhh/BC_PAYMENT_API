@@ -1,9 +1,4 @@
-﻿using System.Data;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
+using NewInvoiceModel = BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice.NewInvoiceModel;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice
 {

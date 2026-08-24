@@ -1,7 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid;
 using ReturnInvoiceModel = BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment.ReturnInvoiceModel;
 
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment

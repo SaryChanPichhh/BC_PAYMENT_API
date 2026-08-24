@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Enums;
-
 namespace BC.PAYMENT.CORE.Entities.Accounting
 {
     public class AccountReceivableModel

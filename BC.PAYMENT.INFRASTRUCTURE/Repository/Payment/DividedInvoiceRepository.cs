@@ -1,12 +1,4 @@
-﻿using System.Data;
-using BC.PAYMENT.APPLICATION.Interfaces.Payment;
-using BC.PAYMENT.CORE.DTO.Filter;
-using BC.PAYMENT.CORE.DTO.Invoice;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Entities.Invoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using BC.PAYMENT.INFRASTRUCTURE.Helper;
-using Dapper;
+using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Payment.IDividedInvoiceRepository;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
 {

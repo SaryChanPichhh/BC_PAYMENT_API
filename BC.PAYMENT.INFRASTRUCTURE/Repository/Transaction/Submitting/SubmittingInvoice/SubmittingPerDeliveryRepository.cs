@@ -1,7 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice
 {
     public class SubmittingPerDeliveryRepository : ISubmittingPerDeliveryRepository

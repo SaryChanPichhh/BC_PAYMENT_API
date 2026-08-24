@@ -1,10 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Entities.Prepare.Preset;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using System.Reflection;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Preset
 {
     public class DistrictRepository : IDistrictRepository

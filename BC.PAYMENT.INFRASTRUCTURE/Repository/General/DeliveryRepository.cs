@@ -1,8 +1,3 @@
-﻿using System.Data;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
     public class DeliveryRepository : IDeliveryRepository

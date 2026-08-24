@@ -1,13 +1,3 @@
-﻿
-using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.CommondityExchange.RepairItem;
-using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.RepairItem

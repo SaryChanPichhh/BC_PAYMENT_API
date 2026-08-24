@@ -1,6 +1,3 @@
-﻿
-
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.InvoiceVerify;
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.InvoiceVerify
 {
     public interface IMonthlyInvoiceRepository

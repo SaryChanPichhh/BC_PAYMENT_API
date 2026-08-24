@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BC.PAYMENT.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v2/[controller]")]
     [TypeFilter(typeof(AuthorizeAttribute))]
     [ApiController]
     public class BaseApiController : ControllerBase

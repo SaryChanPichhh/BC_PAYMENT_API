@@ -1,10 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Repairer;
-using BC.PAYMENT.CORE.DTO.CommondityExchange.RepairItem;
-using BC.PAYMENT.CORE.Entities.CommondityExchange.RepairItem;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.Repairer
 {
     public class RepairerRepository : IRepairerRepository , ICompletedRepairRepository
@@ -87,6 +80,49 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.Repairer
             };
             var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;
+        }
+
+        public async Task<ItemBeingRepaired> GetItemByTransactionCode(string dbCode, string barCode)
+        {
+            var sql = $@"SELECT SUM(COMPLETED.QUANTITY) CompletedQuantity ,REPAIR.QUANTITY RepairQuantity,REPAIR.CUSTOMER_CODE CustomerCode,REPAIR.TRAN_REF Transaction,
+	                    REPAIR.ITEM_CODE ItemCode,DESCRIPTION Description,RECEIVED_DATE CreatedDate, COMPLETED.ITEM_STATUS ItemStatus
+	                    FROM TB_BC_CHANGEINVOICE_REPAIR REPAIR 
+	                    LEFT JOIN TB_BC_CHANGEINVOICE_REPAIR_COMPLETED COMPLETED
+	                    ON REPAIR.TRAN_REF = COMPLETED.TRAN_REF WHERE  IS_RECEIVED = 'Yes' AND REPAIR.DB_CODE = @DB_CODE AND REPAIR.TRAN_REF = @Transaction
+	                    GROUP BY REPAIR.QUANTITY,REPAIR.CUSTOMER_CODE ,REPAIR.TRAN_REF ,
+	                    REPAIR.ITEM_CODE ,DESCRIPTION ,RECEIVED_DATE, COMPLETED.ITEM_STATUS;";
+            var param = new
+            {
+                DB_CODE = dbCode,
+                Transaction = barCode,
+            };
+            var execute = await _sqlDataAccess.LoadSingleData<ItemBeingRepaired, dynamic>(sql,param);
+            return execute;
+        }
+
+        public async Task<int> InsertCompletedRepairItemAsync(ItemRepairReceivedModel model)
+        {
+            var sql= @"INSERT INTO TB_BC_CHANGEINVOICE_REPAIR_COMPLETED(DB_CODE,CUSTOMER_CODE,ITEM_CODE,TRAN_REF,QUANTITY,STATUS_REPAIR,NOTE,CREATED_DATE,CREATED_BY,STATUS,REPAIR_TOOL_CODE,ITEM_STATUS,ITEM_DESCRIPTION)
+            VALUES(@DB_CODE,@CUSTOMER_CODE,@ITEM_CODE,@TRAN_REF,@QUANTITY,@STATUS_REPAIR,@NOTE,@CREATED_DATE,@CREATED_BY,'Pending',@REPAIR_TOOL_CODE,@ITEM_STATUS,@ITEM_DESCRIPTION)
+            IF @@ROWCOUNT > 0
+	            UPDATE TB_BC_CHANGEINVOICE_REPAIR SET IS_RECEIVED = 'Completed' WHERE TRAN_REF = @TRAN_REF AND DB_CODE = @DB_CODE";
+            var param = new
+            {
+                DB_CODE = model.DbCode,
+                CUSTOMER_CODE = model.CustomerCode,
+                ITEM_CODE = model.ItemCode,
+                TRAN_REF = model.TransactionCode,
+                QUANTITY = model.Quantity,
+                STATUS_REPAIR = model.RepairStatus,
+                CREATED_DATE = DateTime.Today,
+                CREATED_BY = model.CreateBy,
+                NOTE = model.Description,
+                REPAIR_TOOL_CODE = model.RepairToolCode,
+                ITEM_STATUS = model.ItemStatus,
+                ITEM_DESCRIPTION = model.ItemDescription
+            };
+            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql,param);
+            return affectedRow; 
         }
     }
 }

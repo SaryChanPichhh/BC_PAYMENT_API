@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Datasources\" />
+    <Folder Include="Dtos\" />
+    <Folder Include="Helper\" />
+    <Folder Include="IServices\" />
+    <Folder Include="Services\" />
+    <Folder Include="Reports\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DevExpress.AspNetCore.Common.v24.2">
+      <HintPath>C:\Program Files\DevExpress 24.2\Components\Offline Packages\devexpress.aspnetcore.common\24.2.7\lib\net8.0\DevExpress.AspNetCore.Common.v24.2.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

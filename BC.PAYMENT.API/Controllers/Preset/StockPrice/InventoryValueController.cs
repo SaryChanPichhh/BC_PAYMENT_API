@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.Preset.InventoryValue;
@@ -26,34 +26,29 @@ namespace BC.PAYMENT.API.Controllers.Preset.StockPrice
         public async Task<ApiResponse<List<InventoryValueModel>>> GetInventoryValueAsync([FromBody] InventoryValueDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var inventoryValue = new ApiResponse<List<InventoryValueModel>>();
             try
             {
                 var execute = await _unitOfWork.InventoryValue.GetInventoryValueAsync(model.BranchDtos.ToDictionary(x => x.DbCode, x => x.DbName), model.Page, model.PageSize);
                 if (execute.Any())
                 {
-                    inventoryValue.Result = execute;
-                    inventoryValue.StatusCode = StatusCodes.Status200OK;
-                    inventoryValue.Success = true;
-                    inventoryValue.Message = "Account receivable fetched successfully";
+                    return ApiResponse<List<InventoryValueModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Account receivable fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    inventoryValue.StatusCode = StatusCodes.Status400BadRequest;
-                    inventoryValue.Message = "Account receivable fetched unsuccessfully";
+                    return ApiResponse<List<InventoryValueModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Account receivable fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                inventoryValue.StatusCode = StatusCodes.Status500InternalServerError;
-                inventoryValue.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                inventoryValue.StatusCode = StatusCodes.Status500InternalServerError;
-                inventoryValue.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<InventoryValueModel>>(ex.Message);
             }
-            return inventoryValue;
         }
     }
 }

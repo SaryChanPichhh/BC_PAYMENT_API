@@ -1,10 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice;
-using BC.PAYMENT.CORE.Entities.Invoice;
-using BC.PAYMENT.CORE.Entities.Transaction.Audit.VerifyInvoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.VerifyInvoice
 {
     public class VerifyInvoiceRepository : IVerifyInvoiceRepository

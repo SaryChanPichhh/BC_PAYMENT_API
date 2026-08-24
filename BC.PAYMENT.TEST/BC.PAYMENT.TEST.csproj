@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -15,12 +15,19 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.6.1" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.6.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
+
   <ItemGroup>
-    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+    <ProjectReference Include="..\BC.PAYMENT.API\BC.PAYMENT.API.csproj" />
+    <ProjectReference Include="..\BC.PAYMENT.CORE\BC.PAYMENT.CORE.csproj" />
+    <ProjectReference Include="..\BC.PAYMENT.APPLICATION\BC.PAYMENT.APPLICATION.csproj" />
+    <ProjectReference Include="..\BC.PAYMENT.INFRASTRUCTURE\BC.PAYMENT.INFRASTRUCTURE.csproj" />
   </ItemGroup>
 
 </Project>

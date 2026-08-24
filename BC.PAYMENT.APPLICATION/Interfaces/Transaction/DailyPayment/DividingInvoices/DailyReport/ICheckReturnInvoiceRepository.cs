@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.DailyReport;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport
 {
     public interface ICheckReturnInvoiceRepository

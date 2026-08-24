@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -7,54 +7,43 @@ using BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment;
 using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
 {
 
-    public class SubmittingPerDeliveryController : BaseApiController
+    public class SubmittingPerDeliveryController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public SubmittingPerDeliveryController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpPost]
         [Route("getallsubmittingperdelivery")]
         public async Task<ApiResponse<PaginatedResponse<ExpenseDetailModel>>> GetAllSubmittedInvoices([FromBody] ByDateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<PaginatedResponse<ExpenseDetailModel>>();
             try
             {
-                var submittedInvoices = await _unitOfWork.SubmittingPerDelivery.GetSubmittedInvoicesAsync(credential.DbCode!,model.FromDate,model.ToDate);
+                var submittedInvoices = await unitOfWork.SubmittingPerDelivery.GetSubmittedInvoicesAsync(credential.DbCode!,model.FromDate,model.ToDate);
                 var newResponds = submittedInvoices.Skip(model.Page-1*model.PageSize).Take(model.PageSize).ToList();
                 if (submittedInvoices.Any())
                 {
-                    submittedInvoice.Result = new PaginatedResponse<ExpenseDetailModel>(newResponds,submittedInvoices.Count,model.Page,model.PageSize);
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    submittedInvoice.Message = "Submitted Invoices fetched successfully";
-                    submittedInvoice.Success = true;
+                    var result = new PaginatedResponse<ExpenseDetailModel>(newResponds,submittedInvoices.Count,model.Page,model.PageSize);
+                    return ApiResponse<PaginatedResponse<ExpenseDetailModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices fetched unsuccessfully";
+                    return ApiResponse<PaginatedResponse<ExpenseDetailModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
                 
-            }catch (SqlException ex)
-            {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<ExpenseDetailModel>>(ex.Message);
             }
-            return submittedInvoice;
         }
         
         [HttpPost]
@@ -62,7 +51,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
         public async Task<ApiResponse<ExpenseDetailPostDto>> AddNewSubmittedInvoiceAynsc([FromBody] ExpenseDetailPostDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<ExpenseDetailPostDto>();
             try
             {
                 var submittedInvoicesModel = new ExpenseDetailModel
@@ -79,32 +67,28 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
                     CreateDate = DateTime.Now,
                     DbCode = credential.DbCode!
                 };
-                var affectedRow = await _unitOfWork.SubmittingPerDelivery.AddNewSubmittedInvoicesAsync(submittedInvoicesModel);
+                var affectedRow = await unitOfWork.SubmittingPerDelivery.AddNewSubmittedInvoicesAsync(submittedInvoicesModel);
                 if (affectedRow > 0)
                 {
-                    submittedInvoice.Result = model;
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    submittedInvoice.Message = "Submitted Invoices added successfully";
-                    submittedInvoice.Success = true;
+                    return ApiResponse<ExpenseDetailPostDto>.Builder()
+                        .WithMessage("Submitted Invoices added successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices added unsuccessfully";
+                    return ApiResponse<ExpenseDetailPostDto>.Builder()
+                        .WithMessage("Submitted Invoices added unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
                 
-            }catch (SqlException ex)
-            {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<ExpenseDetailPostDto>(ex.Message);
             }
-            return submittedInvoice;
         }
-
     }
 }

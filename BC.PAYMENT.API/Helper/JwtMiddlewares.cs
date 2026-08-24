@@ -4,15 +4,8 @@ using BC.PAYMENT.LOGGING;
 
 namespace BC.PAYMENT.API.Helper
 {
-    public class JwtMiddlewares
+    public class JwtMiddlewares(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public JwtMiddlewares(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task Invoke(HttpContext context, IUnitOfWork unitOfWork)
         {
             try
@@ -46,7 +39,7 @@ namespace BC.PAYMENT.API.Helper
             }
 
             // Continue with the pipeline
-            await _next(context);
+            await next(context);
         }
 
        

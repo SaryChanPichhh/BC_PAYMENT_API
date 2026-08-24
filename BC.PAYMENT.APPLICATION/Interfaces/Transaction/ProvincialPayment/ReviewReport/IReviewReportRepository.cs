@@ -1,9 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.ReviewReport;
-using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.DailySubmission;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport
 {
     public interface IReviewReportRepository

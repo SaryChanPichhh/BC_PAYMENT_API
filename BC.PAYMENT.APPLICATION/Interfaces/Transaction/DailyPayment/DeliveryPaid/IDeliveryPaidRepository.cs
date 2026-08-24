@@ -1,11 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BC.PAYMENT.CORE.Entities.Expense;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid
 {
     public interface IDeliveryPaidRepository

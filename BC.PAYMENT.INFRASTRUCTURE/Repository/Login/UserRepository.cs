@@ -1,12 +1,4 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Login;
-using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.CORE.DTO.Login;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Entities.Login;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using BC.PAYMENT.SQL.Queries;
-using Microsoft.Data.SqlClient;
+using BC.PAYMENT.CORE.Contracts.Login;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
 {
@@ -90,6 +82,29 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
             };
             return (await _sqlDataAccess.LoadSingleData<User, dynamic>(UserStoreProcedures.UserById, param));
 
+        }
+
+        public async Task<string> GetUserForOTP(string username)
+        {
+            var sql =
+                @"SELECT USER_ID FROM BCUSERS WHERE USER_NAME = @USER_NAME AND USER_STATUS = '1'";
+            var param = new
+            {
+                USER_NAME = username
+            };
+            return (await _sqlDataAccess.LoadSingleData<string, dynamic>(sql, param));
+        }
+
+        public async Task<Dictionary<string, string>> IsExistsUserName(string username)
+        {
+            if (string.IsNullOrEmpty(username))
+            {
+                return new Dictionary<string, string>();
+            }
+            var execute = await _sqlDataAccess.LoadData<dynamic,dynamic>(UserStoreProcedures.IsExistsUser
+                ,new {APP_CODE ="PYS", USER_NAME = username});
+            var convert = execute.ToDictionary(x=>(string)x.DbCode,y=>(string)y.DbName) ;
+            return convert;
         }
 
         //public async Task<List<User>> GetBcUserCredential(string username)

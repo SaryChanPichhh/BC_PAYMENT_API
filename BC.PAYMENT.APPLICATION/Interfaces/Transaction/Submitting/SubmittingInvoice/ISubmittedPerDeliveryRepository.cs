@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice
 {
     public interface ISubmittedPerDeliveryRepository

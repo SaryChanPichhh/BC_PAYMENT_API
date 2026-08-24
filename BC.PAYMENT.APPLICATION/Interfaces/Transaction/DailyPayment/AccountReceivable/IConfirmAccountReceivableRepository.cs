@@ -1,7 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.BaseInterface;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.AccountReceivable;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.AccountReceivable
 {
     public interface IConfirmAccountReceivableRepository : IBaseRepository<ConfirmAccountReceivableModel.ConfirmBalance>

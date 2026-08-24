@@ -1,8 +1,3 @@
-﻿using System.ComponentModel;
-using BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationStock
 {
     public interface IVerificationStockRepository

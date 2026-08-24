@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Enums;
-
 namespace BC.PAYMENT.CORE.Entities.Invoice
 {
     public class InvoicesModel : Customer

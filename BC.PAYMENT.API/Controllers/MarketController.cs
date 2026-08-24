@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.General;
@@ -7,7 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System.Net;
+using BC.PAYMENT.API.Constants;
+using BC.PAYMENT.CORE.Contracts.Request.Market;
 using BC.PAYMENT.LOGGING;
+using BC.PAYMENT.CORE.Contracts.Response.Market;
+using BC.PAYMENT.CORE.Entities.Setting.Preset;
+using BC.PAYMENT.CORE.Mappers;
 
 namespace BC.PAYMENT.API.Controllers
 {
@@ -17,7 +22,6 @@ namespace BC.PAYMENT.API.Controllers
         #region ===[ Private Members ]=============================================================
 
         private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
 
         #endregion
 
@@ -26,10 +30,10 @@ namespace BC.PAYMENT.API.Controllers
         /// <summary>
         /// Initialize MarketController by injecting an object type of IUnitOfWork
         /// </summary>
-        public MarketController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
+        public MarketController(IUnitOfWork unitOfWork)
         {
             this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
+            
         }
 
         #endregion
@@ -38,51 +42,35 @@ namespace BC.PAYMENT.API.Controllers
         [HttpGet("")]
         public async Task<ApiResponse<List<Market>>> GetMarket()
         {
-            var apiResponse = new ApiResponse<List<Market>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
 
                 var data = await _unitOfWork.Markets.GetMarket(claim.DbCode!);
-                if (!data.Any())
+                if (data.Count == 0)
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No new markets";
-                    apiResponse.Result = new List<Market>();
-                    return apiResponse;
+                    return ApiResponse<List<Market>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("No new markets")
+                        .WithResult(new List<Market>())
+                        .Build();
                 }
-
-                apiResponse.Success = true;
-                apiResponse.Message = "Markets fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
                 data.ForEach(x =>
                 {
                     var encryptedId = EncryptionHelper.EncryptAES(x.MarketID!.ToString());
                     encryptedId = Uri.EscapeDataString(encryptedId); // Ensure URL safety
-                    x.ImagePath = $"api/markets/image/{encryptedId}".Trim();
+                    x.ImagePath = $"api/v2/markets/image/{encryptedId}".Trim();
                 });
-
-                apiResponse.Result = data;
-
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<List<Market>>.Builder()
+                    .WithMessage("Markets fetched successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(data)
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<Market>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [AllowAnonymous]
@@ -94,21 +82,126 @@ namespace BC.PAYMENT.API.Controllers
                 // helper = new EncryptionHelper(_configuration);
 
                 // Decrypt the deliveryId from the request
-                string decryptedId = EncryptionHelper.DecryptAES(Uri.UnescapeDataString(marketId));
+                var decryptedId = EncryptionHelper.DecryptAES(Uri.UnescapeDataString(marketId));
 
-                // Fetch the image using the decrypted deliveryId
-                var data = await _unitOfWork.Deliveries.GetDeliveryImage(decryptedId);
+                // Fetch the image using the decrypted marketId
+                var imageBytes = await _unitOfWork.Markets.GetMarketImageAsync(decryptedId);
 
-                if (data == null || data.Image == null)
+                if (imageBytes.Length == 0)
                 {
                     return NotFound("Image not found");
                 }
 
-                return File(data.Image, "image/jpeg");
+                return File(imageBytes, "image/jpeg");
             }
             catch (Exception ex)
             {
-                return BadRequest($"Invalid or tampered deliveryId: {ex.Message}");
+                return Ok(ex.Message);
+            }
+        }
+
+        [HttpPost("By-SaleTypes")]
+        public async Task<ApiResponse<List<Market>>> LoadMarketBySaleTypes([FromForm] List<string> saleTypes, [FromForm] int fromMov, [FromForm] int toMov)
+        {
+            try
+            {
+                var claim = Common.DecodeJwt(HttpContext.User);
+                
+                var data = await _unitOfWork.Markets.LoadMarketBySaleTypesAsync(claim.DbCode!, saleTypes, fromMov, toMov);
+                return ApiResponse<List<Market>>.Builder()
+                    .WithMessage("Markets loaded successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(data)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<List<Market>>(ex.Message);
+            }
+        }
+
+        [HttpGet("By-DbCode")]
+        public async Task<ApiResponse<List<MarketResponse>>> GetMarketByDbCode()
+        {
+            try
+            {
+                var claim = Common.DecodeJwt(HttpContext.User);
+                var data = await _unitOfWork.Markets.GetMarketByDbCodeAsync(claim.DbCode!);
+                return ApiResponse<List<MarketResponse>>.Builder()
+                    .WithMessage("Markets loaded successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(data)
+                    .Build();
+            }
+            catch (SqlException ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<List<MarketResponse>>(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<List<MarketResponse>>(ex.Message);
+            }
+        }
+        [HttpPost("")]
+        public async Task<ApiResponse<int>> AddNewMarket([FromBody] MarketCreateRequest model)
+        {
+            try
+            {
+                var claim = Common.DecodeJwt(HttpContext.User);
+                var data = model.ToMarketModel();
+                data.DbCode = claim.DbCode;
+                data.CreatedBy = claim.Username;
+                data.CreatedAt = DateTime.Now;
+                var execute = await _unitOfWork.Markets.AddNewMarketAsync(data);
+                return ApiResponse<int>.Builder()
+                    .WithMessage(execute > 0 ? "Market added successfully." :"Market added unsuccessfully.")
+                    .WithStatusCode(execute > 0 ? (int)HttpStatusCode.Created : (int)HttpStatusCode.BadRequest)
+                    .WithResult(execute)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
+            }
+        }
+
+        [HttpPut("")]
+        public async Task<ApiResponse<int>> UpdateMarket([FromBody] MarketModel model)
+        {
+            try
+            {
+                var claim = Common.DecodeJwt(HttpContext.User);
+                model.DbCode = claim.DbCode;
+                model.UpdatedBy = claim.Username;
+                model.UpdatedAt = DateTime.Now;
+                var execute = await _unitOfWork.Markets.UpdateMarketAsync(model);
+                return ApiResponse<int>.Builder()
+                    .WithMessage("Market updated successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(execute)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
+            }
+        }
+
+        [HttpDelete("{marketId}")]
+        public async Task<ApiResponse<int>> DeleteMarket(string marketId)
+        {
+            try
+            {
+                var execute = await _unitOfWork.Markets.DeleteMarketAsync(marketId);
+                return ApiResponse<int>.Builder()
+                    .WithMessage("Market deleted successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(execute)
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
         }
     }

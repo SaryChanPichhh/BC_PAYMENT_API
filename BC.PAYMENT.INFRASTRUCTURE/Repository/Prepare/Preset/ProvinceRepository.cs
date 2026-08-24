@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
-using BC.PAYMENT.CORE.Entities.Prepare.Preset;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Preset
 {
     public  class ProvinceRepository : IProvinceRepository

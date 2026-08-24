@@ -1,8 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
-using BC.PAYMENT.CORE.DTO.Accounting;
-using BC.PAYMENT.CORE.Entities.Accounting;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
 {
     public class AnalysisAccountRepository : IAnalysisAccountRepository
@@ -38,27 +33,27 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
 
         }
 
-        public async Task<List<AnalysisCode>> GetAnalysisByDetail(AnalysisCodeDTO analysisCodeDto)
+        public async Task<List<AnalysisCode>> GetAnalysisByDetail(AnalysisCodeCreateRequest analysisCodeCreateRequest)
         {
             const string sql =
                 @"SELECT ANAD_CODE AnadCode,ANAD_DESC AnadDesc,ANAD_COM AnadCom FROM SIANALD WHERE ANAM_CODE = @ANAM_CODE AND DB_CODE = @DB_CODE";
             var param = new
             {
-                ANAM_CODE = analysisCodeDto.AnamCode,
-                DB_CODE = analysisCodeDto.DbCode
+                ANAM_CODE = analysisCodeCreateRequest.AnamCode,
+                DB_CODE = analysisCodeCreateRequest.DbCode
             };
             var result = await _sqlDataAccess.LoadData<AnalysisCode, dynamic>(sql, param);
             return result.ToList();
         }
 
-        public async Task<List<AnalysisCode>> GetAnalysisByRange(AnalysisCodeDTO analysisCodeDto)
+        public async Task<List<AnalysisCode>> GetAnalysisByRange(AnalysisCodeCreateRequest analysisCodeCreateRequest)
         {
             const string sql =
                 @"SELECT ANAD_CODE AnadCode,ANAD_COM AnadCom FROM SIANALD WHERE ANAM_CODE = @ANAM_CODE AND DB_CODE = @DB_CODE";
             var param = new
             {
-                ANAM_CODE = analysisCodeDto.AnamCode,
-                DB_CODE = analysisCodeDto.DbCode
+                ANAM_CODE = analysisCodeCreateRequest.AnamCode,
+                DB_CODE = analysisCodeCreateRequest.DbCode
             };
             var result = await _sqlDataAccess.LoadData<AnalysisCode, dynamic>(sql, param);
             return result.ToList();

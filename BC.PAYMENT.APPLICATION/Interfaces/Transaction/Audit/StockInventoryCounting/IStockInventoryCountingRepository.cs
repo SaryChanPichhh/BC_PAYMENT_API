@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Transaction.Audit.InventoryCounting;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.StockInventoryCounting
 {
     public interface IStockInventoryCountingRepository

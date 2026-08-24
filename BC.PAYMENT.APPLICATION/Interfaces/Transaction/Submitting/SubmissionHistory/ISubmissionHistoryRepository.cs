@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.HistoryApproval;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.HistoryApproval
 {
     public interface ISubmissionHistoryRepository

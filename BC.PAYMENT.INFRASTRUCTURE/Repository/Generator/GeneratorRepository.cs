@@ -1,15 +1,3 @@
-﻿
-
-using System.Data;
-using System.Diagnostics;
-using BC.PAYMENT.API.Helper;
-using BC.PAYMENT.APPLICATION.Interfaces.Generator;
-using BC.PAYMENT.CORE.DTO.Generator;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
 {
     public class GeneratorRepository : IGeneratorRepository

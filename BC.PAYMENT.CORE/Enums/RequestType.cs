@@ -1,6 +1,3 @@
-﻿
-using System.ComponentModel;
-
 namespace BC.PAYMENT.CORE.Enums
 {
     public enum RequestType

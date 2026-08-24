@@ -1,15 +1,4 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.DailyRefundItems;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BC.PAYMENT.CORE.Entities.CommondityExchange.DailyRefundItems;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using System.Runtime.CompilerServices;
+using ItemModel = BC.PAYMENT.CORE.Entities.CommondityExchange.DailyRefundItems.ItemModel;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundItems
 {

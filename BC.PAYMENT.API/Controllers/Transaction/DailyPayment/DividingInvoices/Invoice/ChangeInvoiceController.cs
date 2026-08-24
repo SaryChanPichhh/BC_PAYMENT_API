@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Enums;
@@ -26,37 +26,31 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
         public async Task<ApiResponse<List<NewInvoiceModel>>> GetInvoicesAsync()
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var changeInvoice = new ApiResponse<List<NewInvoiceModel>>();
             try
             {
                 var execute = await _unitOfWork.NewInvoice.GetInvoices(InvoiceTypes.NewInvoice, credential.DbCode!, DateTime.Today);
                 if (execute.Count > 0)
                 {
-                    changeInvoice.Message = "New Invoices fetched successfully";
-                    changeInvoice.Success = true;
-                    changeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    changeInvoice.Result = execute;
+                    return ApiResponse<List<NewInvoiceModel>>.Builder()
+                        .WithMessage("New Invoices fetched successfully")
+                        .WithSuccess(true)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    changeInvoice.Message = "New Invoices fetched unsuccessfully";
-                    changeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    changeInvoice.Result = new List<NewInvoiceModel>();
+                    return ApiResponse<List<NewInvoiceModel>>.Builder()
+                        .WithMessage("New Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<NewInvoiceModel>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new List<NewInvoiceModel>();
             }
             catch (Exception ex)
             {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new List<NewInvoiceModel>();
+                return GlobalExceptionHandler.ExceptionError<List<NewInvoiceModel>>(ex.Message);
             }
-            return changeInvoice;
         }
 
         [HttpGet]
@@ -64,37 +58,31 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
         public async Task<ApiResponse<List<ChangeInvoiceModel>>> GetLocalInvoiceAsync([Required] DateTime fromDate, DateTime toDate)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var changeInvoice = new ApiResponse<List<ChangeInvoiceModel>>();
             try
             {
                 var execute = await _unitOfWork.ChangeInvoice.GetLocalInvoiceAsync(credential.DbCode!, fromDate, toDate);
                 if (execute.Count > 0)
                 {
-                    changeInvoice.Message = "Invoices fetched successfully";
-                    changeInvoice.Success = true;
-                    changeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    changeInvoice.Result = execute;
+                    return ApiResponse<List<ChangeInvoiceModel>>.Builder()
+                        .WithMessage("Invoices fetched successfully")
+                        .WithSuccess(true)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    changeInvoice.Message = "Invoices fetched unsuccessfully";
-                    changeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    changeInvoice.Result = new List<ChangeInvoiceModel>();
+                    return ApiResponse<List<ChangeInvoiceModel>>.Builder()
+                        .WithMessage("Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<ChangeInvoiceModel>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new List<ChangeInvoiceModel>();
             }
             catch (Exception ex)
             {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new List<ChangeInvoiceModel>();
+                return GlobalExceptionHandler.ExceptionError<List<ChangeInvoiceModel>>(ex.Message);
             }
-            return changeInvoice;
         }
 
         [HttpGet]
@@ -102,37 +90,31 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
         public async Task<ApiResponse<List<ChangeInvoiceModel>>> GetOtherBranchesInvoiceAsync([Required] DateTime fromDate, DateTime toDate)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var changeInvoice = new ApiResponse<List<ChangeInvoiceModel>>();
             try
             {
                 var execute = await _unitOfWork.ChangeInvoice.GetOtherBranchInvoiceAsync(credential.DbCode!, fromDate, toDate);
                 if (execute.Count > 0)
                 {
-                    changeInvoice.Message = "Invoices fetched successfully";
-                    changeInvoice.Success = true;
-                    changeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    changeInvoice.Result = execute;
+                    return ApiResponse<List<ChangeInvoiceModel>>.Builder()
+                        .WithMessage("Invoices fetched successfully")
+                        .WithSuccess(true)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    changeInvoice.Message = "Invoices fetched unsuccessfully";
-                    changeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    changeInvoice.Result = new List<ChangeInvoiceModel>();
+                    return ApiResponse<List<ChangeInvoiceModel>>.Builder()
+                        .WithMessage("Invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<ChangeInvoiceModel>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new List<ChangeInvoiceModel>();
             }
             catch (Exception ex)
             {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new List<ChangeInvoiceModel>();
+                return GlobalExceptionHandler.ExceptionError<List<ChangeInvoiceModel>>(ex.Message);
             }
-            return changeInvoice;
         }
 
         [HttpPost]
@@ -140,7 +122,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
         public async Task<ApiResponse<ChangeInvoiceDto>> AddIfExistsInvoiceAsync(ChangeInvoiceDto model)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var changeInvoice = new ApiResponse<ChangeInvoiceDto>();
             try
             {
                 var changeInvoiceModel = new ChangeInvoiceModel
@@ -157,38 +138,32 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
                 var affectedRow = await _unitOfWork.ChangeInvoice.InsertIfExistsInvoiceAsync(changeInvoiceModel);
                 if (affectedRow > 0)
                 {
-                    changeInvoice.Message = "Invoices added successfully";
-                    changeInvoice.Success = true;
-                    changeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    changeInvoice.Result = model;
+                    return ApiResponse<ChangeInvoiceDto>.Builder()
+                        .WithMessage("Invoices added successfully")
+                        .WithSuccess(true)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    changeInvoice.Message = "Invoices added unsuccessfully";
-                    changeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    changeInvoice.Result = new ChangeInvoiceDto();
+                    return ApiResponse<ChangeInvoiceDto>.Builder()
+                        .WithMessage("Invoices added unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new ChangeInvoiceDto())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new ChangeInvoiceDto();
             }
             catch (Exception ex)
             {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new ChangeInvoiceDto();
+                return GlobalExceptionHandler.ExceptionError<ChangeInvoiceDto>(ex.Message);
             }
-            return changeInvoice;
         }
         [HttpPost]
         [Route("addifnotexistsinvoice")]
         public async Task<ApiResponse<ChangeInvoiceDto>> AddIfNotExistsInvoiceAsync(ChangeInvoiceDto model)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var changeInvoice = new ApiResponse<ChangeInvoiceDto>();
             try
             {
                 var changeInvoiceModel = new ChangeInvoiceModel
@@ -204,31 +179,26 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
                 var affectedRow = await _unitOfWork.ChangeInvoice.InsertIfNotExistsInvoiceAsync(changeInvoiceModel);
                 if (affectedRow > 0)
                 {
-                    changeInvoice.Message = "Invoices added successfully";
-                    changeInvoice.Success = true;
-                    changeInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    changeInvoice.Result = model;
+                    return ApiResponse<ChangeInvoiceDto>.Builder()
+                        .WithMessage("Invoices added successfully")
+                        .WithSuccess(true)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    changeInvoice.Message = "Invoices added unsuccessfully";
-                    changeInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    changeInvoice.Result = new ChangeInvoiceDto();
+                    return ApiResponse<ChangeInvoiceDto>.Builder()
+                        .WithMessage("Invoices added unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new ChangeInvoiceDto())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new ChangeInvoiceDto();
             }
             catch (Exception ex)
             {
-                changeInvoice.Message = ex.Message;
-                changeInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                changeInvoice.Result = new ChangeInvoiceDto();
+                return GlobalExceptionHandler.ExceptionError<ChangeInvoiceDto>(ex.Message);
             }
-            return changeInvoice;
         }
     }
 }

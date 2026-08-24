@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -13,53 +13,36 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
 {
-    public class VerifyInvoicesController : BaseApiController
+    public class VerifyInvoicesController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public VerifyInvoicesController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpGet]
         [Route("getverifyinvoices")]
         public async Task<ApiResponse<List<VerifyInvoiceModel>>> GetVerifyInvoicesAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var verifyInvoices = new ApiResponse<List<VerifyInvoiceModel>>();
             try
             {
-                var verifyInvoiceList = await _unitOfWork.VerifyInvoice.GetVerifyInvoicesAsync(credential.DbCode!);
+                var verifyInvoiceList = await unitOfWork.VerifyInvoice.GetVerifyInvoicesAsync(credential.DbCode!);
                 if (verifyInvoiceList.Any())
                 {
-                    verifyInvoices.StatusCode = (int)HttpStatusCode.OK;
-                    verifyInvoices.Success = true;
-                    verifyInvoices.Message = "Verify Invoices fetched successfully";
-                    verifyInvoices.Result = verifyInvoiceList;
+                    return ApiResponse<List<VerifyInvoiceModel>>.Builder()
+                        .WithResult(verifyInvoiceList)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Verify Invoices fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verifyInvoices.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verifyInvoices.Success = false;
-                    verifyInvoices.Message = "Verify Invoices fetched unsuccessfully";
+                    return ApiResponse<List<VerifyInvoiceModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Verify Invoices fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch(SqlException ex)
-            {
-                verifyInvoices.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verifyInvoices.Success = false;
-                verifyInvoices.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql SqlException",ex);
             }
             catch (Exception ex)
             {
-                verifyInvoices.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verifyInvoices.Success = false;
-                verifyInvoices.Message = $@"Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception",ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerifyInvoiceModel>>(ex.Message);
             }
-            return verifyInvoices;
         }
 
         //[HttpPost]
@@ -67,7 +50,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
         //public async Task<ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>> GetOldInvoicsAsync(OldInvoiceRequestPostDto model)
         //{
         //    var credential = Common.DecodeJwt(HttpContext.User);
-        //    var confirmAccountReceivable = new ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>();
         //    try
         //    {
         //        var oldInvoiceParameter = new OldInvoiceRequestDto
@@ -88,9 +70,9 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
         //            T7 = model.T7,
         //            T8 = model.T8,
         //            T9 = model.T9,
-
+        //
         //        };
-        //        var oldInvoiceModels = await _unitOfWork.Invoices.GetAllOldInvoices(oldInvoiceParameter);
+        //        var oldInvoiceModels = await unitOfWork.Invoices.GetAllOldInvoices(oldInvoiceParameter);
         //        var oldInvoices = oldInvoiceModels.Select(oldInvoiceModel => new ConfirmAccountReceivableModel.ConfirmBalanceDetails
         //        {
         //            CustomerCode = oldInvoiceModel.CustomerCode,
@@ -101,31 +83,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
         //            CreatedBy = credential.Username,
         //        })
         //            .ToList();
-        //        var affectedRow = await _unitOfWork.ConfirmAccountReceivable.AddConfirmAccountReceivableDetails(model.AccountReceivableId, oldInvoices);
+        //        var affectedRow = await unitOfWork.ConfirmAccountReceivable.AddConfirmAccountReceivableDetails(model.AccountReceivableId, oldInvoices);
         //        if (affectedRow > 0)
         //        {
-        //            confirmAccountReceivable.Message = "Confirm Account Receivables Detail added successfully";
-        //            confirmAccountReceivable.Success = true;
-        //            confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-        //            confirmAccountReceivable.Result = oldInvoices;
+        //            return ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>.Builder()
+        //                .WithResult(oldInvoices)
+        //                .WithStatusCode((int)HttpStatusCode.OK)
+        //                .WithMessage("Confirm Account Receivables Detail added successfully")
+        //                .Build();
         //        }
         //        else
         //        {
-        //            confirmAccountReceivable.Message = "Confirm Account Receivables Detail added unsuccessfully";
-        //            confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
+        //            return ApiResponse<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>.Builder()
+        //                .WithStatusCode((int)HttpStatusCode.BadRequest)
+        //                .WithMessage("Confirm Account Receivables Detail added unsuccessfully")
+        //                .Build();
         //        }
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        confirmAccountReceivable.Message = ex.Message;
-        //        confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
         //    }
         //    catch (Exception ex)
         //    {
-        //        confirmAccountReceivable.Message = ex.Message;
-        //        confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+        //        return GlobalExceptionHandler.ExceptionError<List<ConfirmAccountReceivableModel.ConfirmBalanceDetails>>(ex.Message);
         //    }
-        //    return confirmAccountReceivable;
         //}
 
         [HttpPost]
@@ -133,7 +111,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
         public async Task<ApiResponse<List<VerifyInvoiceModel>>> AddNewVerifyInvoice(OldInvoiceRequestPostDto model)
         {
             var credential = Common.DecodeJwt(HttpContext.User);
-            var confirmAccountReceivable = new ApiResponse<List<VerifyInvoiceModel>>();
             try
             {
                 var oldInvoiceParameter = new OldInvoiceRequestDto
@@ -154,9 +131,8 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
                     T7 = model.T7,
                     T8 = model.T8,
                     T9 = model.T9,
-
                 };
-                var oldInvoiceModels = await _unitOfWork.Invoices.GetAllOldInvoices(oldInvoiceParameter);
+                var oldInvoiceModels = await unitOfWork.Invoices.GetAllOldInvoices(oldInvoiceParameter);
                 var verifyInvoiceModels = oldInvoiceModels.Select(oldInvoiceModel => new VerifyInvoiceModel
                 {
                     Transaction = oldInvoiceModel.TransactionCode,
@@ -166,31 +142,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.VerifyInvoice
                     Status = true,
                     Total = oldInvoiceModel.InvoiceValue
                 }).ToList();
-                var affectedRow = await _unitOfWork.VerifyInvoice.InsertVerifyInvoicesAsync(oldInvoiceModels);
+                var affectedRow = await unitOfWork.VerifyInvoice.InsertVerifyInvoicesAsync(oldInvoiceModels);
                 if (affectedRow > 0)
                 {
-                    confirmAccountReceivable.Message = "Verify invoices added successfully";
-                    confirmAccountReceivable.Success = true;
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.OK;
-                    confirmAccountReceivable.Result = verifyInvoiceModels;
+                    return ApiResponse<List<VerifyInvoiceModel>>.Builder()
+                        .WithResult(verifyInvoiceModels)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Verify invoices added successfully")
+                        .Build();
                 }
                 else
                 {
-                    confirmAccountReceivable.Message = "Verify invoices added unsuccessfully";
-                    confirmAccountReceivable.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<VerifyInvoiceModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Verify invoices added unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                confirmAccountReceivable.Message = ex.Message;
-                confirmAccountReceivable.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<VerifyInvoiceModel>>(ex.Message);
             }
-            return confirmAccountReceivable;
         }
     }
 }

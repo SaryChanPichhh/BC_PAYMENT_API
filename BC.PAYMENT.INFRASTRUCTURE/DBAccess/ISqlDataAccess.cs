@@ -1,5 +1,3 @@
-﻿using System.Data;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
 {
     public interface ISqlDataAccess

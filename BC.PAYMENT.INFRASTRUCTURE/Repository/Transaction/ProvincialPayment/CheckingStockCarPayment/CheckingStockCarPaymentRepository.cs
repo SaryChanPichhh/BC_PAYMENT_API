@@ -1,7 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.CheckingStockCarApproval;
-using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.CheckingStockCarPayment;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.CheckingStockCarPayment
 {
     public class CheckingStockCarPaymentRepository : ICheckingStockCarPaymentRepository

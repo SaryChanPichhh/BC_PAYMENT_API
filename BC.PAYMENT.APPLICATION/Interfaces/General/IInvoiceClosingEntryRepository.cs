@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities;
-using BC.PAYMENT.CORE.Entities.General;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.General
 {
     public interface IInvoiceClosingEntryRepository

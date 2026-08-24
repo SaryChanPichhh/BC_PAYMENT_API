@@ -1,9 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice
 {
     public class ChangeInvoiceRepository : IChangeInvoiceRepository

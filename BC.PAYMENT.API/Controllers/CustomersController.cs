@@ -1,89 +1,52 @@
-﻿using BC.PAYMENT.API.Helper;
+using System.Net;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.LOGGING;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
-using System.Net;
 
-namespace BC.PAYMENT.API.Controllers
+namespace BC.PAYMENT.API.Controllers;
+
+public class CustomersController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : BaseApiController
 {
-    public class CustomersController : BaseApiController
+    [Authorize]
+    [HttpGet("")]
+    public async Task<ApiResponse<PaginatedResponse<Customer>>> GetCustomer([FromQuery] int page, int pageSize)
     {
-        #region ===[ Private Members ]=============================================================
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
-
-        #endregion
-
-        #region ===[ Constructor ]=================================================================
-
-        /// <summary>
-        /// Initialize CustomersController by injecting an object type of IUnitOfWork
-        /// </summary>
-        public CustomersController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
+        try
         {
-            this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
+            var allRecords = await unitOfWork.Customers.GetCustomer(page, pageSize);
+            if (!allRecords.Any())
+                return ApiResponse<PaginatedResponse<Customer>>.Builder()
+                    .WithMessage("No customers")
+                    .WithStatusCode
+                        ((int)HttpStatusCode.BadRequest)
+                    .WithResult
+                    (new PaginatedResponse<Customer>(new List<Customer>(),
+                        0, page, pageSize))
+                    .Build();
+
+            // Calculate pagination details
+            var totalRecords = allRecords.Count;
+
+            // Paginate the data
+            var paginatedData = allRecords
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return ApiResponse<PaginatedResponse<Customer>>.Builder()
+                .WithMessage("Account code fetched successfully.")
+                .WithStatusCode((int)HttpStatusCode.OK)
+                .WithResult
+                (new PaginatedResponse<Customer>(paginatedData,
+                    totalRecords, page, pageSize))
+                .Build();
         }
-
-        #endregion
-
-        [Authorize]
-        [HttpGet("")]
-        public async Task<ApiResponse<PaginatedResponse<Customer>>> GetCustomer([FromQuery] int page, int pageSize)
-        {
-            var apiResponse = new ApiResponse<PaginatedResponse<Customer>>();
-
-            try
+        catch (Exception ex)
             {
-                var allRecords = await _unitOfWork.Customers.GetCustomer(page,pageSize);
-                if (!allRecords.Any())
-                {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No customers";
-                    apiResponse.Result = new PaginatedResponse<Customer>(new List<Customer>(), 0, page, pageSize);
-                    return apiResponse;
-                }
-                // Calculate pagination details
-                var totalRecords = allRecords.Count;
-                //var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-
-                // Paginate the data
-                var paginatedData = allRecords
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-
-                // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Account code fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = new PaginatedResponse<Customer>(paginatedData, totalRecords, page, pageSize);
-
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<Customer>>(ex.Message);
             }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
-            }
-            catch (Exception ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
-            }
-
-            return apiResponse;
-        }
-
     }
-
 }

@@ -1,6 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.Entities.General;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid
 {
     public class GeneralInvoicePaymentModel : GeneralInvoiceModel

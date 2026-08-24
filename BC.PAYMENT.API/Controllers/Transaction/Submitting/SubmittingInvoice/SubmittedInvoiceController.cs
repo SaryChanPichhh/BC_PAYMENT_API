@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Net;
 using BC.PAYMENT.API.Helper;
@@ -7,54 +7,40 @@ using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
 {
 
-    public class SubmittedInvoiceController : BaseApiController
+    public class SubmittedInvoiceController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public SubmittedInvoiceController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpGet]
         [Route("getsubmittedinvoice/{fromDate}/{toDate}")]
         public async Task<ApiResponse<List<SubmittedInvoiceModel>>> GetSubmittedInvoicesByDate([Required] string fromDate,string toDate)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<List<SubmittedInvoiceModel>>();
             try
             {
-                var execute = await _unitOfWork.SubmittedInvoice.GetAllNotSubmitPaidInvoice(credential.DbCode!,fromDate,fromDate);
+                var execute = await unitOfWork.SubmittedInvoice.GetAllNotSubmitPaidInvoice(credential.DbCode!,fromDate,fromDate);
                 if (execute.Any())
                 {
-                    submittedInvoice.Result = execute;
-                    submittedInvoice.StatusCode = StatusCodes.Status200OK;
-                    submittedInvoice.Message = "Submitted Invoices fetched successfully";
-                    submittedInvoice.Success = true;
+                    return ApiResponse<List<SubmittedInvoiceModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices fetched unsuccessfully";
+                    return ApiResponse<List<SubmittedInvoiceModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch(SqlException ex)
-            {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<SubmittedInvoiceModel>>(ex.Message);
             }
-            
-            return submittedInvoice;
         }
         
         [HttpPut]
@@ -62,36 +48,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
         public async Task<ApiResponse<string>> UpdateSubmittedInvoiceFromPendingToRejectAsync([Required]string submittedId)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<string>();
             try
             {
-                var affectedRow = await _unitOfWork.SubmittedInvoice.UpdateInvoiceFromPendingToCancelAsync(credential.DbCode!,credential.Username!,submittedId);
+                var affectedRow = await unitOfWork.SubmittedInvoice.UpdateInvoiceFromPendingToCancelAsync(credential.DbCode!,credential.Username!,submittedId);
                 if (affectedRow > 0)
                 {
-                    submittedInvoice.Result = submittedId;
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    submittedInvoice.Message = "Submitted Invoices updated successfully";
-                    submittedInvoice.Success = true;
+                    return ApiResponse<string>.Builder()
+                        .WithMessage("Submitted Invoices updated successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(submittedId)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode =  (int)HttpStatusCode.BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices updated unsuccessfully";
+                    return ApiResponse<string>.Builder()
+                        .WithMessage("Submitted Invoices updated unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch(SqlException ex)
-            {
-                submittedInvoice.StatusCode =  (int)HttpStatusCode.InternalServerError;
-                Debug.WriteLine(ex.StackTrace);
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                Debug.WriteLine(ex.StackTrace);
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<string>(ex.Message);
             }
-            return submittedInvoice;
         }
     }
 }

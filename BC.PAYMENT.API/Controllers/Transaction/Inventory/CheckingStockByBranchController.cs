@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -30,13 +30,12 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         [Route("gettypes")]
         public async Task<ApiResponse<List<string>>> GetTypes()
         {
-            return new ApiResponse<List<string>>()
-            {
-                Result = Types.Values.ToList(),
-                Message = "Types fetched successfully",
-                StatusCode = (int)HttpStatusCode.OK,
-                Success = true
-            };
+            return ApiResponse<List<string>>.Builder()
+                .WithResult(Types.Values.ToList())
+                .WithMessage("Types fetched successfully")
+                .WithStatusCode((int)HttpStatusCode.OK)
+                .WithSuccess(true)
+                .Build();
         }
         
         [HttpGet]
@@ -44,37 +43,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<List<WarehouseDto>>> GetWarehouseAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var warehouse = new ApiResponse<List<WarehouseDto>>();
             try
             {
                 var execute = await _unitOfWork.Warehouses.GetWarehouseAsync(credential.DbCode!);
                 if (execute.Any())
                 {
-                    warehouse.StatusCode = (int)HttpStatusCode.OK;
-                    warehouse.Message = $@"Warehouse fetched successfully";
-                    warehouse.Result = execute;
-                    warehouse.Success = true;
+                    return ApiResponse<List<WarehouseDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Warehouse fetched successfully")
+                        .WithResult(execute)
+                        .WithSuccess(true)
+                        .Build();
                 }
                 else
                 {
-                    warehouse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    warehouse.Message = $@"Warehouse fetched unsuccessfully";
-
+                    return ApiResponse<List<WarehouseDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Warehouse fetched unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                warehouse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                warehouse.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
-
-            }catch (Exception ex)
-            {
-                warehouse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                warehouse.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<WarehouseDto>>(ex.Message);
             }
-            return warehouse;
         }
         
         [HttpGet]
@@ -82,37 +74,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<List<ItemDto>>> GetItemListAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var warehouse = new ApiResponse<List<ItemDto>>();
             try
             {
                 var execute = await _unitOfWork.Items.GetItemListAsync(credential.DbCode);
                 if (execute.Any())
                 {
-                    warehouse.StatusCode = (int)HttpStatusCode.OK;
-                    warehouse.Message = $@"Items fetched successfully";
-                    warehouse.Result = execute;
-                    warehouse.Success = true;
+                    return ApiResponse<List<ItemDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Items fetched successfully")
+                        .WithResult(execute)
+                        .WithSuccess(true)
+                        .Build();
                 }
                 else
                 {
-                    warehouse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    warehouse.Message = $@"Items fetched unsuccessfully";
-
+                    return ApiResponse<List<ItemDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                warehouse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                warehouse.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
-
-            }catch (Exception ex)
-            {
-                warehouse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                warehouse.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<ItemDto>>(ex.Message);
             }
-            return warehouse;
         }
         
         /// <summary>
@@ -136,7 +121,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<List<CheckingStockByBranch>>> GetItemListAsync([FromBody] CheckingStockByBranchDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var warehouse = new ApiResponse<List<CheckingStockByBranch>>();
             try
             {
                 if (Types.ContainsValue(model.RecType))
@@ -144,31 +128,25 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                 var execute = await _unitOfWork.VerificationStock.GetCheckingStockByBranchAsync(model);
                 if (execute != null)
                 {
-                    warehouse.StatusCode = (int)HttpStatusCode.OK;
-                    warehouse.Message = $@"Items fetched successfully";
-                    warehouse.Result = execute;
-                    warehouse.Success = true;
+                    return ApiResponse<List<CheckingStockByBranch>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Items fetched successfully")
+                        .WithResult(execute)
+                        .WithSuccess(true)
+                        .Build();
                 }
                 else
                 {
-                    warehouse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    warehouse.Message = $@"Items fetched unsuccessfully";
-
+                    return ApiResponse<List<CheckingStockByBranch>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                warehouse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                warehouse.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
-
-            }catch (Exception ex)
-            {
-                warehouse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                warehouse.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<CheckingStockByBranch>>(ex.Message);
             }
-            return warehouse;
         }
     }
 }

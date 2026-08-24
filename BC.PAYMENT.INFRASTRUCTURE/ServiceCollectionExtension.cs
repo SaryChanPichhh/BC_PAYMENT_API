@@ -1,82 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
-using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.DailyRefundItems;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.ExchangeItem;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Invoices;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Repairer;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Generator;
-using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
-using BC.PAYMENT.APPLICATION.Interfaces.Items;
-using BC.PAYMENT.APPLICATION.Interfaces.Login;
-using BC.PAYMENT.APPLICATION.Interfaces.Payment;
-using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
-using BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
-using BC.PAYMENT.APPLICATION.Interfaces.Prepare.Preset;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.AnnualPurchase;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.DailyAnalysis;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.ExchangeItemAnalysis;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.ItemTransaction;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.OwedInvoice;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.StockPrice;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.StockInventoryCounting;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.AccountReceivable;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationRFID;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.CheckingStockCarApproval;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.HistoryApproval;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.InvoiceVerify;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.CashFlow.CashFlowData;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundItems;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ExchangeItem;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.Invoices;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.Repairer;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.RepairItem;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.General;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Generator;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Items;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Login;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Payment;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Account;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.EmployeeSchedule;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Preset;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.AnnualPurchase;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.DailySaleAnalysis;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ExchangeItemAnalysis;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ItemTransaction;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.OwedInvoice;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.StockPrice;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.InventoryCounting;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.VerifyInvoice;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.AccountReceivable;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DailyPayment;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DeliveryPaid;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationRFID;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationStock;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.CheckingStockCarPayment;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.ReviewReport;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.DailySubmission;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.HistoryApproval;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.InvoiceVerify;
-using BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice;
-using Microsoft.Extensions.DependencyInjection;
+using BC.PAYMENT.APPLICATION.Interfaces.ViewStock;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.ViewStock;
 using DividedInvoiceRepository = BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice.DividedInvoiceRepository;
 using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Payment.IDividedInvoiceRepository;
 
@@ -93,10 +16,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE
             services.AddTransient<IInvoiceRepository, InvoiceRepository>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<IAnalysisAccountRepository, AnalysisAccountRepository>();
-            services.AddTransient<APPLICATION.Interfaces.Payment.IDividedInvoiceRepository, Repository.Payment.DividedInvoiceRepository>();
+            services.AddTransient<IDividedInvoiceRepository, Repository.Payment.DividedInvoiceRepository>();
             services.AddTransient<IDeliveryRepository, DeliveryRepository>();
             services.AddTransient<IAreaRepository, AreaRepository>();
             services.AddTransient<IMarketRepository, MarketRepository>();
+            services.AddTransient<IEmployeeRepository, EmployeeRepository>();
             // Prepare 
                 // Preset
                 services.AddTransient<IDistrictRepository,DistrictRepository>();
@@ -158,6 +82,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<ICompletedRepairRepository, RepairerRepository>();
                     services.AddTransient<ICheckingInvoiceRepository, CheckingInvoiceRepository>();
                     services.AddTransient<IExchangeItemRepository, ExchangeItemRepository>();
+                    services.AddTransient<IReportDividedInvoiceRepository, ReportDividedInvoiceRepository>();
+                    services.AddTransient<IItemExchangeReportRepository, ItemExchangeReportRepository>();
+                    services.AddTransient<IItemRepairReportRepository, ItemRepairReportRepository>();
+                    services.AddTransient<ICreditNoteReportRepository, CreditNoteReportRepository>();
 
             // Preset
                     services.AddTransient<IItemTransactionAnalysisRepository,ItemTransactionAnalysisRepository>();
@@ -166,11 +94,40 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<IOwedInvoiceRepository, OwedInvoiceRepository>();
                     services.AddTransient<IInventoryValueRepository, InventoryValueRepository>();
                     services.AddTransient<IDailyAnalysisRepository, DailyAnalysisRepository>();
+            // Report
+                // Daily Payment Report
+                    services.AddTransient<ICreditInvoiceRepository, CreditInvoiceRepository>();
+                    services.AddTransient<IPaidInvoiceRepository, PaidInvoiceRepository>();
+                    services.AddTransient<ISummaryInvoiceRepository, SummaryInvoiceReportRepository>();
+                    services.AddTransient<IAmountCollectedRepository, AmountCollectedRepository>();
+                    services.AddTransient<ITotalMonthlyPaymentRepository, MonthlyPaymentRepository>();
+                    services.AddTransient<IExpenseInvoiceReportRepository, ExpenseInvoiceReportRepository>();
+                // Other Reports 
+                    services.AddTransient<IBillsOwedRepository, BillsOwedRepository>();
+                    services.AddTransient<ICustomerReportRepository, CustomerReportRepository>();
+                // Provincial
+                    services.AddTransient<ICarPaymentReportRepository,CarPaymentReportRepository>();
+                    services.AddTransient<ICarPaymentRepository,CarPaymentRepository>();
 
                     services.AddTransient<IUnitOfWork, UnitOfWork>();
                     services.AddTransient<IWarehouseRepository, WarehouseRepository>();
                     services.AddTransient<IItemRepository, ItemRepository>();
                     services.AddTransient<IGeneratorRepository, GeneratorRepository>();
+            // Inventory
+                    services.AddTransient<IInventoryRepository, InventoryRepository>();
+                    services.AddTransient<IProductRepository, ProductRepository>();
+                    services.AddTransient<IInventoryReportRepository, InventoryReportRepository>();
+                    services.AddTransient<IInventoryExpiredRepository, InventoryExpiredRepository>();
+                    services.AddTransient<IInventoryTrackingRepository, InventoryTrackingRepository>();
+                    services.AddTransient<IWarehousePresetRepository, WarehousePresetRepository>();
+                    services.AddTransient<IOpeningBalanceRepository, OpeningBalanceRepository>();
+                    services.AddTransient<IClosingInventoryRepository, ClosingInventoryRepository>();
+                    services.AddTransient<IItemSaleStockRepository, ItemSaleStockRepository>();
+                    services.AddTransient<IViewStockupRepository, ViewStocRepository>();
+                    
+            
+            // validate Schema
+            services.AddValidatorsFromAssemblyContaining<AccReceivablePresetValidate>();
         }
     }
 }

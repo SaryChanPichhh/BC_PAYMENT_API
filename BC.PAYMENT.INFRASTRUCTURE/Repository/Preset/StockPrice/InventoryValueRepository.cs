@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.StockPrice;
-using BC.PAYMENT.CORE.Entities.Preset.InventoryValue;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.StockPrice
 {
     public class InventoryValueRepository : IInventoryValueRepository

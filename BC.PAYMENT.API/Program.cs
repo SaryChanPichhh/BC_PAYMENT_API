@@ -90,6 +90,21 @@ builder.Services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.Http,
         Scheme = "Bearer"
     });
+    options.CustomSchemaIds(type =>
+    {
+        if (!type.IsGenericType)
+            return type.FullName!.Replace("+", ".");
+
+        var genericBase = type.GetGenericTypeDefinition().FullName!
+            .Split('`')[0]
+            .Replace("+", ".");
+        var genericArgs = string.Join("_", type.GetGenericArguments().Select(t =>
+            t.IsGenericType
+                ? t.GetGenericTypeDefinition().FullName!.Split('`')[0].Split('.').Last() + "_" +
+                  string.Join("_", t.GetGenericArguments().Select(a => a.FullName ?? a.Name))
+                : (t.FullName ?? t.Name)));
+        return $"{genericBase}[{genericArgs}]";
+    });
     options.UseInlineDefinitionsForEnums();
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -111,40 +126,46 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+var enableApiDocs = builder.Configuration.GetValue<bool>("EnableApiDocs");
+
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// ✅ .NET 8 Fix: MapOpenApi() requires .NET 9. Use UseSwagger (Swashbuckle) as the OpenAPI source,
+//    and configure Scalar to read from that Swashbuckle endpoint.
+// ✅ Scalar is accessible via "EnableApiDocs": true in appsettings (works after deploy too)
+if (app.Environment.IsDevelopment() || enableApiDocs)
 {
+    // Swashbuckle generates the OpenAPI JSON
+    app.UseSwagger();
+
+    // Scalar reads from Swashbuckle's default endpoint: /swagger/v1/swagger.json
     app.MapScalarApiReference(options =>
-        {
-            // Fluent API
-            options
-                .WithTitle("TD PAYMENT API")
-                .WithSidebar(true);
-            options.Title = "TD PAYMENT API";
-        })
-        ;
-    app.UseSwagger(options =>
     {
-        options.RouteTemplate = "/openapi/{documentName}.json";
+        options
+            .WithTitle("TD PAYMENT API")
+            .WithSidebar(true)
+            .WithOpenApiRoutePattern("/swagger/v1/swagger.json"); // Point Scalar at Swashbuckle
+        options.Title = "TD PAYMENT API";
     });
 
+    // Optional: Keep SwaggerUI as fallback at /swagger
     app.UseSwaggerUI();
 }
-// global cors policy
+
+// ✅ Fix 3: Correct middleware order
+app.UseHttpsRedirection();  // Must be first
+
+app.UseRouting();
+
+// global cors policy — must come after UseRouting
 app.UseCors(x => x
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
 
-//Correct Middleware order
-
-app.UseRouting();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddlewares>();
 //app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseHttpsRedirection();
 
 app.MapControllers();
 

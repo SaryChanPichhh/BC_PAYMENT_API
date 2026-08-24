@@ -1,4 +1,3 @@
-﻿using BC.PAYMENT.CORE.DTO.CommondityExchange.DailyRefundItems;
 namespace BC.PAYMENT.CORE.Entities.CommondityExchange.RepairItem
 {
     public class CompletedRepairItemModel : RefundItemDto

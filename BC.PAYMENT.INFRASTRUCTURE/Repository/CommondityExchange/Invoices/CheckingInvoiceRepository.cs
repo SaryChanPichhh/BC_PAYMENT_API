@@ -1,15 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.Invoices;
-using BC.PAYMENT.CORE.DTO.CommondityExchange.Invoices;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.Invoices
 {
     public class CheckingInvoiceRepository : ICheckingInvoiceRepository

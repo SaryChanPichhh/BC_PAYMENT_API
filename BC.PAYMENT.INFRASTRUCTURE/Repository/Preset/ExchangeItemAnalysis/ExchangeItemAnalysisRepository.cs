@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.ExchangeItemAnalysis;
-using BC.PAYMENT.CORE.Entities.Preset.ExchangeItemAnalysis;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ExchangeItemAnalysis
 {
     public class ExchangeItemAnalysisRepository : IExchangeItemAnalysisRepository

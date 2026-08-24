@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
@@ -11,14 +11,8 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
 {
-    public class RepairGoodController : BaseApiController
+    public class RepairGoodController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public RepairGoodController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         #region Send Repair Good To Repairation
 
@@ -27,68 +21,58 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<List<RepairGoodsRespondDto>>> GetReceivedRepairGoodByBranchAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<RepairGoodsRespondDto>>();
             try
             {
-                var result = await _unitOfWork.RepairGoods.GetReceivedRepairGoodsByBranchAsync(credential.DbCode);
+                var result = await unitOfWork.RepairGoods.GetReceivedRepairGoodsByBranchAsync(credential.DbCode);
                 if (result != null)
                 {
-                    response.Result = result;
-                    response.Message = "Received repair goods fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
+                    return ApiResponse<List<RepairGoodsRespondDto>>.Builder()
+                        .WithMessage("Received repair goods fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    response.Result = new List<RepairGoodsRespondDto>();
-                    response.Message = "Received repair goods fetched unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<RepairGoodsRespondDto>>.Builder()
+                        .WithMessage("Received repair goods fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<RepairGoodsRespondDto>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<RepairGoodsRespondDto>>(ex.Message);
             }
-            return response;
         }
         [HttpDelete]
         [Route("deletereceivedrepair/{receivedId}/{detailId}")]
         public async Task<ApiResponse<int>> DeleteReceivedRepairGoodAsync([Required] int receivedId, [Required] int detailId)
         {
-            var response = new ApiResponse<int>();
             try
             {
-                var result = await _unitOfWork.RepairGoods.DeleteReceivedRepairGoodAsync(receivedId, detailId);
+                var result = await unitOfWork.RepairGoods.DeleteReceivedRepairGoodAsync(receivedId, detailId);
                 if (result != null)
                 {
-                    response.Result = result;
-                    response.Message = "Received repair goods deleted successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Received repair goods deleted successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Received repair goods deleted unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Received repair goods deleted unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
         
         [HttpPost]
@@ -96,7 +80,6 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<int>> TransferRepairGoodsAsync([FromBody]RepairGoodsDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
                 var receivedModel = new RepairGoodsRespondDto
@@ -109,31 +92,27 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                     Description = model.Description,
                     CreateBy = credential.Username,
                 };
-                var result = await _unitOfWork.RepairGoods.TransferRepairGoodsAsync(receivedModel);
+                var result = await unitOfWork.RepairGoods.TransferRepairGoodsAsync(receivedModel);
                 if (result != null)
                 {
-                    response.Result = result;
-                    response.Message = "Received repair goods added successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Received repair goods added successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Received repair goods added unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Received repair goods added unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
 
         #endregion
@@ -145,70 +124,59 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<List<ItemRepairInprogressDto>>> GetRepairingGoodsByDateAsync([Required] string fromDate, [Required] string toDate)
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<ItemRepairInprogressDto>>();
             try
             {
-                var result = await _unitOfWork.RepairGoods.GetReparingGoodsByDateAsync(credential.DbCode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate));
+                var result = await unitOfWork.RepairGoods.GetReparingGoodsByDateAsync(credential.DbCode, Convert.ToDateTime(fromDate), Convert.ToDateTime(toDate));
                 if (result != null)
                 {
-                    response.Result = result;
-                    response.Message = "Received repair goods fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
+                    return ApiResponse<List<ItemRepairInprogressDto>>.Builder()
+                        .WithMessage("Received repair goods fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    response.Result = new List<ItemRepairInprogressDto>();
-                    response.Message = "Received repair goods fetched unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<ItemRepairInprogressDto>>.Builder()
+                        .WithMessage("Received repair goods fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new List<ItemRepairInprogressDto>())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<ItemRepairInprogressDto>>(ex.Message);
             }
-            return response;
         }
         
         [HttpDelete]
         [Route("deletereparinggoods/{receivedId}/{repairId}")]
         public async Task<ApiResponse<int>> DeleteRepairItemAsync([Required] int receivedId, [Required] int repairId)
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
-                var result = await _unitOfWork.RepairGoods.DeleteRepairItem( receivedId, repairId);
+                var result = await unitOfWork.RepairGoods.DeleteRepairItem( receivedId, repairId);
                 if (result != null)
                 {
-                    response.Result = result;
-                    response.Message = "Received repair goods deleted successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Received repair goods deleted successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Received repair goods deleted unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Received repair goods deleted unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
 
         #endregion
@@ -220,35 +188,29 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<List<string>>> GetSaleCodeAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var saleCode = new ApiResponse<List<string>>();
             try
             {
-                var execute = await _unitOfWork.Generators.GetSaleCodeAsync(credential.DbCode);
+                var execute = await unitOfWork.Generators.GetSaleCodeAsync(credential.DbCode);
                 if (execute.Any())
                 {
-                    saleCode.Message = $@"Sale codes fetched successfully";
-                    saleCode.Result = execute;
-                    saleCode.StatusCode = StatusCodes.Status200OK;
-                    saleCode.Success = true;
+                    return ApiResponse<List<string>>.Builder()
+                        .WithMessage("Sale codes fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    saleCode.Message = $@"Sale codes fetched unsuccessfully";
-                    saleCode.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<List<string>>.Builder()
+                        .WithMessage("Sale codes fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saleCode.Message = $@"Sql Exception : {ex.Message}";
-                saleCode.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                saleCode.Message = $@"Error Exception : {ex.Message}";
-                saleCode.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<string>>(ex.Message);
             }
-
-            return saleCode;
         }
 
         [HttpGet]
@@ -256,45 +218,38 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<string>> GetNewTransactionIfCost([Required] string saleType)
         {
             var credential = Common.DecodeJwt(User);
-            var newTransaction = new ApiResponse<string>();
             try
             {
-                var execute = await _unitOfWork.Generators.PostSaleOrderAutoNumberAsync(saleType, credential.DbCode);
+                var execute = await unitOfWork.Generators.PostSaleOrderAutoNumberAsync(saleType, credential.DbCode);
                 if (execute.Any())
                 {
-                    newTransaction.Message = $@"New transaction fetched successfully";
-                    newTransaction.Result = execute;
-                    newTransaction.StatusCode = StatusCodes.Status200OK;
-                    newTransaction.Success = true;
+                    return ApiResponse<string>.Builder()
+                        .WithMessage("New transaction fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    newTransaction.Message = $@"New transaction fetched unsuccessfully";
-                    newTransaction.StatusCode = StatusCodes.Status400BadRequest;
+                    return ApiResponse<string>.Builder()
+                        .WithMessage("New transaction fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                newTransaction.Message = $@"Sql Exception : {ex.Message}";
-                newTransaction.StatusCode = StatusCodes.Status500InternalServerError;
             }
             catch (Exception ex)
             {
-                newTransaction.Message = $@"Error Exception : {ex.Message}";
-                newTransaction.StatusCode = StatusCodes.Status500InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<string>(ex.Message);
             }
-
-            return newTransaction;
         }
         [HttpGet]
         [Route("getallcustomerhascompletedrepair")]
         public async Task<ApiResponse<List<CustomerRespondDto>>> GetAllCustomerHasCompletedRepair()
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<CustomerRespondDto>>();
             try
             {
-                var result = await _unitOfWork.RepairGoods.GetAllCustomerHasCompletedRepair(credential.DbCode);
+                var result = await unitOfWork.RepairGoods.GetAllCustomerHasCompletedRepair(credential.DbCode);
                 var newRespond = result.Select(x => new CustomerRespondDto
                 {
                     UserCode = x.UserCode,
@@ -308,28 +263,24 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                 }).ToList();
                 if (result.Any())
                 {
-                    response.Result = newRespond;
-                    response.Message = "Customer fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
+                    return ApiResponse<List<CustomerRespondDto>>.Builder()
+                        .WithMessage("Customer fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(newRespond)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Customer fetched unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<CustomerRespondDto>>.Builder()
+                        .WithMessage("Customer fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<CustomerRespondDto>>(ex.Message);
             }
-            return response;
         }
         
         [HttpGet]
@@ -337,10 +288,9 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<List<ItemRepairCompletedRespondDto>>> GetAllItemHasCompletedRepairByCustomerCode([Required] string customerCode)
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<ItemRepairCompletedRespondDto>>();
             try
             {
-                var result = await _unitOfWork.RepairGoods.GetAllItemHasCompletedRepairByCustomerCode(credential.DbCode, customerCode);
+                var result = await unitOfWork.RepairGoods.GetAllItemHasCompletedRepairByCustomerCode(credential.DbCode, customerCode);
                 var newRespond = result.Select(x => new ItemRepairCompletedRespondDto
                 {
                     RepairCompletedId = x.RepairCompletedId,
@@ -360,28 +310,24 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                 }).ToList();
                 if (result.Any())
                 {
-                    response.Result = newRespond;
-                    response.Message = "Goods fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
+                    return ApiResponse<List<ItemRepairCompletedRespondDto>>.Builder()
+                        .WithMessage("Goods fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(newRespond)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Goods fetched unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<ItemRepairCompletedRespondDto>>.Builder()
+                        .WithMessage("Goods fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<ItemRepairCompletedRespondDto>>(ex.Message);
             }
-            return response;
         }
         
         [HttpPost]
@@ -389,36 +335,31 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<int>> SwitchItemTypeAsync(SwitchItemTypeDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
                 const string fromType = "REPAIR";
                 const string toType = "EXCHANGE";
-                var affectedRow = await _unitOfWork.RepairGoods.SwitchItemType(credential.DbCode, credential.Username,model.RequestDetailId,model.Description,fromType,toType);
+                var affectedRow = await unitOfWork.RepairGoods.SwitchItemType(credential.DbCode, credential.Username,model.RequestDetailId,model.Description,fromType,toType);
                 if (affectedRow > 0 )
                 {
-                    response.Result = affectedRow;
-                    response.Message = "Switch type updated successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Switch type updated successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Switch type updated unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Switch type updated unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
         /// <summary>
         // sample param
@@ -466,7 +407,6 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         {
 
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
                 var affectedRow = 0;
@@ -482,13 +422,14 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                 if (total is not { } or > 0)
                 {
                     var saleAnalysisByCustomerCodeAsync =
-                        await _unitOfWork.Generators.GetSaleAnalysisByCustomerCodeAsync(param.CustomerWhoRepairGoods.CustomerCode,credential.DbCode);
+                        await unitOfWork.Generators.GetSaleAnalysisByCustomerCodeAsync(param.CustomerWhoRepairGoods.CustomerCode,credential.DbCode);
 
                     if (saleAnalysisByCustomerCodeAsync is null)
                     {
-                        response.Message = "Sale analysis not found for this customer";
-                        response.StatusCode = (int)HttpStatusCode.NotFound;
-                        return response;
+                        return ApiResponse<int>.Builder()
+                            .WithMessage("Sale analysis not found for this customer")
+                            .WithStatusCode((int)HttpStatusCode.NotFound)
+                            .Build();
                     }
                     var saleHeaderDto = new SaleHeaderDto
                     {
@@ -526,7 +467,7 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                     do
                     {
                         checkingIfNotEnough = false;
-                        var execute = await _unitOfWork.Invoices.GetItemExpiredDates(credential.DbCode, qtyAndEpd, param.NewInvoiceIssuance.Warehouse);
+                        var execute = await unitOfWork.Invoices.GetItemExpiredDates(credential.DbCode, qtyAndEpd, param.NewInvoiceIssuance.Warehouse);
                         foreach (var item in execute)
                         {
                             var checkIfOutOfStock = false;
@@ -620,9 +561,9 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                         }
                     } while (checkingIfNotEnough);
 
-                    affectedRow += await _unitOfWork.Invoices.CreateInvoiceSaleAsync(credential.DbCode,saleHeaderDto, allDetailsDtos);
+                    affectedRow += await unitOfWork.Invoices.CreateInvoiceSaleAsync(credential.DbCode,saleHeaderDto, allDetailsDtos);
 
-                    affectedRow += await _unitOfWork.Invoices.InsertRecordInvoice(credential.DbCode,credential.Username,param.NewInvoiceIssuance.TransactionCode, param.CustomerWhoRepairGoods.CustomerCode,
+                    affectedRow += await unitOfWork.Invoices.InsertRecordInvoice(credential.DbCode,credential.Username,param.NewInvoiceIssuance.TransactionCode, param.CustomerWhoRepairGoods.CustomerCode,
                         param.CustomerWhoRepairGoods.CustomerName, total, param.NewInvoiceIssuance.InvoiceDate, credential.InvoiceEntryCode);
                     var createInvoiceDetailDtos = param.OldInvoiceIssuance.Select(item => new CreateInvoiceDetailDto
                     {
@@ -639,23 +580,26 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                         total,param.CustomerWhoRepairGoods.CustomerCode,credential.DbCode,credential.Username);
                     if (affectedRow > 6)
                     {
-                        response.StatusCode = StatusCodes.Status204NoContent;
-                        response.Message = "Repair goods paid successfully";
-                        response.Success = true;
-                        response.Result = affectedRow;
+                        return ApiResponse<int>.Builder()
+                            .WithMessage("Repair goods paid successfully")
+                            .WithStatusCode(StatusCodes.Status204NoContent)
+                            .WithResult(affectedRow)
+                            .Build();
                     }
                     else
                     {
-                        response.StatusCode = StatusCodes.Status204NoContent;
-                        response.Message = "Repair goods paid unsuccessfully";
+                        return ApiResponse<int>.Builder()
+                            .WithMessage("Repair goods paid unsuccessfully")
+                            .WithStatusCode(StatusCodes.Status204NoContent)
+                            .Build();
                     }
                     
-                    //await _unitOfWork.Invoices.GetInvoiceByCustomerCode(credential.DbCode, param.CustomerWhoRepairGoods.CustomerCode);
+                    //await unitOfWork.Invoices.GetInvoiceByCustomerCode(credential.DbCode, param.CustomerWhoRepairGoods.CustomerCode);
                 }
                 else
                 {
-                    var generateFixInvoice = await _unitOfWork.Generators.GenerateFixInvoice(credential.DbCode);
-                     affectedRow += await _unitOfWork.Invoices.InsertRecordInvoice(credential.DbCode,credential.Username,generateFixInvoice, param.CustomerWhoRepairGoods.CustomerCode,
+                    var generateFixInvoice = await unitOfWork.Generators.GenerateFixInvoice(credential.DbCode);
+                     affectedRow += await unitOfWork.Invoices.InsertRecordInvoice(credential.DbCode,credential.Username,generateFixInvoice, param.CustomerWhoRepairGoods.CustomerCode,
                         param.CustomerWhoRepairGoods.CustomerName, total, param.NewInvoiceIssuance.InvoiceDate, credential.InvoiceEntryCode);
                     var createInvoiceDetailDtos = param.OldInvoiceIssuance.Select(item => new CreateInvoiceDetailDto
                     {
@@ -673,31 +617,27 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
 
                     if (affectedRow > 4)
                     {
-                        response.StatusCode = StatusCodes.Status204NoContent;
-                        response.Message = "Repair goods paid successfully";
-                        response.Success = true;
-                        response.Result = affectedRow;
+                        return ApiResponse<int>.Builder()
+                            .WithMessage("Repair goods paid successfully")
+                            .WithStatusCode(StatusCodes.Status204NoContent)
+                            .WithResult(affectedRow)
+                            .Build();
                     }
                     else
                     {
-                        response.StatusCode = StatusCodes.Status400BadRequest;
-                        response.Message = "Repair goods paid unsuccessfully";
-                        response.Success = false;
+                        return ApiResponse<int>.Builder()
+                            .WithMessage("Repair goods paid unsuccessfully")
+                            .WithStatusCode(StatusCodes.Status400BadRequest)
+                            .Build();
                     }
                     
                 }
 
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }catch (Exception ex)
-            {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
         private async Task<int> CreateRecordFixInvoice(List<CreateInvoiceDetailDto> createInvoiceDetailDtos, string description,
             string transactionCode, DateTime date, double total,string customerCode,string dbCode,string userName)
@@ -733,7 +673,7 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
                     })
                 .ToList();
 
-            affectedRow = await _unitOfWork.Invoices.CreateInvoice(createInvoiceDto, createInvoiceDetailDto); // return 4
+            affectedRow = await unitOfWork.Invoices.CreateInvoice(createInvoiceDto, createInvoiceDetailDto); // return 4
             return affectedRow;
         }
 
@@ -742,34 +682,29 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange.RepairItem
         public async Task<ApiResponse<int>> UpdateAmountRepairCompletedAsync([Required] double totalPrice, [Required] int repairCompletedId )
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.RepairGoods.PaidRepairItemAsync(credential.Username, totalPrice, repairCompletedId);
+                var affectedRow = await unitOfWork.RepairGoods.PaidRepairItemAsync(credential.Username, totalPrice, repairCompletedId);
                 if (affectedRow > 0)
                 {
-                    response.Result = affectedRow;
-                    response.Message = "Amount updated successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Amount updated successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    response.Message = "Amount updated unsuccessfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Amount updated unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
         #endregion
     }

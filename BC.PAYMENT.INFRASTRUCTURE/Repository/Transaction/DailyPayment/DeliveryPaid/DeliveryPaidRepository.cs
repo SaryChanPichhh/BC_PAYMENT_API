@@ -1,15 +1,3 @@
-﻿
-
-using System.Data;
-using System.Diagnostics;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DeliveryPaid;
-using BC.PAYMENT.CORE.Entities.Expense;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DeliveryPaid
 {
     public class DeliveryPaidRepository : IDeliveryPaidRepository

@@ -1,20 +1,3 @@
-﻿
-
-using System.Data;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.DTO.Invoice;
-using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Entities.Invoice;
-using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Identity.Client;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.StockCarPayment
 {
     public  class SaleRepresentRepository : ISaleRepresentRepository

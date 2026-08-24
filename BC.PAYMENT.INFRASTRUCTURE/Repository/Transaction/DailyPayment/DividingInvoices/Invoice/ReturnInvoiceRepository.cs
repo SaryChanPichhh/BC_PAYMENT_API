@@ -1,8 +1,4 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
+using ReturnInvoiceModel = BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice.ReturnInvoiceModel;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice
 {

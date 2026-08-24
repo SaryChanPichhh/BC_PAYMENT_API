@@ -55,7 +55,20 @@
                     U.USER_NAME = @USER_NAME
                     AND M.DB_CODE = @DB_CODE 
                     AND M.APP_CODE = @APP_CODE
-                    AND U.USER_STATUS = 1;"; 
+                    AND U.USER_STATUS = 1;";
+
+        public static string IsExistsUser =>
+            $@"SELECT M.DB_CODE DbCode, S.DB_NAME DbName
+                FROM 
+                    dbo.BCUSERS U
+                INNER JOIN 
+                    dbo.BCMSAPP M 
+                    ON M.USER_ID = U.USER_ID
+              INNER JOIN SIDBINFO S ON S.DB_CODE = M.DB_CODE
+                WHERE 
+                    U.USER_NAME = @USER_NAME
+                    AND M.APP_CODE = @APP_CODE
+                    AND U.USER_STATUS = 1;";
         public static string GetUserId => "";
         public static string GetAppCode => "";
     }

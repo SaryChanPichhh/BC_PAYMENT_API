@@ -1,10 +1,3 @@
-﻿using System.Data;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.AccountReceivable;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.AccountReceivable;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-using Microsoft.Data.SqlClient;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.AccountReceivable
 {
     public class ConfirmAccountReceivableRepository : IConfirmAccountReceivableRepository

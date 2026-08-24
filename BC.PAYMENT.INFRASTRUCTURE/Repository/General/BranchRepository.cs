@@ -1,8 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using BC.PAYMENT.SQL.Queries;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
     public class BranchRepository : IBranchRepository
@@ -27,7 +22,6 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
         public async Task<List<BranchDTO>> GetLoginBranchAsync(string username, string appCode = "PYS")
         {
             return (await _sqlDataAccess.LoadData<BranchDTO, dynamic>(BranchQueries.LoginBranches, new { USER_NAME = username, APP_CODE = appCode })).ToList();
-
         }
 
         public async Task<List<BranchDTO>> GetBranchAsync()

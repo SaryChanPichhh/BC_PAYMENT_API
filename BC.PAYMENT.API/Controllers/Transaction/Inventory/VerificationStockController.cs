@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
@@ -10,90 +10,73 @@ using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
 using BC.PAYMENT.LOGGING;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
 {
-    public class VerificationStockController : BaseApiController
+    public class VerificationStockController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public VerificationStockController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpGet]
         [Route("getmaxsequence")]
         public async Task<ApiResponse<int>> GetMaxSequence()
         {
             var credential = Common.DecodeJwt(User);
-            var maxSequence = new ApiResponse<int>();
             try
             {
-                var maxSeq = await _unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
+                var maxSeq = await unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
                 if (maxSeq > 0)
                 {
-                    maxSequence.Result = maxSeq;
-                    maxSequence.StatusCode = (int)HttpStatusCode.OK;
-                    maxSequence.Message = "Max Sequence fetched successfully";
-                    maxSequence.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(maxSeq)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Max Sequence fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    maxSequence.StatusCode = (int)HttpStatusCode.BadRequest;
-                    maxSequence.Message = "Max Sequence fetched unsuccessfully";
+                    return ApiResponse<int>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Max Sequence fetched unsuccessfully")
+                        .Build();
                 }
-            }catch (SqlException ex)
-            {
-                maxSequence.StatusCode = (int)HttpStatusCode.InternalServerError;
-                maxSequence.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                maxSequence.StatusCode = (int)HttpStatusCode.InternalServerError;
-                maxSequence.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return maxSequence;
         }
-        
         
         [HttpGet]
         [Route("getrectype/{movType}")]
         public async Task<ApiResponse<BcModels>> GetRecTypesAsync([Required] string movType)
         {
             var credential = Common.DecodeJwt(User);
-            var recType = new ApiResponse<BcModels>();
             try
             {
-                var execute = await _unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!,movType);
+                var execute = await unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!,movType);
                 if (execute != null)
                 {
-                    recType.Result = execute;
-                    recType.StatusCode = (int)HttpStatusCode.OK;
-                    recType.Message = "Rectype fetched successfully";
-                    recType.Success = true;
+                    return ApiResponse<BcModels>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Rectype fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    recType.StatusCode = (int)HttpStatusCode.BadRequest;
-                    recType.Message = "Rectype fetched unsuccessfully";
+                    return ApiResponse<BcModels>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Rectype fetched unsuccessfully")
+                        .Build();
                 }
-            }catch (SqlException ex)
-            {
-                recType.StatusCode = (int)HttpStatusCode.InternalServerError;
-                recType.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                recType.StatusCode = (int)HttpStatusCode.InternalServerError;
-                recType.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<BcModels>(ex.Message);
             }
-            return recType;
         }
         
         [HttpGet]
@@ -101,70 +84,59 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<double>> GetItemCostByItemCodeAsync([Required] string itemCode)
         {
             var credential = Common.DecodeJwt(User);
-            var itemCost = new ApiResponse<double>();
             try
             {
-                var execute = await _unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, itemCode);
+                var execute = await unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, itemCode);
                 if (execute != null)
                 {
-                    itemCost.Result = execute;
-                    itemCost.StatusCode = (int)HttpStatusCode.OK;
-                    itemCost.Message = "Item cost fetched successfully";
-                    itemCost.Success = true;
+                    return ApiResponse<double>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Item cost fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemCost.StatusCode = (int)HttpStatusCode.BadRequest;
-                    itemCost.Message = "Item cost fetched unsuccessfully";
+                    return ApiResponse<double>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Item cost fetched unsuccessfully")
+                        .Build();
                 }
-            }catch (SqlException ex)
-            {
-                itemCost.StatusCode = (int)HttpStatusCode.InternalServerError;
-                itemCost.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                itemCost.StatusCode = (int)HttpStatusCode.InternalServerError;
-                itemCost.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<double>(ex.Message);
             }
-            return itemCost;
         }
+
         [HttpPost]
         [Route("getitemstockbylocationandcountingdate")]
         public async Task<ApiResponse<List<VerificationStockModel>>> GetAllStockItemByLocationAndCountingDateAsync([FromBody] PaginatedVerificationStockByDateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var itemCost = new ApiResponse<List<VerificationStockModel>>();
             try
             {
-                var execute = await _unitOfWork.VerificationStock.GetAllStockItemByLocationAndCountingDateAsync(credential.DbCode!, model.Location,Convert.ToDateTime(model.FromDate),Convert.ToDateTime( model.ToDate),model.Page,model.PageSize);
+                var execute = await unitOfWork.VerificationStock.GetAllStockItemByLocationAndCountingDateAsync(credential.DbCode!, model.Location,Convert.ToDateTime(model.FromDate),Convert.ToDateTime( model.ToDate),model.Page,model.PageSize);
                 if (execute.Any())
                 {
-                    itemCost.Result = execute;
-                    itemCost.StatusCode = (int)HttpStatusCode.OK;
-                    itemCost.Message = "Items fetched successfully";
-                    itemCost.Success = true;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemCost.StatusCode = (int)HttpStatusCode.BadRequest;
-                    itemCost.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }catch (SqlException ex)
-            {
-                itemCost.StatusCode = (int)HttpStatusCode.InternalServerError;
-                itemCost.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                itemCost.StatusCode = (int)HttpStatusCode.InternalServerError;
-                itemCost.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockModel>>(ex.Message);
             }
-            return itemCost;
         }
         
         [HttpPost]
@@ -172,42 +144,36 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<List<VerificationStockModel>>> GetAllStockItemByLocationAndCountingDateAsync([FromBody] PaginatedVerificationStockByPeriodDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var itemCost = new ApiResponse<List<VerificationStockModel>>();
             try
             {
-                var execute = await _unitOfWork.VerificationStock.GetAllStockItemByLocationAndCountingPeriodAsync(credential.DbCode!, model.Location,model.Month,model.Year,model.Page,model.PageSize);
+                var execute = await unitOfWork.VerificationStock.GetAllStockItemByLocationAndCountingPeriodAsync(credential.DbCode!, model.Location,model.Month,model.Year,model.Page,model.PageSize);
                 if (execute.Any())
                 {
-                    itemCost.Result = execute;
-                    itemCost.StatusCode = (int)HttpStatusCode.OK;
-                    itemCost.Message = "Items fetched successfully";
-                    itemCost.Success = true;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Items fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    itemCost.StatusCode = (int)HttpStatusCode.BadRequest;
-                    itemCost.Message = "Items fetched unsuccessfully";
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Items fetched unsuccessfully")
+                        .Build();
                 }
-            }catch (SqlException ex)
-            {
-                itemCost.StatusCode = (int)HttpStatusCode.InternalServerError;
-                itemCost.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                itemCost.StatusCode = (int)HttpStatusCode.InternalServerError;
-                itemCost.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockModel>>(ex.Message);
             }
-            return itemCost;
         }
+
         [HttpPost]
         [Route("saveitemafterverification")]
         public async Task<ApiResponse<List<VerificationStockDto>>> SaveRecordStockItemAfterVerify([FromBody] List<VerificationStockDto> model)
         {
             var credential = Common.DecodeJwt(User);
-            var saveRecord = new ApiResponse<List<VerificationStockDto>>();
             try
             {
                 var itemModel = model.Select(x => new VerificationStockModel
@@ -224,32 +190,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                     CreateBy = credential.Username!,
                     DbCode = credential.DbCode!,
                 }).ToList();
-                var execute = await _unitOfWork.VerificationStock.SaveRecordStockItemAfterVerify(itemModel);
+                var execute = await unitOfWork.VerificationStock.SaveRecordStockItemAfterVerify(itemModel);
                 if (execute > 0)
                 {
-                    saveRecord.Result = model;
-                    saveRecord.StatusCode = (int)HttpStatusCode.OK;
-                    saveRecord.Message = "Items saved successfully";
-                    saveRecord.Success = true;
+                    return ApiResponse<List<VerificationStockDto>>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Items saved successfully")
+                        .Build();
                 }
                 else
                 {
-                    saveRecord.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saveRecord.Message = "Items saved unsuccessfully";
+                    return ApiResponse<List<VerificationStockDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Items saved unsuccessfully")
+                        .Build();
                 }
-            }catch (SqlException ex)
-            {
-                saveRecord.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saveRecord.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                saveRecord.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saveRecord.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockDto>>(ex.Message);
             }
-            return saveRecord;
         }
         
         [HttpPost]
@@ -257,17 +218,16 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<List<AdjustmentInventoryDto>>> AdjustmentInventoryAsync([FromBody] List<AdjustmentInventoryDto> model)
         {
             var credential = Common.DecodeJwt(User);
-            var saveRecord = new ApiResponse<List<AdjustmentInventoryDto>>();
             try
             {
                 var affectedRow = 0;
                 var i = 1;
                 foreach (var item in model)
                 {
-                    var sequence = await _unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
-                    var movTypes = await _unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!,item.StatusType );
-                    var movRef = await _unitOfWork.Generators.GenerateAdjRefCode(credential.DbCode!,movTypes.MovType, movTypes.RecType);
-                    var itemCost = await _unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, item.ItemCode);
+                    var sequence = await unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
+                    var movTypes = await unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!,item.StatusType );
+                    var movRef = await unitOfWork.Generators.GenerateAdjRefCode(credential.DbCode!,movTypes.MovType, movTypes.RecType);
+                    var itemCost = await unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, item.ItemCode);
                     var inventory = new InventoryAdjustmentModel
                     {
                         Sequence = sequence,
@@ -306,34 +266,28 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                         IdEntered = credential.Username!,
                         IdAlloc = "",
                     };
-                    affectedRow += await _unitOfWork.VerificationStock.AdjustInventory(inventory);
+                    affectedRow += await unitOfWork.VerificationStock.AdjustInventory(inventory);
                 }
                 if (affectedRow > 0)
                 {
-                    saveRecord.Result = model;
-                    saveRecord.StatusCode = (int)HttpStatusCode.OK;
-                    saveRecord.Message = "Adjustment Inventory saved successfully";
-                    saveRecord.Success = true;
+                    return ApiResponse<List<AdjustmentInventoryDto>>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Adjustment Inventory saved successfully")
+                        .Build();
                 }
                 else
                 {
-                    saveRecord.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saveRecord.Message = "Adjustment Inventory saved unsuccessfully";
+                    return ApiResponse<List<AdjustmentInventoryDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Adjustment Inventory saved unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saveRecord.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saveRecord.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                saveRecord.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saveRecord.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<AdjustmentInventoryDto>>(ex.Message);
             }
-            return saveRecord;
         }
     }
 }

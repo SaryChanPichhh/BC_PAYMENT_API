@@ -1,11 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.DailyAnalysis;
-using BC.PAYMENT.CORE.Entities.Preset.DailySaleAnalysis;
-using System.Data;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.DailySaleAnalysis
 {
     public class DailyAnalysisRepository : IDailyAnalysisRepository

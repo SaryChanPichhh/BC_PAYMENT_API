@@ -1,41 +1,29 @@
-﻿using System.Data;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
 {
-    public class SqlDataAccess : ISqlDataAccess
+    public class SqlDataAccess(IConfiguration settings) : ISqlDataAccess
     {
-        private readonly IConfiguration _settings;
-
-        public SqlDataAccess(IConfiguration settings)
-        {
-            _settings = settings;
-        }
-
         public async Task<int> ExecuteAsync<U>(string storedProcedure, U parameters, CommandType commandType = CommandType.Text, string connectionString = "Default")
         {
             if (connectionString == "Default")
             {
-                connectionString = _settings.GetConnectionString("DBConnection")!;
+                connectionString = settings.GetConnectionString("DBConnection")!;
             }
 
-            using (var connection = new SqlConnection(connectionString))
-            {
-                if (connection.State == ConnectionState.Closed)
-                    await connection.OpenAsync();
-                return await connection.ExecuteAsync(storedProcedure, parameters, commandType: commandType);
-            }
+            await using var connection = new SqlConnection(connectionString);
+            if (connection.State == ConnectionState.Closed)
+                await connection.OpenAsync();
 
 
+            var transaction = connection.BeginTransaction();
+
+            return await connection.ExecuteAsync(storedProcedure, parameters, commandType: commandType);
         }
 
         public T ExecuteScalar<T, TU>(string query, TU parameters, CommandType commandType = CommandType.Text, string connectionString = "Default")
         {
             if (connectionString == "Default")
             {
-                connectionString = _settings.GetConnectionString("DBConnection")!;
+                connectionString = settings.GetConnectionString("DBConnection")!;
             }
             using var connection = new SqlConnection(connectionString);
             if (connection.State == ConnectionState.Closed)
@@ -48,10 +36,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
             {
                 if (connectionString == "Default")
                 {
-                    connectionString = _settings.GetConnectionString("DBConnection")!;
+                    connectionString = settings.GetConnectionString("DBConnection")!;
                 }
 
-                using var connection = new SqlConnection(connectionString);
+                await using var connection = new SqlConnection(connectionString);
                 if (connection.State == ConnectionState.Closed)
                     await connection.OpenAsync();
                 return await connection.ExecuteScalarAsync<T>(query, parameters, commandType: commandType);
@@ -61,9 +49,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
         {
             if (connectionString == "Default")
             {
-                connectionString = _settings.GetConnectionString("DBConnection")!;
+                connectionString = settings.GetConnectionString("DBConnection")!;
             }
-            using var connection = new SqlConnection(connectionString);
+
+            await using var connection = new SqlConnection(connectionString);
             if (connection.State == ConnectionState.Closed)
                 await connection.OpenAsync();
             return await connection.QueryAsync<T>(storedProcedure, parameters, commandType: commandType);
@@ -73,7 +62,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
         {
             if (connectionString == "Default")
             {
-                connectionString = _settings.GetConnectionString("DBConnection")!;
+                connectionString = settings.GetConnectionString("DBConnection")!;
             }
 
             using var connection = new SqlConnection(connectionString);
@@ -90,7 +79,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
         {
             if (connectionString == "Default")
             {
-                connectionString = _settings.GetConnectionString("DBConnection")!;
+                connectionString = settings.GetConnectionString("DBConnection")!;
             }
 
             using var connection = new SqlConnection(connectionString);

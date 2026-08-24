@@ -1,6 +1,3 @@
-﻿using System.Globalization;
-using BC.PAYMENT.CORE.DTO.Generator;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Generator
 {
     public interface IGeneratorRepository

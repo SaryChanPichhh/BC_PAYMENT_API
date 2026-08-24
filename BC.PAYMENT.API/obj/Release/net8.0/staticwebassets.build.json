@@ -1,11 +1,1 @@
-{
-  "Version": 1,
-  "Hash": "9wgVeis/pdv49FDucDPFq5I6ABcBvroZgnUzoD5cqqc=",
-  "Source": "BC.PAYMENT.API",
-  "BasePath": "_content/BC.PAYMENT.API",
-  "Mode": "Default",
-  "ManifestType": "Build",
-  "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
-}
+{"Version":1,"Hash":"ZZvWzUBJEbSzFFWsjIiQFgcsyxSLpcizfc/bD7C4Xx8=","Source":"BC.PAYMENT.API","BasePath":"/","Mode":"Root","ManifestType":"Build","ReferencedProjectsConfiguration":[],"DiscoveryPatterns":[],"Assets":[],"Endpoints":[]}

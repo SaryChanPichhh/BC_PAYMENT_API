@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -12,15 +12,8 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPayment
 {
-    public class ReviewReportController : BaseApiController
+    public class ReviewReportController(IUnitOfWork unitOfWork, ILogger<ReviewReportController> logger) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<ReviewReportController> _logger;
-        public ReviewReportController(IUnitOfWork unitOfWork, ILogger<ReviewReportController> logger)
-        {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
-        }
 
         #region Requestion Action
 
@@ -28,81 +21,60 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getallrequestionaction")]
         public async Task<ApiResponse<List<RequestionActionDto>>> GetRequestActionAsync()
         {
-            var requestAction = new ApiResponse<List<RequestionActionDto>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllActionAsync();
+                var result = await unitOfWork.ReviewReport.GetAllActionAsync();
                 if (result.Any())
                 {
-                    requestAction.Result = result;
-                    requestAction.StatusCode = StatusCodes.Status200OK;
-                    requestAction.Message = "Request action fetched successfully";
-                    requestAction.Success = true;
+                    return ApiResponse<List<RequestionActionDto>>.Builder()
+                        .WithMessage("Request action fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    requestAction.Result = result;
-                    requestAction.StatusCode = StatusCodes.Status400BadRequest;
-                    requestAction.Message = "Request action fetched unsuccessfully";
-                    requestAction.Success = false;
+                    return ApiResponse<List<RequestionActionDto>>.Builder()
+                        .WithMessage("Request action fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-                
-            }catch (SqlException ex)
-            {
-                requestAction.StatusCode = StatusCodes.Status500InternalServerError;
-                requestAction.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
-                _logger.LogError($@"Sql Exception : {ex.Message}");
             }
             catch (Exception ex)
             {
-                requestAction.StatusCode = StatusCodes.Status500InternalServerError;
-                requestAction.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
-                _logger.LogError($@"Error Exception : {ex.Message}");
+                return GlobalExceptionHandler.ExceptionError<List<RequestionActionDto>>(ex.Message);
             }
-            return requestAction;
         }
         [HttpGet]
         [Route("getallrequestbyactionid/{actionId}")]
         public async Task<ApiResponse<List<StockCarRequestDto>>> GetAllRequestByActionIdAsync([Required] int actionId)
         {
             var credential = Common.DecodeJwt(User);
-            var requestAction = new ApiResponse<List<StockCarRequestDto>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllRequestByActionIdAsync(credential.DbCode!,actionId);
+                var result = await unitOfWork.ReviewReport.GetAllRequestByActionIdAsync(credential.DbCode!,actionId);
                 if (result.Any())
                 {
-                    requestAction.Result = result;
-                    requestAction.StatusCode = StatusCodes.Status200OK;
-                    requestAction.Message = "Requests fetched successfully";
-                    requestAction.Success = true;
+                    return ApiResponse<List<StockCarRequestDto>>.Builder()
+                        .WithMessage("Requests fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    requestAction.Result = result;
-                    requestAction.StatusCode = StatusCodes.Status400BadRequest;
-                    requestAction.Message = "Requests fetched unsuccessfully";
-                    requestAction.Success = false;
+                    return ApiResponse<List<StockCarRequestDto>>.Builder()
+                        .WithMessage("Requests fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-                
-            }
-            catch (SqlException ex)
-            {
-                requestAction.StatusCode = StatusCodes.Status500InternalServerError;
-                requestAction.Message = $"Sql Exception : {ex.Message}";
-                //Logger.Instance.Error("Sql Exception", ex);
-                //_logger.LogError($@"Sql Exception ", ex);
             }
             catch (Exception ex)
             {
-                requestAction.StatusCode = StatusCodes.Status500InternalServerError;
-                requestAction.Message = $"Error Exception : {ex.Message}";
-                //Logger.Instance.Error("Error Exception", ex);
-                _logger.LogInformation($@"Error Exception ", ex);
+                return GlobalExceptionHandler.ExceptionError<List<StockCarRequestDto>>(ex.Message);
             }
-            return requestAction;
         }
         
         [HttpGet]
@@ -110,38 +82,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         public async Task<ApiResponse<List<StockCarRequestDto>>> GetAllRequestByActionIdAndRoleIdAsync([FromBody]  StockCarRequestParamDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var requestAction = new ApiResponse<List<StockCarRequestDto>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllRequestByActionIdAndRoleIdAsync(credential.DbCode!,model.ActionId,model.RoleId);
+                var result = await unitOfWork.ReviewReport.GetAllRequestByActionIdAndRoleIdAsync(credential.DbCode!,model.ActionId,model.RoleId);
                 if (result.Any())
                 {
-                    requestAction.Result = result;
-                    requestAction.StatusCode = StatusCodes.Status200OK;
-                    requestAction.Message = "Requests fetched successfully";
-                    requestAction.Success = true;
+                    return ApiResponse<List<StockCarRequestDto>>.Builder()
+                        .WithMessage("Requests fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    requestAction.Result = result;
-                    requestAction.StatusCode = StatusCodes.Status400BadRequest;
-                    requestAction.Message = "Requests fetched unsuccessfully";
-                    requestAction.Success = false;
+                    return ApiResponse<List<StockCarRequestDto>>.Builder()
+                        .WithMessage("Requests fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-                
-            }catch (SqlException ex)
-            {
-                requestAction.StatusCode = StatusCodes.Status500InternalServerError;
-                requestAction.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception",ex);
             }
             catch (Exception ex)
             {
-                requestAction.StatusCode = StatusCodes.Status500InternalServerError;
-                requestAction.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<StockCarRequestDto>>(ex.Message);
             }
-            return requestAction;
         }
 
         #endregion
@@ -151,77 +115,59 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getallcreditinvoicebyrequestid/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<List<ReviewReportCreditInvoice>>> GetAllCreditInvoiceByRequestIdAndCheckingStatusAsync([Required] int requestId,[Required] bool checkingStatus)
         {
-            var creditInvoice = new ApiResponse<List<ReviewReportCreditInvoice>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllCreditInvoiceByRequestIdAndCheckingStatus(requestId, checkingStatus);
+                var result = await unitOfWork.ReviewReport.GetAllCreditInvoiceByRequestIdAndCheckingStatus(requestId, checkingStatus);
                 if (result.Any())
                 {
-                    creditInvoice.Result = result;
-                    creditInvoice.StatusCode = StatusCodes.Status200OK;
-                    creditInvoice.Message = "Credit invoices fetched successfully";
-                    creditInvoice.Success = true;
+                    return ApiResponse<List<ReviewReportCreditInvoice>>.Builder()
+                        .WithMessage("Credit invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    creditInvoice.Result = result;
-                    creditInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    creditInvoice.Message = "Credit invoices fetched unsuccessfully";
-                    creditInvoice.Success = false;
+                    return ApiResponse<List<ReviewReportCreditInvoice>>.Builder()
+                        .WithMessage("Credit invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                creditInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                creditInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                creditInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                creditInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<ReviewReportCreditInvoice>>(ex.Message);
             }
-            return creditInvoice;
         }
         
         [HttpPut]
         [Route("updatestatuscreditinvoice/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<int>> UpdateStatusCheckingCreditInvoiceBySubmitId([Required] int requestId, [Required] bool checkingStatus)
         {
-            var creditInvoice = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.ReviewReport.UpdateStatusCheckingCreditInvoiceBySubmitId(requestId, checkingStatus);
+                var affectedRow = await unitOfWork.ReviewReport.UpdateStatusCheckingCreditInvoiceBySubmitId(requestId, checkingStatus);
                 if (affectedRow > 0)
                 {
-                    creditInvoice.Result = affectedRow;
-                    creditInvoice.StatusCode = StatusCodes.Status204NoContent;
-                    creditInvoice.Message = "Checking status of credit invoices updated successfully";
-                    creditInvoice.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of credit invoices updated successfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    creditInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    creditInvoice.Message = "Checking status of credit invoices updated unsuccessfully";
-                    creditInvoice.Success = false;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of credit invoices updated unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                creditInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                creditInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                creditInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                creditInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return creditInvoice;
         }
 
         #endregion
@@ -231,77 +177,59 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getallpaidinvoicebyrequestid/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<List<PaidInvoiceRequestDto>>> GetAllPaidInvoiceByRequestIdAndCheckingStatus([Required] int requestId, [Required] bool checkingStatus)
         {
-            var paidInvoice = new ApiResponse<List<PaidInvoiceRequestDto>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllPaidInvoiceByRequestIdAndCheckingStatus(requestId, checkingStatus);
+                var result = await unitOfWork.ReviewReport.GetAllPaidInvoiceByRequestIdAndCheckingStatus(requestId, checkingStatus);
                 if (result.Any())
                 {
-                    paidInvoice.Result = result;
-                    paidInvoice.StatusCode = StatusCodes.Status200OK;
-                    paidInvoice.Message = "Paid invoices fetched successfully";
-                    paidInvoice.Success = true;
+                    return ApiResponse<List<PaidInvoiceRequestDto>>.Builder()
+                        .WithMessage("Paid invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    paidInvoice.Result = result;
-                    paidInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    paidInvoice.Message = "Paid invoices fetched unsuccessfully";
-                    paidInvoice.Success = false;
+                    return ApiResponse<List<PaidInvoiceRequestDto>>.Builder()
+                        .WithMessage("Paid invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                paidInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                paidInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                paidInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                paidInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<PaidInvoiceRequestDto>>(ex.Message);
             }
-            return paidInvoice;
         }
         
         [HttpPut]
         [Route("updatestatuspaidinvoice/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<int>> UpdateStatusCheckingPaymentInvoiceByInvoiceId([Required] int requestId, [Required] bool checkingStatus)
         {
-            var paidInvoice = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.ReviewReport.UpdateStatusCheckingPaymentInvoiceByInvoiceId(requestId, checkingStatus);
+                var affectedRow = await unitOfWork.ReviewReport.UpdateStatusCheckingPaymentInvoiceByInvoiceId(requestId, checkingStatus);
                 if (affectedRow > 0)
                 {
-                    paidInvoice.Result = affectedRow;
-                    paidInvoice.StatusCode = StatusCodes.Status204NoContent;
-                    paidInvoice.Message = "Checking status of paid invoices updated successfully";
-                    paidInvoice.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of paid invoices updated successfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    paidInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    paidInvoice.Message = "Checking status of paid invoices updated unsuccessfully";
-                    paidInvoice.Success = false;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of paid invoices updated unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                paidInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                paidInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                paidInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                paidInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return paidInvoice;
         }
 
         #endregion
@@ -311,77 +239,59 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getalltransferinvoicebyrequestid/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<List<TransferMoneyModel>>> GetAllTransferByRequestIdAndCheckingStatus([Required] int requestId, [Required] bool checkingStatus)
         {
-            var transferInvoice = new ApiResponse<List<TransferMoneyModel>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllTransferByRequestIdAndCheckingStatus(requestId, checkingStatus);
+                var result = await unitOfWork.ReviewReport.GetAllTransferByRequestIdAndCheckingStatus(requestId, checkingStatus);
                 if (result.Any())
                 {
-                    transferInvoice.Result = result;
-                    transferInvoice.StatusCode = StatusCodes.Status200OK;
-                    transferInvoice.Message = "Transfer invoices fetched successfully";
-                    transferInvoice.Success = true;
+                    return ApiResponse<List<TransferMoneyModel>>.Builder()
+                        .WithMessage("Transfer invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    transferInvoice.Result = result;
-                    transferInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    transferInvoice.Message = "Transfer invoices fetched unsuccessfully";
-                    transferInvoice.Success = false;
+                    return ApiResponse<List<TransferMoneyModel>>.Builder()
+                        .WithMessage("Transfer invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<TransferMoneyModel>>(ex.Message);
             }
-            return transferInvoice;
         }
         
         [HttpPut]
         [Route("updatestatustransferinvoice/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<int>> UpdateStatusCheckingTransferBySubmitTransferId([Required] int requestId, [Required] bool checkingStatus)
         {
-            var transferInvoice = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.ReviewReport.UpdateStatusCheckingTransferBySubmitTransferId(requestId, checkingStatus);
+                var affectedRow = await unitOfWork.ReviewReport.UpdateStatusCheckingTransferBySubmitTransferId(requestId, checkingStatus);
                 if (affectedRow > 0)
                 {
-                    transferInvoice.Result = affectedRow;
-                    transferInvoice.StatusCode = StatusCodes.Status204NoContent;
-                    transferInvoice.Message = "Checking status of transfer invoices updated successfully";
-                    transferInvoice.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of transfer invoices updated successfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    transferInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    transferInvoice.Message = "Checking status of transfer invoices updated unsuccessfully";
-                    transferInvoice.Success = false;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of transfer invoices updated unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return transferInvoice;
         }
         #endregion
 
@@ -391,76 +301,59 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getallexpenseinvoicebyrequestid/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<List<ReviewReportExpenseDto>>> GetAllExpenseByRequestIdAndCheckingStatus([Required] int requestId, [Required] bool checkingStatus)
         {
-            var transferInvoice = new ApiResponse<List<ReviewReportExpenseDto>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllExpenseByRequestIdAndCheckingStatus(requestId, checkingStatus);
+                var result = await unitOfWork.ReviewReport.GetAllExpenseByRequestIdAndCheckingStatus(requestId, checkingStatus);
                 if (result.Any())
                 {
-                    transferInvoice.Result = result;
-                    transferInvoice.StatusCode = StatusCodes.Status200OK;
-                    transferInvoice.Message = "Expense invoices fetched successfully";
-                    transferInvoice.Success = true;
+                    return ApiResponse<List<ReviewReportExpenseDto>>.Builder()
+                        .WithMessage("Expense invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    transferInvoice.Result = result;
-                    transferInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    transferInvoice.Message = "Expense invoices fetched unsuccessfully";
-                    transferInvoice.Success = false;
+                    return ApiResponse<List<ReviewReportExpenseDto>>.Builder()
+                        .WithMessage("Expense invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-
-            }
-            catch (SqlException ex)
-            {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<ReviewReportExpenseDto>>(ex.Message);
             }
-            return transferInvoice;
         }
 
         [HttpPut]
         [Route("updatestatusexpenseinvoice/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<int>> UpdateStatusCheckingExpenseByInvoiceId([Required] int requestId, [Required] bool checkingStatus)
         {
-            var transferInvoice = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.ReviewReport.UpdateStatusCheckingExpenseByInvoiceId(requestId, checkingStatus);
+                var affectedRow = await unitOfWork.ReviewReport.UpdateStatusCheckingExpenseByInvoiceId(requestId, checkingStatus);
                 if (affectedRow > 0)
                 {
-                    transferInvoice.Result = affectedRow;
-                    transferInvoice.StatusCode = StatusCodes.Status204NoContent;
-                    transferInvoice.Message = "Checking status of expense invoices updated successfully";
-                    transferInvoice.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of expense invoices updated successfully")
+                        .WithStatusCode(StatusCodes.Status204NoContent)
+                        .WithResult(affectedRow)
+                        .Build();
                 }
                 else
                 {
-                    transferInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    transferInvoice.Message = "Checking status of expense invoices updated unsuccessfully";
-                    transferInvoice.Success = false;
+                    return ApiResponse<int>.Builder()
+                        .WithMessage("Checking status of expense invoices updated unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return transferInvoice;
         }
 
         #endregion
@@ -469,38 +362,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         [Route("getallapprovalinvoicehistorybyrequestid/{requestId}/{checkingStatus}")]
         public async Task<ApiResponse<List<ApprovalInvoiceHistoryModel>>> GetAllApprovalHistoryByRequestIdAsync([Required] int requestId, [Required] bool checkingStatus)
         {
-            var transferInvoice = new ApiResponse<List<ApprovalInvoiceHistoryModel>>();
             try
             {
-                var result = await _unitOfWork.ReviewReport.GetAllApprovalHistoryByRequestIdAsync(requestId, checkingStatus);
+                var result = await unitOfWork.ReviewReport.GetAllApprovalHistoryByRequestIdAsync(requestId, checkingStatus);
                 if (result.Any())
                 {
-                    transferInvoice.Result = result;
-                    transferInvoice.StatusCode = StatusCodes.Status200OK;
-                    transferInvoice.Message = "Approval invoices fetched successfully";
-                    transferInvoice.Success = true;
+                    return ApiResponse<List<ApprovalInvoiceHistoryModel>>.Builder()
+                        .WithMessage("Approval invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(result)
+                        .Build();
                 }
                 else
                 {
-                    transferInvoice.Result = result;
-                    transferInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    transferInvoice.Message = "Approval invoices fetched unsuccessfully";
-                    transferInvoice.Success = false;
+                    return ApiResponse<List<ApprovalInvoiceHistoryModel>>.Builder()
+                        .WithMessage("Approval invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithResult(result)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                transferInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                transferInvoice.Message = $"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<ApprovalInvoiceHistoryModel>>(ex.Message);
             }
-            return transferInvoice;
         }
 
 

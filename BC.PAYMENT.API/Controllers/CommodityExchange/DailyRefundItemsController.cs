@@ -1,4 +1,4 @@
-﻿
+
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
@@ -11,22 +11,15 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.CommodityExchange
 {
-    public class DailyRefundItemsController : BaseApiController
+    public class DailyRefundItemsController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public DailyRefundItemsController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpGet]
         [Route("getdailyrefunditemsallbranches")]
         public async Task<ApiResponse<List<RefundItemDetailDto>>> GetItemsefundByAllBranchAsync()
         {
-            var response = new ApiResponse<List<RefundItemDetailDto>>();
             try
             {
-                var result = await _unitOfWork.DailyRefundItem.GetItemsRefundByAllBranchAsync();
+                var result = await unitOfWork.DailyRefundItem.GetItemsRefundByAllBranchAsync();
                 var newRespond = result.Select(x => new RefundItemDetailDto
                 {
                     Id = x.Id,
@@ -52,35 +45,32 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange
                 });
                 if (result.Any())
                 {
-                    response.Result = newRespond;
-                    response.Message = "Items refunded by all branches fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
+                    return ApiResponse<List<RefundItemDetailDto>>.Builder()
+                        .WithResult(newRespond)
+                        .WithMessage("Items refunded by all branches fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .Build();
                 }
                 else
                 {
-                    response.Result = new List<RefundItemDetailDto>();
-                    response.Message = "Items refunded by all branches fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<RefundItemDetailDto>>.Builder()
+                        .WithResult(new List<RefundItemDetailDto>())
+                        .WithMessage("Items refunded by all branches fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }catch(SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<RefundItemDetailDto>>(ex.Message);
             }
-            return response;
         }
 
         [HttpGet]
         [Route("getitemimage/{detailId}")]
         public async Task<IActionResult> GetImageByDetailId([Required] int detailId)
         {
-            var response = await _unitOfWork.DailyRefundItem.GetImageByDetailIdAsync(detailId);
+            var response = await unitOfWork.DailyRefundItem.GetImageByDetailIdAsync(detailId);
             try
             {
                 if (response != null)
@@ -88,9 +78,9 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange
                     return File(response, "image/jpeg");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return BadRequest($"Error fetching image: {ex.Message}");
+                return Ok(ex.Message);
             }
             return NotFound();
         }
@@ -98,10 +88,9 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange
         [Route("getdailyrefunditemsbybranches/{dbCode}")]
         public async Task<ApiResponse<List<RefundItemDetailDto>>> GetItemsRefundByByBranchAsync([Required] string dbCode)
         {
-            var response = new ApiResponse<List<RefundItemDetailDto>>();
             try
             {
-                var result = await _unitOfWork.DailyRefundItem.GetItemsRefundByByBranchAsync(dbCode);
+                var result = await unitOfWork.DailyRefundItem.GetItemsRefundByByBranchAsync(dbCode);
                 var newRespond = result.Select(x => new RefundItemDetailDto
                 {
                     Id = x.Id,
@@ -127,28 +116,25 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange
                 });
                 if (result.Any())
                 {
-                    response.Result = newRespond;
-                    response.Message = "Items refunded by all branches fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
+                    return ApiResponse<List<RefundItemDetailDto>>.Builder()
+                        .WithResult(newRespond)
+                        .WithMessage("Items refunded by all branches fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .Build();
                 }
                 else
                 {
-                    response.Result = new List<RefundItemDetailDto>();
-                    response.Message = "Items refunded by all branches fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<List<RefundItemDetailDto>>.Builder()
+                        .WithResult(new List<RefundItemDetailDto>())
+                        .WithMessage("Items refunded by all branches fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }catch(SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<RefundItemDetailDto>>(ex.Message);
             }
-            return response;
         }
         
         /// <summary>
@@ -161,34 +147,30 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange
         [Route("deleterefunditems/{masterId}/{detailId}")]
         public async Task<ApiResponse<int>> GetItemsefundByAllBranchAsync([Required] int masterId, [Required] int detailId)
         {
-            var response = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.DailyRefundItem.DeleteRequestItem(masterId,detailId);
+                var affectedRow = await unitOfWork.DailyRefundItem.DeleteRequestItem(masterId,detailId);
                 if (affectedRow > 0)
                 {
-                    response.Result = affectedRow;
-                    response.Message = "Items refunded deleted successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithMessage("Items refunded deleted successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .Build();
                 }
                 else
                 {
-                    response.Result = 0;
-                    response.Message = "Items refunded deleted fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(0)
+                        .WithMessage("Items refunded deleted fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }catch(SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
         
         [HttpPost]
@@ -196,34 +178,30 @@ namespace BC.PAYMENT.API.Controllers.CommodityExchange
         public async Task<ApiResponse<int>> InsertReceivedItem([Required] int masterId, [Required] int detailId)
         {
             var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<int>();
             try
             {
-                var affectedRow = await _unitOfWork.DailyRefundItem.InsertReceivedItem(credential.Username, detailId);
+                var affectedRow = await unitOfWork.DailyRefundItem.InsertReceivedItem(credential.Username, detailId);
                 if (affectedRow > 0)
                 {
-                    response.Result = affectedRow;
-                    response.Message = "Items refunded added successfully";
-                    response.StatusCode = (int)HttpStatusCode.NoContent;
-                    response.Success = true;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(affectedRow)
+                        .WithMessage("Items refunded added successfully")
+                        .WithStatusCode((int)HttpStatusCode.NoContent)
+                        .Build();
                 }
                 else
                 {
-                    response.Result = 0;
-                    response.Message = "Items refunded added fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    return ApiResponse<int>.Builder()
+                        .WithResult(0)
+                        .WithMessage("Items refunded added fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }catch(SqlException ex)
-            {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
             }
             catch (Exception ex)
             {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
             }
-            return response;
         }
     }
 }

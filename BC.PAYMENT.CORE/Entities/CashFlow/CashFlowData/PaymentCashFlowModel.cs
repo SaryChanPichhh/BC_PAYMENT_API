@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.DTO.CashFlow.CashFlowData;
-using BC.PAYMENT.CORE.Enums;
-
 namespace BC.PAYMENT.CORE.Entities.CashFlow.CashFlowData
 {
     public class PaymentCashFlowModel : PaymentCashFlowDto

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
@@ -25,39 +25,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.InventoryCounting
         public async Task<ApiResponse<List<StockInventoryCountingModel>>> GetInventoryCountingAsync()
         {
             var credential = Common.DecodeJwt(User);
-            var inventoryCounting = new ApiResponse<List<StockInventoryCountingModel>>();
             try
             {
                 var inventoryCountings =
                     await _unitOfWork.StockInventoryCounting.GetInventoryCountingAsync(credential.DbCode!);
                 if (inventoryCountings.Any())
                 {
-                    inventoryCounting.Result = inventoryCountings;
-                    inventoryCounting.StatusCode = StatusCodes.Status200OK;
-                    inventoryCounting.Message = "Inventory Countings fetched successfully";
-                    inventoryCounting.Success = true;
+                    return ApiResponse<List<StockInventoryCountingModel>>.Builder()
+                        .WithResult(inventoryCountings)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Inventory Countings fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                    inventoryCounting.Message = "Inventory Countings fetched unsuccessfully";
-                    inventoryCounting.Success = false;
+                    return ApiResponse<List<StockInventoryCountingModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Inventory Countings fetched unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Sql Exception : {e.Message}";
-                Logger.Instance.Error("Sql Exception",e);
+                return GlobalExceptionHandler.ExceptionError<List<StockInventoryCountingModel>>(ex.Message);
             }
-            catch (Exception e)
-            {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Error Exception : {e.Message}";
-                Logger.Instance.Error("Error Exception", e);
-            }
-
-            return inventoryCounting;
         }
         
         [HttpPost]
@@ -65,7 +56,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.InventoryCounting
         public async Task<ApiResponse<InventoryCountingDto>> AddNewInventoryCountingAsync([FromBody] InventoryCountingDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var inventoryCounting = new ApiResponse<InventoryCountingDto>();
             try
             {
                 var inventoryCountingModel = new StockInventoryCountingModel
@@ -83,32 +73,24 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.InventoryCounting
                     await _unitOfWork.StockInventoryCounting.InsertInventoryCountingAsync(inventoryCountingModel);
                 if (affectedRow > 0 )
                 {
-                    inventoryCounting.Result = model;
-                    inventoryCounting.StatusCode = StatusCodes.Status200OK;
-                    inventoryCounting.Message = "Inventory Countings added successfully";
-                    inventoryCounting.Success = true;
+                    return ApiResponse<InventoryCountingDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Inventory Countings added successfully")
+                        .Build();
                 }
                 else
                 {
-                    inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                    inventoryCounting.Message = "Inventory Countings added unsuccessfully";
-                    inventoryCounting.Success = false;
+                    return ApiResponse<InventoryCountingDto>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Inventory Countings added unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Sql Exception : {e.Message}";
-                Logger.Instance.Error("Sql Exception",e);
+                return GlobalExceptionHandler.ExceptionError<InventoryCountingDto>(ex.Message);
             }
-            catch (Exception e)
-            {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Error Exception : {e.Message}";
-                Logger.Instance.Error("Error Exception", e);
-            }
-
-            return inventoryCounting;
         }
         
         [HttpPut]
@@ -116,7 +98,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.InventoryCounting
         public async Task<ApiResponse<InventoryCountingDto>> UpdateInventoryCountingAsync([FromBody] InventoryCountingUpdateDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var inventoryCounting = new ApiResponse<InventoryCountingDto>();
             try
             {
                 var inventoryCountingModel = new StockInventoryCountingModel
@@ -135,32 +116,24 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.InventoryCounting
                     await _unitOfWork.StockInventoryCounting.UpdateInventoryCountingAsync(inventoryCountingModel);
                 if (affectedRow > 0 )
                 {
-                    inventoryCounting.Result = model;
-                    inventoryCounting.StatusCode = StatusCodes.Status200OK;
-                    inventoryCounting.Message = "Inventory Countings updated successfully";
-                    inventoryCounting.Success = true;
+                    return ApiResponse<InventoryCountingDto>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Inventory Countings updated successfully")
+                        .Build();
                 }
                 else
                 {
-                    inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                    inventoryCounting.Message = "Inventory Countings updated unsuccessfully";
-                    inventoryCounting.Success = false;
+                    return ApiResponse<InventoryCountingDto>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Inventory Countings updated unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Sql Exception : {e.Message}";
-                Logger.Instance.Error("Sql Exception",e);
+                return GlobalExceptionHandler.ExceptionError<InventoryCountingDto>(ex.Message);
             }
-            catch (Exception e)
-            {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Error Exception : {e.Message}";
-                Logger.Instance.Error("Error Exception", e);
-            }
-
-            return inventoryCounting;
         }
         
         [HttpDelete]
@@ -168,39 +141,30 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Audit.InventoryCounting
         public async Task<ApiResponse<string>> DeleteInventoryCountingAsync([Required] string stockId)
         {
             var credential = Common.DecodeJwt(User);
-            var inventoryCounting = new ApiResponse<string>();
             try
             {
                 var affectedRow =
                     await _unitOfWork.StockInventoryCounting.DeleteInventoryCountingAsync(stockId);
                 if (affectedRow > 0 )
                 {
-                    inventoryCounting.Result = stockId;
-                    inventoryCounting.StatusCode = StatusCodes.Status200OK;
-                    inventoryCounting.Message = "Inventory Countings deleted successfully";
-                    inventoryCounting.Success = true;
+                    return ApiResponse<string>.Builder()
+                        .WithResult(stockId)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Inventory Countings deleted successfully")
+                        .Build();
                 }
                 else
                 {
-                    inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                    inventoryCounting.Message = "Inventory Countings deleted unsuccessfully";
-                    inventoryCounting.Success = false;
+                    return ApiResponse<string>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Inventory Countings deleted unsuccessfully")
+                        .Build();
                 }
             }
-            catch (SqlException e)
+            catch (Exception ex)
             {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Sql Exception : {e.Message}";
-                Logger.Instance.Error("Sql Exception",e);
+                return GlobalExceptionHandler.ExceptionError<string>(ex.Message);
             }
-            catch (Exception e)
-            {
-                inventoryCounting.StatusCode = StatusCodes.Status400BadRequest;
-                inventoryCounting.Message = $"Error Exception : {e.Message}";
-                Logger.Instance.Error("Error Exception", e);
-            }
-
-            return inventoryCounting;
         }
     }
 }

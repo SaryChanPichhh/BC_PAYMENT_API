@@ -1,7 +1,3 @@
-﻿
-
-using BC.PAYMENT.CORE.Entities.Preset.DailySaleAnalysis;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Preset.DailyAnalysis
 {
     public interface IDailyAnalysisRepository

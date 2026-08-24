@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Mime;
 using System.Transactions;
@@ -10,34 +10,23 @@ using BC.PAYMENT.CORE.Entities.Accounting;
 using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
 using BC.PAYMENT.CORE.Enums;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using static BC.PAYMENT.CORE.Entities.Accounting.AccountReceivableModel;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
 {
 
-    public class SubmittingController : BaseApiController
+    public class SubmittingController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public SubmittingController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
-
         [HttpPost]
         [Route("addnewsubmittedinvoices")]
         public async Task<ApiResponse<SubmittingInvoiceDto>> PostSubmittedInvoiceAsync(SubmittingInvoiceDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<SubmittingInvoiceDto>();
             try
             {
                 var submittedInvoices = new List<SubmittedInvoiceModel>();
@@ -45,9 +34,9 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
                 foreach (var invoice in model.AccountReceivables)
                 {
                     if(invoice.InvoiceType == "N")
-                        await _unitOfWork.Invoices.PostPrintInvoiceAsync(invoice.TransactionCode, RequestType.Invoice,credential.DbCode!,credential.Period,credential.Username!);
+                        await unitOfWork.Invoices.PostPrintInvoiceAsync(invoice.TransactionCode, RequestType.Invoice,credential.DbCode!,credential.Period,credential.Username!);
                     var analysisByCustomerCodeAsync =
-                        await _unitOfWork.Generators.GetSaleAnalysisByCustomerCodeAsync(invoice.CustomerCode!, credential.DbCode!);
+                        await unitOfWork.Generators.GetSaleAnalysisByCustomerCodeAsync(invoice.CustomerCode!, credential.DbCode!);
                     if (model.IsAutoAccountsReceivable)
                     {
                         if (invoice.Status)
@@ -77,13 +66,13 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
                                 credential.Username!,
                                 DateTime.Today
                             );
-                            await _unitOfWork.AccountReceivable.InsertAccountReceivable(accountReceivableParameter, true);
+                            await unitOfWork.AccountReceivable.InsertAccountReceivable(accountReceivableParameter, true);
                         }
                         else
                         {
                             var total = invoice.Paid-invoice.HalfPaid;
                             // split account receivable to two account receivable
-                            var results = await _unitOfWork.AccountReceivable.SplitAccountReceivable(invoice.CustomerCode,
+                            var results = await unitOfWork.AccountReceivable.SplitAccountReceivable(invoice.CustomerCode,
                                 invoice.TransactionCode, credential.DbCode, total, invoice.HalfPaid);
                             if (results)
                             {
@@ -112,7 +101,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
                                     credential.Username,
                                     DateTime.Today
                                 );
-                                await _unitOfWork.AccountReceivable.InsertAccountReceivable(accountReceivableParameter);
+                                await unitOfWork.AccountReceivable.InsertAccountReceivable(accountReceivableParameter);
                             }
                         }
                     }
@@ -132,28 +121,27 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
                     submittedInvoices.Add(submittedInvoiceModel);
                 }
 
-                var affectedRow = await _unitOfWork.SubmittingInvoice.AddSubmittedInvoices(submittedInvoices);
+                var affectedRow = await unitOfWork.SubmittingInvoice.AddSubmittedInvoices(submittedInvoices);
                 if (affectedRow > 0)
                 {
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    submittedInvoice.Success = true;
-                    submittedInvoice.Message = "Submitted invoices added successfully";
-                    submittedInvoice.Result = model;
+                    return ApiResponse<SubmittingInvoiceDto>.Builder()
+                        .WithMessage("Submitted invoices added successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    submittedInvoice.Success = false;
-                    submittedInvoice.Message = "Submitted invoices added unsuccessfully";
+                    return ApiResponse<SubmittingInvoiceDto>.Builder()
+                        .WithMessage("Submitted invoices added unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Success = false;
-                submittedInvoice.Message = $@"Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<SubmittingInvoiceDto>(ex.Message);
             }
-            return submittedInvoice;
         }
 
 
@@ -162,37 +150,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
         public async Task<ApiResponse<List<SubmittedInvoiceModel>>> GetAllNotSubmitPaidInvoiceAsync([Required] string fromDate, [Required] string toDate)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<List<SubmittedInvoiceModel>>();
             try
             {
-                var execute = await _unitOfWork.SubmittingInvoice.GetAllNotSubmitPaidInvoice(credential.DbCode!, fromDate, toDate);
+                var execute = await unitOfWork.SubmittingInvoice.GetAllNotSubmitPaidInvoice(credential.DbCode!, fromDate, toDate);
                 if (execute.Count > 0)
                 {
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    submittedInvoice.Success = true;
-                    submittedInvoice.Message = "Unsubmitted invoices fetched successfully";
-                    submittedInvoice.Result = execute;
+                    return ApiResponse<List<SubmittedInvoiceModel>>.Builder()
+                        .WithMessage("Unsubmitted invoices fetched successfully")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    submittedInvoice.Success = false;
-                    submittedInvoice.Message = "Unsubmitted invoices fetched unsuccessfully";
+                    return ApiResponse<List<SubmittedInvoiceModel>>.Builder()
+                        .WithMessage("Unsubmitted invoices fetched unsuccessfully")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Success = false;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                submittedInvoice.Success = false;
-                submittedInvoice.Message = $@"Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<SubmittedInvoiceModel>>(ex.Message);
             }
-            return submittedInvoice;
         }
     }
 }

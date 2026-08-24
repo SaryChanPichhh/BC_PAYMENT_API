@@ -1,7 +1,4 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Items;
-using BC.PAYMENT.CORE.DTO.Items;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
+using ItemDto = BC.PAYMENT.CORE.DTO.Items.ItemDto;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Items
 {

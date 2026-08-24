@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Enums;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice
 {
     public class NewInvoiceModel : Customer

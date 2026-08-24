@@ -1,7 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
-using BC.PAYMENT.CORE.Entities.Prepare.EmployeeSchedule;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.EmployeeSchedule
 {
     public  class PublicHolidayRepository : IPublicHolidayRepository

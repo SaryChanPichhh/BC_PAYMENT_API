@@ -1,13 +1,4 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Accounting;
-using BC.PAYMENT.CORE.Entities.Accounting;
-using Microsoft.Data.SqlClient;
 using static BC.PAYMENT.CORE.Entities.Accounting.AccountReceivableModel;
-using System.Data;
-using BC.PAYMENT.CORE.DTO.Generator;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
 {

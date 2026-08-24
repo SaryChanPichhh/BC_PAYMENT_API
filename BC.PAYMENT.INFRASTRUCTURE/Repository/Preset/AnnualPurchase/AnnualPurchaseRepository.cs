@@ -1,10 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.AnnualPurchase;
-using BC.PAYMENT.CORE.DTO.Preset.ExchangeItemAnalysis;
-using BC.PAYMENT.CORE.Entities.Preset.AnnualPurchase;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.AnnualPurchase
 {
     public class AnnualPurchaseRepository : IAnnualPurchaseRepository

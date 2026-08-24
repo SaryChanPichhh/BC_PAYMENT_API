@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
@@ -11,49 +11,28 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
 {
-    public class CashFlowDataReportController : BaseApiController
+    public class CashFlowDataReportController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CashFlowDataReportController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
 
         [HttpGet]
         [Route("getallpaymentcashflowreport")]
         public async Task<ApiResponse<List<PaymentCashFlowModel>>> GetAllPaymentCashFlowReportAsync()
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<PaymentCashFlowModel>>();
             try
             {
-                var result = await _unitOfWork.CashFlowDataReport.GetPaymentCashFlowReportAsync(credential.DbCode!);
-                if (result.Any())
-                {
-                    response.Result = result;
-                    response.Message = "Payment cash flow report fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Result = new List<PaymentCashFlowModel>();
-                    response.Message = "Payment cash flow report fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
+                var credential = Common.DecodeJwt(User);
+                var result = await unitOfWork.CashFlowDataReport.GetPaymentCashFlowReportAsync(credential.DbCode!);
                 
+                return ApiResponse<List<PaymentCashFlowModel>>.Builder()
+                    .WithMessage("Payment cash flow report fetched successfully")
+                    .WithStatusCode(result.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(result.Any() ? result : new List<PaymentCashFlowModel>())
+                    .Build();
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }catch (Exception ex)
-            {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<PaymentCashFlowModel>>(ex.Message);
             }
-            return response;
         }
 
         /// <summary>
@@ -66,36 +45,21 @@ namespace BC.PAYMENT.API.Controllers.CashFlow.CashFlowData
         [Route("getpaymentcashflowreportbydate/{fromDate}/{toDate}")]
         public async Task<ApiResponse<List<PaymentCashFlowModel>>> GetPaymentCashFlowReportByDateAsync([Required] string fromDate, [Required] string toDate)
         {
-            var credential = Common.DecodeJwt(User);
-            var response = new ApiResponse<List<PaymentCashFlowModel>>();
             try
             {
-                var result = await _unitOfWork.CashFlowDataReport.GetPaymentCashFlowReportByDateAsync(credential.DbCode!,Convert.ToDateTime( fromDate),Convert.ToDateTime(toDate));
-                if (result.Any())
-                {
-                    response.Result = result;
-                    response.Message = "Payment cash flow report fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.OK;
-                    response.Success = true;
-                }
-                else
-                {
-                    response.Result = new List<PaymentCashFlowModel>();
-                    response.Message = "Payment cash flow report fetched successfully";
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                }
+                var credential = Common.DecodeJwt(User);
+                var result = await unitOfWork.CashFlowDataReport.GetPaymentCashFlowReportByDateAsync(credential.DbCode!,Convert.ToDateTime( fromDate),Convert.ToDateTime(toDate));
                 
+                return ApiResponse<List<PaymentCashFlowModel>>.Builder()
+                    .WithMessage("Payment cash flow report fetched successfully")
+                    .WithStatusCode(result.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(result.Any() ? result : new List<PaymentCashFlowModel>())
+                    .Build();
             }
-            catch (SqlException ex)
+            catch (Exception ex)
             {
-                response.Message = $"Sql Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }catch (Exception ex)
-            {
-                response.Message = $"Error Exception : {ex.Message}";
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                return GlobalExceptionHandler.ExceptionError<List<PaymentCashFlowModel>>(ex.Message);
             }
-            return response;
         }
     }
 }

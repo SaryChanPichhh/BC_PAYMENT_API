@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.General;
@@ -12,50 +12,27 @@ using System.Net;
 namespace BC.PAYMENT.API.Controllers
 {
     [Helper.Authorize]
-    public class DeliveriesController : BaseApiController
+    public class DeliveriesController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : BaseApiController
     {
-        #region ===[ Private Members ]=============================================================
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
-        #endregion
-
-        #region ===[ Constructor ]=================================================================
-
-        /// <summary>
-        /// Initialize DeliveriesController by injecting an object type of IUnitOfWork
-        /// </summary>
-        public DeliveriesController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
-        {
-            this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
-        }
-
-        #endregion
 
 
         [HttpGet("")]
         public async Task<ApiResponse<List<Delivery>>> GetDelivery()
         {
-            var apiResponse = new ApiResponse<List<Delivery>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
 
-                var data = await _unitOfWork.Deliveries.GetDelivery(claim.DbCode!);
+                var data = await unitOfWork.Deliveries.GetDelivery(claim.DbCode!);
                 if (!data.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No new deliveries";
-                    apiResponse.Result = new List<Delivery>();
-                    return apiResponse;
+                    return ApiResponse<List<Delivery>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("No new deliveries")
+                        .WithResult(new List<Delivery>())
+                        .Build();
                 }
 
-                apiResponse.Success = true;
-                apiResponse.Message = "Deliveries fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
                 data.ForEach(x =>
                 {
                     var encryptedId = EncryptionHelper.EncryptAES(x.DeliveryId.ToString());
@@ -63,25 +40,16 @@ namespace BC.PAYMENT.API.Controllers
                     x.ImagePath = $"api/deliveries/image/{encryptedId}".Trim();
                 });
 
-                apiResponse.Result = data;
-
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<List<Delivery>>.Builder()
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithMessage("Deliveries fetched successfully.")
+                    .WithResult(data)
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<Delivery>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [AllowAnonymous]
@@ -91,7 +59,7 @@ namespace BC.PAYMENT.API.Controllers
             try
             {
                 string decryptedId = EncryptionHelper.DecryptAES(Uri.UnescapeDataString(deliveryId));
-                var data = await _unitOfWork.Deliveries.GetDeliveryImage(decryptedId);
+                var data = await unitOfWork.Deliveries.GetDeliveryImage(decryptedId);
 
                 if (data == null || data.Image == null)
                 {
@@ -102,7 +70,7 @@ namespace BC.PAYMENT.API.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest("Image not found");
+                return Ok(ex.Message);
             }
         }
     }

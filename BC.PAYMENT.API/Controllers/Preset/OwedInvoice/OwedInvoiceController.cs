@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.General;
@@ -25,68 +25,58 @@ namespace BC.PAYMENT.API.Controllers.Preset.OwedInvoice
         public async Task<ApiResponse<List<OwedInvoiceDto>>> GetAccountReceivableAmount([FromBody] List<BranchDTO> model)
         {
             var credential = Common.DecodeJwt(User);
-            var oweInvoice = new ApiResponse<List<OwedInvoiceDto>>();
             try
             {
                 var execute = await _unitOfWork.OwedInvoice.GetAccountReceivableAmount(model.ToDictionary(x=>x.DbCode,x=>x.DbName));
                 if (execute.Any())
                 {
-                    oweInvoice.Result = execute;
-                    oweInvoice.StatusCode = StatusCodes.Status200OK;
-                    oweInvoice.Success = true;
-                    oweInvoice.Message = "Amount fetched successfully";
+                    return ApiResponse<List<OwedInvoiceDto>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Amount fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    oweInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    oweInvoice.Message = "Amount fetched unsuccessfully";
+                    return ApiResponse<List<OwedInvoiceDto>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Amount fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                oweInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                oweInvoice.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                oweInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                oweInvoice.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<OwedInvoiceDto>>(ex.Message);
             }
-            return oweInvoice;
         }
         [HttpPost]
         [Route("getaccountreceivabledetail")]
         public async Task<ApiResponse<List<SummaryAccountsReceivableModel>>> GetAccountReceivableSummaries([FromBody] OwedInvoiceFilterDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var oweInvoice = new ApiResponse<List<SummaryAccountsReceivableModel>>();
             try
             {
                 var execute = await _unitOfWork.OwedInvoice.GetAccountReceivableSummaries(model.BranchDtos.ToDictionary(x=>x.DbCode,x=>x.DbName),model.Page,model.PageSize);
                 if (execute.Any())
                 {
-                    oweInvoice.Result = execute;
-                    oweInvoice.StatusCode = StatusCodes.Status200OK;
-                    oweInvoice.Success = true;
-                    oweInvoice.Message = "Account receivable fetched successfully";
+                    return ApiResponse<List<SummaryAccountsReceivableModel>>.Builder()
+                        .WithResult(execute)
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithMessage("Account receivable fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    oweInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    oweInvoice.Message = "Account receivable fetched unsuccessfully";
+                    return ApiResponse<List<SummaryAccountsReceivableModel>>.Builder()
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .WithMessage("Account receivable fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                oweInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                oweInvoice.Message = $"Sql Exception : ${ex.Message}";
             }
             catch (Exception ex)
             {
-                oweInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                oweInvoice.Message = $"Sql Exception : ${ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<SummaryAccountsReceivableModel>>(ex.Message);
             }
-            return oweInvoice;
         }
     }
 }

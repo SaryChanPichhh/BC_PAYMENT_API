@@ -1,9 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.ReviewReport;
-using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.ReviewReport;
-using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.ReviewReport
 {
     public class ReviewReportRepository : IReviewReportRepository

@@ -1,0 +1,747 @@
+﻿|-- .cr
+|   |-- personal
+|   |   |-- FavoritesList
+|   |   |   |-- List.xml
+|-- .github
+|   |-- workflows
+|-- BC.PAYMENT.API
+|   |-- .config
+|   |   |-- dotnet-tools.json
+|   |-- Controllers
+|   |   |-- CashFlow
+|   |   |   |-- CashFlowData
+|   |   |-- ClosingInventoryAndInvoice
+|   |   |   |-- ClosingInventory
+|   |   |-- CommodityExchange
+|   |   |   |-- CreditNoteReport
+|   |   |   |-- ExchangeInvoiceAndRepairInvoiceReport
+|   |   |   |-- ExchangeItem
+|   |   |   |-- Invoices
+|   |   |   |-- ItemExchangeReport
+|   |   |   |-- ItemRepairReport
+|   |   |   |-- PostInvoice
+|   |   |   |-- Repairer
+|   |   |   |-- RepairItem
+|   |   |   |-- ReportDividedInvoice
+|   |   |   |-- DailyRefundItemsController.cs
+|   |   |-- Inventory
+|   |   |   |-- Inventory
+|   |   |   |-- InventoryExpired
+|   |   |   |-- InventoryReport
+|   |   |   |-- WarehousePresetController.cs
+|   |   |-- Prepare
+|   |   |   |-- Account
+|   |   |   |-- EmployeeSchedule
+|   |   |   |-- Preset
+|   |   |-- Preset
+|   |   |   |-- DailySaleAnalysis
+|   |   |   |-- ExchangeItemAnalysis
+|   |   |   |-- ItemTransaction
+|   |   |   |-- OwedInvoice
+|   |   |   |-- StockPrice
+|   |   |   |-- TotalAnnualPurchase
+|   |   |-- Report
+|   |   |   |-- DailyPaymentReport
+|   |   |   |-- OthersReport
+|   |   |   |-- ProvincialPayment
+|   |   |-- Transaction
+|   |   |   |-- Audit
+|   |   |   |-- DailyPayment
+|   |   |   |-- Inventory
+|   |   |   |-- Provincial Payment
+|   |   |   |-- Submitting
+|   |   |-- AnalysisAccountsController.cs
+|   |   |-- AuthController.cs
+|   |   |-- BaseApiController.cs
+|   |   |-- BranchesController.cs
+|   |   |-- CustomersController.cs
+|   |   |-- DeliveriesController.cs
+|   |   |-- InvoicesController.cs
+|   |   |-- IssuranceInvoicesController.cs
+|   |   |-- MarketController.cs
+|   |   |-- PaymentsController.cs
+|   |   |-- UsersController.cs
+|   |-- Filter
+|   |   |-- AuthorizationFilterAttribute.cs
+|   |-- Helper
+|   |   |-- AppSettings.cs
+|   |   |-- AuthorizeAttribute.cs
+|   |   |-- Common.cs
+|   |   |-- EncryptionHelper.cs
+|   |   |-- GlobalExceptionHandler.cs
+|   |   |-- GlobalFormat.cs
+|   |   |-- JwtMiddleware.cs
+|   |   |-- JwtMiddlewares.cs
+|   |   |-- TimeCalculatorExtension.cs
+|   |-- Mapper
+|   |   |-- AccReceivablePresetMapper.cs
+|   |   |-- MapperDto.cs
+|   |   |-- ValidatorMapper.cs
+|   |-- Models
+|   |   |-- ApiResponse.cs
+|   |   |-- AuthenticateRequest.cs
+|   |   |-- AuthenticateResponse.cs
+|   |   |-- PagedResponse.cs
+|   |   |-- PaginatedResponse.cs
+|   |   |-- ValidatorResponse.cs
+|   |-- Properties
+|   |   |-- PublishProfiles
+|   |   |   |-- API.pubxml
+|   |   |   |-- API.pubxml.user
+|   |   |   |-- IISProfile.pubxml
+|   |   |   |-- IISProfile.pubxml.user
+|   |   |-- launchSettings.json
+|   |-- appsettings.BC.PAYMENT.API.Development.json
+|   |-- appsettings.BC.PAYMENT.API.json
+|   |-- BC.PAYMENT.API.csproj
+|   |-- BC.PAYMENT.API.csproj.bak
+|   |-- BC.PAYMENT.API.csproj.user
+|   |-- BC.PAYMENT.API.deploy-readme.txt
+|   |-- BC.PAYMENT.API.deploy.cmd
+|   |-- BC.PAYMENT.API.http
+|   |-- BC.PAYMENT.API.Parameters.xml
+|   |-- BC.PAYMENT.API.SetParameters.xml
+|   |-- BC.PAYMENT.API.SourceManifest.xml
+|   |-- BC.PAYMENT.API.zip
+|   |-- log4net.config
+|   |-- Program.cs
+|-- BC.PAYMENT.APPLICATION
+|   |-- Interfaces
+|   |   |-- Accounting
+|   |   |   |-- IAccountReceivableRepository.cs
+|   |   |   |-- IAnalysisAccountRepository.cs
+|   |   |-- BaseInterface
+|   |   |   |-- IBaseRepository.cs
+|   |   |-- CashFlow
+|   |   |   |-- CashFlowData
+|   |   |-- ClosingInventoryAndInvoice
+|   |   |   |-- ClosingInventory
+|   |   |-- CommondityExchange
+|   |   |   |-- CreditNoteReport
+|   |   |   |-- DailyRefundItems
+|   |   |   |-- ExchangeItem
+|   |   |   |-- Invoices
+|   |   |   |-- ItemExchangeReport
+|   |   |   |-- ItemRepairReport
+|   |   |   |-- PostInvoice
+|   |   |   |-- Repairer
+|   |   |   |-- RepairItem
+|   |   |   |-- ReportDividedInvoice
+|   |   |-- General
+|   |   |   |-- IAreaRepository.cs
+|   |   |   |-- IBranchRepository.cs
+|   |   |   |-- ICustomerRepository.cs
+|   |   |   |-- IDeliveryRepository.cs
+|   |   |   |-- IEmployeeRepository.cs
+|   |   |   |-- IInvoiceClosingEntryRepository.cs
+|   |   |   |-- ILogger.cs
+|   |   |   |-- IMarketRepository.cs
+|   |   |   |-- IProductRepository.cs
+|   |   |   |-- IRepository.cs
+|   |   |   |-- IUnitOfWork.cs
+|   |   |   |-- IWarehouseRepository.cs
+|   |   |-- Generator
+|   |   |   |-- IGeneratorRepository.cs
+|   |   |-- Inventory
+|   |   |   |-- IInventoryExpiredRepository.cs
+|   |   |   |-- IInventoryReportRepository.cs
+|   |   |   |-- IInventoryRepository.cs
+|   |   |   |-- IInventoryTrackingRepository.cs
+|   |   |   |-- IWarehousePresetRepository.cs
+|   |   |-- Invoice
+|   |   |   |-- IInvoiceRepository.cs
+|   |   |-- Items
+|   |   |   |-- IItemRepository.cs
+|   |   |-- Login
+|   |   |   |-- IUserRepository.cs
+|   |   |-- Payment
+|   |   |   |-- IDividedInvoiceRepository.cs
+|   |   |   |-- IPaymentRepository.cs
+|   |   |-- Prepare
+|   |   |   |-- Account
+|   |   |   |-- EmployeeSchedule
+|   |   |   |-- Preset
+|   |   |-- Preset
+|   |   |   |-- AnnualPurchase
+|   |   |   |-- DailyAnalysis
+|   |   |   |-- ExchangeItemAnalysis
+|   |   |   |-- ItemTransaction
+|   |   |   |-- OwedInvoice
+|   |   |   |-- StockPrice
+|   |   |-- Report
+|   |   |   |-- DailyPaymentReport
+|   |   |   |-- OthersReport
+|   |   |   |-- Provincial Payment
+|   |   |-- Transaction
+|   |   |   |-- Audit
+|   |   |   |-- DailyPayment
+|   |   |   |-- Inventory
+|   |   |   |-- ProvincialPayment
+|   |   |   |-- Submitting
+|   |   |-- IExchangeInvoiceAndRepairInvoiceReportRepository.cs
+|   |-- BC.PAYMENT.APPLICATION.csproj
+|-- BC.PAYMENT.CORE
+|   |-- DTO
+|   |   |-- Accounting
+|   |   |   |-- AnalysisCodeCreateRequest.cs
+|   |   |-- AR
+|   |   |   |-- AgingDto.cs
+|   |   |-- CashFlow
+|   |   |   |-- CashFlowData
+|   |   |-- ClosingInventoryAndInvoice
+|   |   |   |-- ClosingInventory
+|   |   |   |-- OpeningBalanceDto.cs
+|   |   |-- CommondityExchange
+|   |   |   |-- CreditNote
+|   |   |   |-- DailyRefundItems
+|   |   |   |-- ExchangeItem
+|   |   |   |-- Invoices
+|   |   |   |-- ItemExchangeReport
+|   |   |   |-- ItemRepairReport
+|   |   |   |-- PostInvoice
+|   |   |   |-- RepairItem
+|   |   |   |-- ReportDividedInvoice
+|   |   |-- Expense
+|   |   |   |-- ExpenseDto.cs
+|   |   |-- Filter
+|   |   |   |-- BaseFilterDTO.cs
+|   |   |   |-- FilterDTO.cs
+|   |   |   |-- IssueInvoiceExclusionFilterDTO.cs
+|   |   |   |-- IssueInvoiceFilterDTO.cs
+|   |   |-- General
+|   |   |   |-- BranchDTO.cs
+|   |   |   |-- ClaimDTO.cs
+|   |   |   |-- ContextDTO.cs
+|   |   |   |-- CustomerDto.cs
+|   |   |   |-- EmployeeDto.cs
+|   |   |   |-- MarketDto.cs
+|   |   |   |-- ReportDTO.cs
+|   |   |   |-- WarehouseDto.cs
+|   |   |-- Generator
+|   |   |   |-- SaleAnalysisDto.cs
+|   |   |   |-- SILEDG.cs
+|   |   |-- Inventory
+|   |   |   |-- ClosingTrackingInventoryDto.cs
+|   |   |   |-- InBoundGoodsDto.cs
+|   |   |   |-- InventoryDto.cs
+|   |   |   |-- InventoryExpiredDto.cs
+|   |   |   |-- InventoryReportRequestDto.cs
+|   |   |   |-- InventoryTrackingDto.cs
+|   |   |   |-- InventoryTrackingWarehouseDto.cs
+|   |   |   |-- WarehousePresetDto.cs
+|   |   |-- Invoice
+|   |   |   |-- CreateInvoiceDetailDto.cs
+|   |   |   |-- CreateInvoiceDto.cs
+|   |   |   |-- InvoiceDTO.cs
+|   |   |   |-- IssueInvoiceDTO.cs
+|   |   |   |-- NewInvoiceDTO.cs
+|   |   |   |-- NewInvoicesRequestDTO.cs
+|   |   |   |-- OldInvoiceDTO.cs
+|   |   |   |-- OldInvoiceRequestDTO.cs
+|   |   |   |-- SaleDetailsDto.cs
+|   |   |   |-- SaleHeaderDto.cs
+|   |   |   |-- SaveInvoiceDTO.cs
+|   |   |-- Items
+|   |   |   |-- ItemDto.cs
+|   |   |-- Login
+|   |   |   |-- LoginRequestDTO.cs
+|   |   |   |-- LoginResponseDTO.cs
+|   |   |-- Payment
+|   |   |   |-- InvoiceExpenseDTO.cs
+|   |   |   |-- PaymentInvoiceHeaderDTO.cs
+|   |   |-- Prepare
+|   |   |   |-- Account
+|   |   |   |-- EmployeeSchedule
+|   |   |   |-- Preset
+|   |   |-- Preset
+|   |   |   |-- DailySaleAnalysis
+|   |   |   |-- ExchangeItemAnalysis
+|   |   |   |-- InventoryValue
+|   |   |   |-- ItemTransaction
+|   |   |   |-- OwedInvoiceDto
+|   |   |-- Transaction
+|   |   |   |-- Audit
+|   |   |   |-- DailyPayment
+|   |   |   |-- Inventory
+|   |   |   |-- ProvincialPayment
+|   |   |   |-- Submitting
+|   |-- Entities
+|   |   |-- Accounting
+|   |   |   |-- AccountCode.cs
+|   |   |   |-- AccountReceivableModel.cs
+|   |   |   |-- AnalysisCode.cs
+|   |   |   |-- AnalysisCodeModel.cs
+|   |   |   |-- AnalysisCodeType.cs
+|   |   |-- CashFlow
+|   |   |   |-- CashFlowData
+|   |   |-- ClosingInventoryAndInvoice
+|   |   |   |-- ClosingInventory
+|   |   |-- CommondityExchange
+|   |   |   |-- DailyRefundItems
+|   |   |   |-- ExchangeItem
+|   |   |   |-- Invoices
+|   |   |   |-- ItemRepairReport
+|   |   |   |-- Repairer
+|   |   |   |-- RepairItem
+|   |   |-- Expense
+|   |   |   |-- ExpenseModel.cs
+|   |   |-- General
+|   |   |   |-- Area.cs
+|   |   |   |-- BcModels.cs
+|   |   |   |-- Branch.cs
+|   |   |   |-- Customer.cs
+|   |   |   |-- Delivery.cs
+|   |   |   |-- District.cs
+|   |   |   |-- EmployeeModel.cs
+|   |   |   |-- InvoiceClosingEntriesModel.cs
+|   |   |   |-- Market.cs
+|   |   |   |-- MarketImage.cs
+|   |   |   |-- ProductModel.cs
+|   |   |   |-- Province.cs
+|   |   |   |-- TimeCalculationExtension.cs
+|   |   |-- Inventory
+|   |   |   |-- Inventory
+|   |   |   |-- InventoryExpired
+|   |   |   |-- InventoryReport
+|   |   |   |-- WarehousePresetModel.cs
+|   |   |-- Invoice
+|   |   |   |-- ChangeInvoice.cs
+|   |   |   |-- DividedInvoiceSummary.cs
+|   |   |   |-- Invoices.cs
+|   |   |   |-- InvoicesModel.cs
+|   |   |   |-- NewInvoiceModel.cs
+|   |   |   |-- OldInvoicesModel.cs
+|   |   |   |-- ReturnInvoice.cs
+|   |   |-- Items
+|   |   |   |-- ItemModel.cs
+|   |   |-- Login
+|   |   |   |-- User.cs
+|   |   |-- Payment
+|   |   |   |-- DeliveryPayment.cs
+|   |   |-- Prepare
+|   |   |   |-- Account
+|   |   |   |-- EmployeeSchedule
+|   |   |   |-- Preset
+|   |   |-- Preset
+|   |   |   |-- AnnualPurchase
+|   |   |   |-- DailySaleAnalysis
+|   |   |   |-- ExchangeItemAnalysis
+|   |   |   |-- InventoryValue
+|   |   |   |-- ItemTransaction
+|   |   |   |-- OwedInvoice
+|   |   |-- Report
+|   |   |   |-- DailyPaymentReport
+|   |   |   |-- OthersReport
+|   |   |   |-- ProvincialPayment
+|   |   |-- Transaction
+|   |   |   |-- Audit
+|   |   |   |-- DailyPayment
+|   |   |   |-- Inventory
+|   |   |   |-- ProvincialPayment
+|   |   |   |-- Submitting
+|   |   |-- Aging.cs
+|   |   |-- BasedEntity.cs
+|   |-- Enums
+|   |   |-- ClosingEntryType.cs
+|   |   |-- CreditDebitType.cs
+|   |   |-- CurrencyFormat.cs
+|   |   |-- EnumDescriptionConverter.cs
+|   |   |-- ExchangeStatus.cs
+|   |   |-- GetEnumDescription.cs
+|   |   |-- InventoryTrackingTypes.cs
+|   |   |-- InvoiceTypes.cs
+|   |   |-- RepairStatus.cs
+|   |   |-- RequestStatus.cs
+|   |   |-- RequestType.cs
+|   |   |-- SubmittedStatus.cs
+|   |-- Validate
+|   |   |-- AccReceivablePresetValidate.cs
+|   |-- BC.PAYMENT.CORE.csproj
+|   |-- GlobalConfig.cs
+|-- BC.PAYMENT.INFRASTRUCTURE
+|   |-- DBAccess
+|   |   |-- ISqlDataAccess.cs
+|   |   |-- SqlDataAccess.cs
+|   |-- Helper
+|   |   |-- AppExtension.cs
+|   |   |-- StringExtension.cs
+|   |-- Repository
+|   |   |-- Accounting
+|   |   |   |-- AccountReceivableRepository.cs
+|   |   |   |-- AnalysisAccountRepository.cs
+|   |   |-- CashFlow
+|   |   |   |-- CashFlowData
+|   |   |-- ClosingInventoryAndInvoice
+|   |   |   |-- ClosingInventoryRepository.cs
+|   |   |   |-- OpeningBalanceRepository.cs
+|   |   |-- CommondityExchange
+|   |   |   |-- CreditNoteReport
+|   |   |   |-- DailyRefundItems
+|   |   |   |-- ExchangeItem
+|   |   |   |-- Invoices
+|   |   |   |-- ItemExchangeReport
+|   |   |   |-- ItemRepairReport
+|   |   |   |-- PostInvoiceReport
+|   |   |   |-- Repairer
+|   |   |   |-- RepairItem
+|   |   |   |-- ReportDividedInvoice
+|   |   |-- General
+|   |   |   |-- AreaRepository.cs
+|   |   |   |-- BranchRepository.cs
+|   |   |   |-- CustomerRepository.cs
+|   |   |   |-- DeliveryRepository.cs
+|   |   |   |-- EmployeeRepository.cs
+|   |   |   |-- InvoiceClosingEntryRepository.cs
+|   |   |   |-- MarketRepository.cs
+|   |   |   |-- ProductRepository.cs
+|   |   |   |-- UnitOfWork.cs
+|   |   |   |-- WarehouseRepository.cs
+|   |   |-- Generator
+|   |   |   |-- GeneratorRepository.cs
+|   |   |-- Inventory
+|   |   |   |-- InventoryExpiredRepository.cs
+|   |   |   |-- InventoryReportRepository.cs
+|   |   |   |-- InventoryRepository.cs
+|   |   |   |-- InventoryTrackingRepository.cs
+|   |   |   |-- WarehousePresetRepository.cs
+|   |   |-- Invoice
+|   |   |   |-- InvoiceRepository.cs
+|   |   |-- Items
+|   |   |   |-- ItemRepository.cs
+|   |   |-- Login
+|   |   |   |-- UserRepository.cs
+|   |   |-- Payment
+|   |   |   |-- DividedInvoiceRepository.cs
+|   |   |   |-- PaymentRepository.cs
+|   |   |-- Prepare
+|   |   |   |-- Account
+|   |   |   |-- EmployeeSchedule
+|   |   |   |-- Preset
+|   |   |-- Preset
+|   |   |   |-- AnnualPurchase
+|   |   |   |-- DailySaleAnalysis
+|   |   |   |-- ExchangeItemAnalysis
+|   |   |   |-- ItemTransaction
+|   |   |   |-- OwedInvoice
+|   |   |   |-- StockPrice
+|   |   |-- Report
+|   |   |   |-- DailyPaymentReport
+|   |   |   |-- OthersReport
+|   |   |   |-- ProvincialPayment
+|   |   |-- Transaction
+|   |   |   |-- Audit
+|   |   |   |-- DailyPayment
+|   |   |   |-- Inventory
+|   |   |   |-- ProvincialPayment
+|   |   |   |-- Submitting
+|   |-- BC.PAYMENT.INFRASTRUCTURE.csproj
+|   |-- ServiceCollectionExtension.cs
+|-- BC.PAYMENT.LOGGING
+|   |-- BC.PAYMENT.LOGGING.csproj
+|   |-- Logger.cs
+|-- BC.PAYMENT.REPORT
+|   |-- .config
+|   |   |-- dotnet-tools.json
+|   |-- Controllers
+|   |   |-- HomeController.cs
+|   |   |-- IssuranceInvoicesReportController.cs
+|   |   |-- ReportingControllers.cs
+|   |-- DataSources
+|   |   |-- EmployeesDataSource.cs
+|   |   |-- ReportDividedInvoiceToDeliveriesDataSource.cs
+|   |   |-- SaleOrderDataSource.cs
+|   |-- Models
+|   |-- POSReport
+|   |   |-- Report1.cs
+|   |   |-- Report1.Designer.cs
+|   |   |-- Report2.cs
+|   |   |-- Report2.Designer.cs
+|   |   |-- XtraReport1.cs
+|   |   |-- XtraReport1.Designer.cs
+|   |-- PredefinedReports
+|   |   |-- NewFolder
+|   |   |-- EmployeeReport.cs
+|   |   |-- EmployeeReport.Designer.cs
+|   |   |-- EmployeeReport.repx
+|   |   |-- ReportDividedInvoiceToDeliveries.cs
+|   |   |-- ReportDividedInvoiceToDeliveries.Designer.cs
+|   |   |-- ReportDividedInvoiceToDeliveries.Designer.cs.bak
+|   |   |-- ReportDividedInvoiceToDeliveries.resx
+|   |   |-- ReportDividedInvoiceToDeliveries22.cs
+|   |   |-- ReportDividedInvoiceToDeliveries22.Designer.cs
+|   |   |-- ReportDividedInvoiceToDeliveries22.Designer.cs.bak
+|   |   |-- ReportDividedInvoiceToDeliveries22.resx
+|   |   |-- ReportsFactory.cs
+|   |-- Properties
+|   |   |-- PublishProfiles
+|   |   |   |-- FolderProfile.pubxml
+|   |   |   |-- FolderProfile.pubxml.user
+|   |   |-- launchSettings.json
+|   |-- Reports
+|   |   |-- EmployeeReport.repx
+|   |-- Services
+|   |   |-- CustomObjectDataSourceConstructorFilterService.cs
+|   |   |-- CustomReportStorageWebExtension.cs
+|   |   |-- CustomWebDocumentViewerReportResolver.cs
+|   |   |-- ObjectDataSourceWizardCustomTypeProvider.cs
+|   |-- Views
+|   |   |-- Home
+|   |   |   |-- Designer.cshtml
+|   |   |   |-- Index.cshtml
+|   |   |   |-- Viewer.cshtml
+|   |   |-- IssuranceInvoicesReport
+|   |   |   |-- ReportDivideInvoices.cshtml
+|   |   |-- POS Report
+|   |   |   |-- report.cshtml
+|   |   |-- Shared
+|   |   |   |-- _Layout.cshtml
+|   |   |-- _ViewImports.cshtml
+|   |   |-- _ViewStart.cshtml
+|   |-- appsettings.Development.json
+|   |-- appsettings.json
+|   |-- BC.PAYMENT.REPORT.csproj
+|   |-- BC.PAYMENT.REPORT.csproj.bak
+|   |-- BC.PAYMENT.REPORT.csproj.user
+|   |-- bundleconfig.json
+|   |-- libman.json
+|   |-- licenses.licx
+|   |-- licenses.licx.bak
+|   |-- package-lock.json
+|   |-- package.json
+|   |-- Program.cs
+|   |-- Startup.cs
+|-- BC.PAYMENT.REPORTS
+|   |-- Controllers
+|   |   |-- HomeController.cs
+|   |   |-- OtpController.cs
+|   |   |-- OtpEntry.cs
+|   |-- Datasources
+|   |-- Dtos
+|   |-- Helper
+|   |   |-- AppSettings.cs
+|   |   |-- ReportExtension.cs
+|   |-- IServices
+|   |   |-- ReportToken
+|   |   |   |-- ITokenValidatorService.cs
+|   |-- Models
+|   |   |-- Export.cs
+|   |   |-- FlatInvoiceRow.cs
+|   |   |-- FlatPurchaseOrderRow.cs
+|   |   |-- ReportSettings.cs
+|   |-- PredefinedReports
+|   |   |-- ReportsFactory.cs
+|   |-- Properties
+|   |   |-- launchSettings.json
+|   |-- Reports
+|   |   |-- MainReport.cs
+|   |   |-- MainReport.Designer.cs
+|   |   |-- MainReport.resx
+|   |-- Services
+|   |   |-- AR
+|   |   |-- ReportToken
+|   |   |   |-- TokenValidatorService.cs
+|   |   |-- ConnectionStringInfo.cs
+|   |   |-- CustomObjectDataSourceConstructorFilterService.cs
+|   |   |-- CustomReportStorageWebExtension.cs
+|   |   |-- CustomSqlDataSourceProvider.cs
+|   |   |-- CustomWebDocumentViewerReportResolver.cs
+|   |   |-- ObjectDataSourceWizardCustomTypeProvider.cs
+|   |   |-- ReportExportService.cs
+|   |   |-- TelegramOtpSender.cs
+|   |-- Views
+|   |   |-- Home
+|   |   |   |-- Designer.cshtml
+|   |   |   |-- Index.cshtml
+|   |   |   |-- Login.cshtml
+|   |   |   |-- Viewer.cshtml
+|   |   |-- IssuranceInvoicesReport
+|   |   |   |-- ReportDivideInvoices.cshtml
+|   |   |-- Reports
+|   |   |   |-- Invoice.cshtml
+|   |   |-- Shared
+|   |   |   |-- _Layout.cshtml
+|   |   |   |-- _Layout.cshtml.css
+|   |   |-- _ViewImports.cshtml
+|   |   |-- _ViewStart.cshtml
+|   |-- appsettings.Development.json
+|   |-- appsettings.json
+|   |-- BC.PAYMENT.REPORTS.csproj
+|   |-- BC.PAYMENT.REPORTS.csproj.bak
+|   |-- BC.PAYMENT.REPORTS.csproj.DotSettings.user
+|   |-- BC.PAYMENT.REPORTS.csproj.user
+|   |-- bundleconfig.json
+|   |-- libman.json
+|   |-- package-lock.json
+|   |-- package.json
+|   |-- Program.cs
+|   |-- Startup.cs
+|-- BC.PAYMENT.SQL
+|   |-- Queries
+|   |   |-- BranchQueries.cs
+|   |   |-- UserStoreProcedures.cs
+|   |-- Scripts
+|   |-- BC.PAYMENT.SQL.csproj
+|-- BC.PAYMENT.TEST
+|   |-- Helper
+|   |   |-- TestConstants.cs
+|   |-- BC.PAYMENT.TEST.csproj
+|-- DxBlazorApplication1
+|-- publish
+|   |-- API
+|   |-- Report
+|   |   |-- de
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- es
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- fr
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- it
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- ja
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- ko
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- pt-BR
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- Reports
+|   |   |-- ru
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- runtimes
+|   |   |   |-- alpine-x64
+|   |   |   |-- linux-arm
+|   |   |   |-- linux-arm64
+|   |   |   |-- linux-armel
+|   |   |   |-- linux-mips64
+|   |   |   |-- linux-musl-x64
+|   |   |   |-- linux-s390x
+|   |   |   |-- linux-x64
+|   |   |   |-- linux-x86
+|   |   |   |-- osx-arm64
+|   |   |   |-- osx-x64
+|   |   |   |-- unix
+|   |   |   |-- win
+|   |   |   |-- win-arm
+|   |   |   |-- win-arm64
+|   |   |   |-- win-x64
+|   |   |   |-- win-x86
+|   |   |-- zh-Hans
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- zh-Hant
+|   |   |   |-- Microsoft.Data.SqlClient.resources.dll
+|   |   |-- appsettings.BC.PAYMENT.API.Development.json
+|   |   |-- appsettings.BC.PAYMENT.API.json
+|   |   |-- appsettings.Development.json
+|   |   |-- appsettings.json
+|   |   |-- Azure.Core.dll
+|   |   |-- Azure.Identity.dll
+|   |   |-- BC.PAYMENT.API.deps.json
+|   |   |-- BC.PAYMENT.API.dll
+|   |   |-- BC.PAYMENT.API.exe
+|   |   |-- BC.PAYMENT.API.pdb
+|   |   |-- BC.PAYMENT.API.runtimeconfig.json
+|   |   |-- BC.PAYMENT.APPLICATION.dll
+|   |   |-- BC.PAYMENT.APPLICATION.pdb
+|   |   |-- BC.PAYMENT.CORE.dll
+|   |   |-- BC.PAYMENT.CORE.pdb
+|   |   |-- BC.PAYMENT.INFRASTRUCTURE.dll
+|   |   |-- BC.PAYMENT.INFRASTRUCTURE.pdb
+|   |   |-- BC.PAYMENT.LOGGING.dll
+|   |   |-- BC.PAYMENT.LOGGING.pdb
+|   |   |-- BC.PAYMENT.REPORT.deps.json
+|   |   |-- BC.PAYMENT.REPORT.dll
+|   |   |-- BC.PAYMENT.REPORT.exe
+|   |   |-- BC.PAYMENT.REPORT.pdb
+|   |   |-- BC.PAYMENT.REPORT.runtimeconfig.json
+|   |   |-- BC.PAYMENT.SQL.dll
+|   |   |-- BC.PAYMENT.SQL.pdb
+|   |   |-- BCrypt.Net-Next.dll
+|   |   |-- bundleconfig.json
+|   |   |-- Dapper.dll
+|   |   |-- DevExpress.AspNetCore.Common.v22.2.dll
+|   |   |-- DevExpress.AspNetCore.Core.v22.2.dll
+|   |   |-- DevExpress.AspNetCore.Reporting.v22.2.dll
+|   |   |-- DevExpress.AspNetCore.Resources.v22.2.dll
+|   |   |-- DevExpress.Charts.v22.2.Core.dll
+|   |   |-- DevExpress.CodeParser.v22.2.dll
+|   |   |-- DevExpress.Data.v22.2.dll
+|   |   |-- DevExpress.DataAccess.v22.2.dll
+|   |   |-- DevExpress.DataVisualization.v22.2.Core.dll
+|   |   |-- DevExpress.Drawing.v22.2.dll
+|   |   |-- DevExpress.Office.v22.2.Core.dll
+|   |   |-- DevExpress.Pdf.v22.2.Core.dll
+|   |   |-- DevExpress.Pdf.v22.2.Drawing.dll
+|   |   |-- DevExpress.PivotGrid.v22.2.Core.dll
+|   |   |-- DevExpress.Printing.v22.2.Core.dll
+|   |   |-- DevExpress.RichEdit.v22.2.Core.dll
+|   |   |-- DevExpress.RichEdit.v22.2.Export.dll
+|   |   |-- DevExpress.Sparkline.v22.2.Core.dll
+|   |   |-- DevExpress.Xpo.v22.2.dll
+|   |   |-- DevExpress.XtraCharts.v22.2.dll
+|   |   |-- DevExpress.XtraGauges.v22.2.Core.dll
+|   |   |-- DevExpress.XtraReports.v22.2.dll
+|   |   |-- DevExpress.XtraReports.v22.2.Web.dll
+|   |   |-- EntityFramework.dll
+|   |   |-- EntityFramework.SqlServer.dll
+|   |   |-- libman.json
+|   |   |-- log4net.config
+|   |   |-- log4net.dll
+|   |   |-- Microsoft.AspNetCore.Authentication.JwtBearer.dll
+|   |   |-- Microsoft.Bcl.AsyncInterfaces.dll
+|   |   |-- Microsoft.Data.SqlClient.dll
+|   |   |-- Microsoft.Data.Sqlite.dll
+|   |   |-- Microsoft.Extensions.Configuration.Abstractions.dll
+|   |   |-- Microsoft.Extensions.Configuration.dll
+|   |   |-- Microsoft.Extensions.DependencyInjection.Abstractions.dll
+|   |   |-- Microsoft.Extensions.DependencyModel.dll
+|   |   |-- Microsoft.Extensions.Primitives.dll
+|   |   |-- Microsoft.Identity.Client.dll
+|   |   |-- Microsoft.Identity.Client.Extensions.Msal.dll
+|   |   |-- Microsoft.IdentityModel.Abstractions.dll
+|   |   |-- Microsoft.IdentityModel.JsonWebTokens.dll
+|   |   |-- Microsoft.IdentityModel.Logging.dll
+|   |   |-- Microsoft.IdentityModel.Protocols.dll
+|   |   |-- Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+|   |   |-- Microsoft.IdentityModel.Tokens.dll
+|   |   |-- Microsoft.OpenApi.dll
+|   |   |-- Microsoft.SqlServer.Server.dll
+|   |   |-- Microsoft.Win32.SystemEvents.dll
+|   |   |-- Newtonsoft.Json.dll
+|   |   |-- package-lock.json
+|   |   |-- package.json
+|   |   |-- Scalar.AspNetCore.dll
+|   |   |-- SQLitePCLRaw.batteries_v2.dll
+|   |   |-- SQLitePCLRaw.core.dll
+|   |   |-- SQLitePCLRaw.provider.e_sqlite3.dll
+|   |   |-- Swashbuckle.AspNetCore.Swagger.dll
+|   |   |-- Swashbuckle.AspNetCore.SwaggerGen.dll
+|   |   |-- Swashbuckle.AspNetCore.SwaggerUI.dll
+|   |   |-- System.ClientModel.dll
+|   |   |-- System.CodeDom.dll
+|   |   |-- System.Configuration.ConfigurationManager.dll
+|   |   |-- System.Data.SqlClient.dll
+|   |   |-- System.Data.SQLite.dll
+|   |   |-- System.Data.SQLite.EF6.dll
+|   |   |-- System.Drawing.Common.dll
+|   |   |-- System.IdentityModel.Tokens.Jwt.dll
+|   |   |-- System.Memory.Data.dll
+|   |   |-- System.Runtime.Caching.dll
+|   |   |-- System.Security.Cryptography.ProtectedData.dll
+|   |   |-- System.Security.Permissions.dll
+|   |   |-- System.ServiceModel.dll
+|   |   |-- System.ServiceModel.Http.dll
+|   |   |-- System.ServiceModel.NetTcp.dll
+|   |   |-- System.ServiceModel.Primitives.dll
+|   |   |-- System.ServiceModel.Security.dll
+|   |   |-- System.Threading.AccessControl.dll
+|   |   |-- web.config
+|-- .gitignore
+|-- BC.PAYMENT.SYSTEM.sln
+|-- BC.PAYMENT.SYSTEM.sln.DotSettings.user
+|-- BC.PAYMENT.SYSTEM.slnLaunch.user
+|-- LICENSE
+|-- package.json
+|-- README.md
+|-- read_list.js
+|-- refactor.js
+|-- temp_controllers.txt
+|-- tree.txt

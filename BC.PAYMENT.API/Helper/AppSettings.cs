@@ -11,5 +11,6 @@
         public required string Subject { get; set; }
         public required string AES_KEY { get; set; }
         public required string AES_IV { get; set; }
+        public required string ItemImageBaseUrl { get; set; }
     }
 }

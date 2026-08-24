@@ -1,19 +1,11 @@
 ﻿namespace BC.PAYMENT.API.Models
 {
-    public class PaginatedResponse<T>
+    public class PaginatedResponse<T>(List<T> data, int totalRecords, int page, int pageSize)
     {
-        public List<T> Data { get; set; }
-        public int TotalRecords { get; set; }
-        public int Page { get; set; }
-        public int PageSize { get; set; }
-
-        public PaginatedResponse(List<T> data, int totalRecords, int page, int pageSize)
-        {
-            Data = data;
-            TotalRecords = totalRecords;
-            Page = page;
-            PageSize = pageSize;
-        }
+        public List<T> Data { get; set; } = data;
+        public int TotalRecords { get; set; } = totalRecords;
+        public int Page { get; set; } = page;
+        public int PageSize { get; set; } = pageSize;
     }
 
 }

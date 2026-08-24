@@ -1,7 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
     public class WarehouseRepository : IWarehouseRepository
@@ -15,7 +11,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 
         public async Task<List<WarehouseDto>> GetWarehouseAsync(string dbCode)
         {
-            var sql = $@"SELECT WAR_CODE WarehouseCode , WAR_NAME WarehouseName FROM SIWAREH WHERE DB_CODE = @DB_CODE";
+            var sql = $@"SELECT WAR_CODE WarehouseCode , WAR_NAME WarehouseName FROM SIWAREH WHERE DB_CODE = @DB_CODE AND WAR_STAT = 'A';";
             var param = new
             {
                 DB_CODE = dbCode

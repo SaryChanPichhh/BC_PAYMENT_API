@@ -1,6 +1,3 @@
-﻿using BC.PAYMENT.CORE.DTO.Payment;
-using BC.PAYMENT.CORE.Entities.Payment;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Payment
 {
     public interface IPaymentRepository

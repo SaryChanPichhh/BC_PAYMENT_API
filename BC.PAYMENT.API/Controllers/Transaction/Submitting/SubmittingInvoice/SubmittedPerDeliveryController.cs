@@ -1,9 +1,8 @@
-﻿using BC.PAYMENT.API.Models;
+using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection.Metadata;
 using BC.PAYMENT.API.Helper;
@@ -12,84 +11,66 @@ using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
 namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
 {
 
-    public class SubmittedPerDeliveryController : BaseApiController
+    public class SubmittedPerDeliveryController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public SubmittedPerDeliveryController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
         [HttpGet]
         [Route("getsubmittedperdeliverybydate/{fromDate}/{toDate}")]
         public async Task<ApiResponse<List<ExpenseDetailModel>>> GetSubmittedPerDeliveryByDateAsync([Required] string fromDate, string toDate)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<List<ExpenseDetailModel>>();
             try
             {
-                var execute = await _unitOfWork.SubmittedPerDelivery.GetSubmittedInvoicePerDeliveryAsync(credential.DbCode!, fromDate, fromDate);
+                var execute = await unitOfWork.SubmittedPerDelivery.GetSubmittedInvoicePerDeliveryAsync(credential.DbCode!, fromDate, fromDate);
                 if (execute.Any())
                 {
-                    submittedInvoice.Result = execute;
-                    submittedInvoice.StatusCode = StatusCodes.Status200OK;
-                    submittedInvoice.Message = "Submitted Invoices fetched successfully";
-                    submittedInvoice.Success = true;
+                    return ApiResponse<List<ExpenseDetailModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices fetched unsuccessfully";
+                    return ApiResponse<List<ExpenseDetailModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<ExpenseDetailModel>>(ex.Message);
             }
-
-            return submittedInvoice;
         }
+        
         [HttpGet]
         [Route("getsubmittedperdeliverybyperiod/{year}/{month}")]
         public async Task<ApiResponse<List<ExpenseDetailModel>>> GetSubmittedPerDeliveryByPeriodAsync([Required] int month, int year)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<List<ExpenseDetailModel>>();
             try
             {
-                var execute = await _unitOfWork.SubmittedPerDelivery.GetSubmittedInvoicePerDeliveryByPeriodAsync(credential.DbCode!, month, year);
+                var execute = await unitOfWork.SubmittedPerDelivery.GetSubmittedInvoicePerDeliveryByPeriodAsync(credential.DbCode!, month, year);
                 if (execute.Any())
                 {
-                    submittedInvoice.Result = execute;
-                    submittedInvoice.StatusCode = StatusCodes.Status200OK;
-                    submittedInvoice.Message = "Submitted Invoices fetched successfully";
-                    submittedInvoice.Success = true;
+                    return ApiResponse<List<ExpenseDetailModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices fetched unsuccessfully";
+                    return ApiResponse<List<ExpenseDetailModel>>.Builder()
+                        .WithMessage("Submitted Invoices fetched unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<ExpenseDetailModel>>(ex.Message);
             }
-
-            return submittedInvoice;
         } 
         
         [HttpDelete]
@@ -97,36 +78,29 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
         public async Task<ApiResponse<string>> DeleteSubmittedInvoicePerDeliveryAsync([Required] string submittedInvoiceId)
         {
             var credential = Common.DecodeJwt(User);
-            var submittedInvoice = new ApiResponse<String>();
             try
             {
-                var affectedRow = await _unitOfWork.SubmittedPerDelivery.DeleteSubmittedInvoiceAsync(submittedInvoiceId);
+                var affectedRow = await unitOfWork.SubmittedPerDelivery.DeleteSubmittedInvoiceAsync(submittedInvoiceId);
                 if (affectedRow > 0 )
                 {
-                    submittedInvoice.Result = submittedInvoiceId;
-                    submittedInvoice.StatusCode = StatusCodes.Status200OK;
-                    submittedInvoice.Message = "Submitted Invoices deleted successfully";
-                    submittedInvoice.Success = true;
+                    return ApiResponse<string>.Builder()
+                        .WithMessage("Submitted Invoices deleted successfully")
+                        .WithStatusCode(StatusCodes.Status200OK)
+                        .WithResult(submittedInvoiceId)
+                        .Build();
                 }
                 else
                 {
-                    submittedInvoice.StatusCode = StatusCodes.Status400BadRequest;
-                    submittedInvoice.Message = "Submitted Invoices deleted unsuccessfully";
+                    return ApiResponse<string>.Builder()
+                        .WithMessage("Submitted Invoices deleted unsuccessfully")
+                        .WithStatusCode(StatusCodes.Status400BadRequest)
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                submittedInvoice.StatusCode = StatusCodes.Status500InternalServerError;
-                submittedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<string>(ex.Message);
             }
-
-            return submittedInvoice;
         }
-
     }
 }

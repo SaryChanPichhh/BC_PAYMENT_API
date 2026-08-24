@@ -1,0 +1,208 @@
+﻿@{
+    ViewData["Title"] = "OTP Verification";
+}
+
+<style>
+    body {
+        margin: 0;
+        background: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-page {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 100px);
+        padding: 20px;
+    }
+
+    .login-box {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        max-width: 400px;
+        width: 100%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        color: #333;
+    }
+
+    .login-box h2 {
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        color: #007acc;
+    }
+
+    .form-control {
+        background: #fff;
+        border: 1px solid #ccc;
+        color: #333;
+    }
+
+    .form-control:focus {
+        border-color: #007acc;
+        box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
+    }
+
+    .btn-login {
+        background: #007acc;
+        color: #fff;
+    }
+
+    .btn-login:hover {
+        background: #005f99;
+    }
+
+    .otp-section {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        align-items: stretch; /* This makes both items the same height */
+    }
+
+        .otp-section .form-control {
+            flex: 1; /* Make the input box expand */
+        }
+
+        .otp-section .btn {
+            width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+    .error-msg {
+        color: red;
+        margin-bottom: 10px;
+    }
+
+    .success-msg {
+        color: green;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="login-page">
+    <div class="login-box">
+        <h2>OTP Verification</h2>
+        <form id="otpForm">
+            <div class="mb-3">
+                <label for="username" class="form-label">Username / Phone / Email</label>
+                <input class="form-control" id="username" required />
+            </div>
+
+            <div class="otp-section">
+                <input type="text" class="form-control" id="otp" placeholder="Enter OTP" maxlength="6" required />
+                <button type="button" class="btn btn-login" id="sendOtpBtn">Send OTP</button>
+            </div>
+
+            <div id="message" class="error-msg"></div>
+
+            <button type="submit" class="btn btn-login" style="width: 100%;">Verify OTP</button>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const usernameInput = document.getElementById("username");
+            const otpInput = document.getElementById("otp");
+            const sendOtpBtn = document.getElementById("sendOtpBtn");
+            const messageBox = document.getElementById("message");
+            const otpForm = document.getElementById("otpForm");
+            let countdown = 60;
+            let timer;
+
+            // 🔹 Focus username on load
+            usernameInput.focus();
+
+            function startCooldown() {
+                sendOtpBtn.disabled = true;
+                sendOtpBtn.innerText = `${countdown}s`;
+                sendOtpBtn.title = `Resend OTP (${countdown}s)`;
+
+                timer = setInterval(() => {
+                    countdown--;
+                    sendOtpBtn.innerText = `${countdown}s`;
+                    sendOtpBtn.title = `Resend OTP (${countdown}s)`;
+
+                    if (countdown <= 0) {
+                        clearInterval(timer);
+                        sendOtpBtn.disabled = false;
+                        sendOtpBtn.innerText = "Send OTP";
+                        sendOtpBtn.removeAttribute("title");
+                        countdown = 60;
+                    }
+                }, 1000);
+            }
+
+            sendOtpBtn.addEventListener("click", async function () {
+                const username = usernameInput.value.trim();
+
+                if (!username) {
+                    messageBox.className = "error-msg";
+                    messageBox.innerText = "Please enter a username before requesting OTP.";
+                    usernameInput.focus(); // Refocus username input
+                    return;
+                }
+
+                const res = await fetch("/api/otp/request", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username })
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    messageBox.className = "success-msg";
+                    messageBox.innerText = "OTP has been sent.";
+                    otpInput.focus(); 
+                    startCooldown();
+                } else {
+                    messageBox.className = "error-msg";
+                    messageBox.innerText = result.message || "Failed to send OTP.";
+                }
+            });
+
+            otpInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    otpForm.requestSubmit(); 
+                }
+            });
+
+            otpForm.addEventListener("submit", async function (e) {
+                e.preventDefault();
+
+                const username = usernameInput.value.trim();
+                const otp = otpInput.value.trim();
+
+                const res = await fetch("/api/otp/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, otp })
+                });
+
+                const result = await res.json();
+
+                if (result.success) {
+                    window.location.href = "/home/designer";
+                } else {
+                    messageBox.className = "error-msg";
+                    messageBox.innerText = result.message || "Invalid or expired OTP.";
+                    otpInput.focus();
+                }
+            });
+        });
+    </script>
+}
+

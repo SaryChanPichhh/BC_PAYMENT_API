@@ -1,5 +1,4 @@
-﻿
-using BC.PAYMENT.CORE.DTO.Items;
+using ItemDto = BC.PAYMENT.CORE.DTO.Items.ItemDto;
 
 namespace BC.PAYMENT.APPLICATION.Interfaces.Items
 {

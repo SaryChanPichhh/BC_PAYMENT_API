@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.Accounting;
@@ -13,178 +13,90 @@ using BC.PAYMENT.CORE.Entities;
 namespace BC.PAYMENT.API.Controllers
 {
     [Authorize]
-    public class AnalysisAccountsController : BaseApiController
+    public class AnalysisAccountsController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : BaseApiController
     {
-        #region ===[ Private Members ]=============================================================
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
-
-        #endregion
-
-        #region ===[ Constructor ]=================================================================
-        public AnalysisAccountsController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
-        {
-            this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
-        }
-        #endregion
 
         [HttpPut("details")]
-        public async Task<ApiResponse<List<AnalysisCode>>> GetAnalysisByDetail([FromBody]AnalysisCodeDTO analysisCodeDto)
+        public async Task<ApiResponse<List<AnalysisCode>>> GetAnalysisByDetail([FromBody]AnalysisCodeCreateRequest analysisCodeCreateRequest)
         {
-            var apiResponse = new ApiResponse<List<AnalysisCode>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
-                analysisCodeDto.DbCode = claim.DbCode;
-                var data = await _unitOfWork.AnalysisAccounts.GetAnalysisByDetail(analysisCodeDto);
-                if (!data.Any())
-                {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No analysis account code";
-                    apiResponse.Result = new List<AnalysisCode>();
-                    return apiResponse;
-                }
-                
-                apiResponse.Success = true;
-                apiResponse.Message = "Analysis account code fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = data;
-
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                analysisCodeCreateRequest.DbCode = claim.DbCode;
+                var data = await unitOfWork.AnalysisAccounts.GetAnalysisByDetail(analysisCodeCreateRequest);
+                return ApiResponse<List<AnalysisCode>>.Builder()
+                    .WithMessage(data.Any() ? "Analysis account code fetched successfully." : "No analysis account code")
+                    .WithStatusCode(data.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(data.Any() ? data : new List<AnalysisCode>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<AnalysisCode>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("alldetails")]
         public async Task<ApiResponse<Dictionary<string, List<AnalysisCode>>>> GetAllAnalysisByDetail()
         {
-            var apiResponse = new ApiResponse<Dictionary<string, List<AnalysisCode>>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
-                var result = await _unitOfWork.AnalysisAccounts.GetAnalysisByDetailDictionary(claim.DbCode!);
+                var result = await unitOfWork.AnalysisAccounts.GetAnalysisByDetailDictionary(claim.DbCode!);
 
-                if (!result.Any())
-                {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No analysis account code";
-                    apiResponse.Result = new Dictionary<string, List<AnalysisCode>>();
-                    return apiResponse;
-                }
-
-               
-                // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Analysis account code fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = result;
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<Dictionary<string, List<AnalysisCode>>>.Builder()
+                    .WithMessage(result.Any() ? "Analysis account code fetched successfully." : "No analysis account code")
+                    .WithStatusCode(result.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(result.Any() ? result : new Dictionary<string, List<AnalysisCode>>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<Dictionary<string, List<AnalysisCode>>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("accountcodes")]
         public async Task<ApiResponse<List<AccountCode>>> GetAllAccountCode()
         {
-            var apiResponse = new ApiResponse<List<AccountCode>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
-                var result = await _unitOfWork.AnalysisAccounts.GetAccountCode(claim.DbCode!);
+                var result = await unitOfWork.AnalysisAccounts.GetAccountCode(claim.DbCode!);
 
-                if (!result.Any())
-                {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No account code";
-                    apiResponse.Result = new List<AccountCode>();
-                    return apiResponse;
-                }
-
-
-                // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Account code fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = result;
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<List<AccountCode>>.Builder()
+                    .WithMessage(result.Any() ? "Account code fetched successfully." : "No account code")
+                    .WithStatusCode(result.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(result.Any() ? result : new List<AccountCode>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<AccountCode>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("accountcodespaged")]
         public async Task<ApiResponse<PaginatedResponse<AccountCode>>> GetAllAccountCode([FromQuery] int page = 1, int pageSize = 10)
         {
-            var apiResponse = new ApiResponse<PaginatedResponse<AccountCode>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
 
                 // Fetch all records
-                var allRecords = await _unitOfWork.AnalysisAccounts.GetAccountCode(claim.DbCode!,page,pageSize);
+                var allRecords = await unitOfWork.AnalysisAccounts.GetAccountCode(claim.DbCode!,page,pageSize);
 
                 if (!allRecords.Any())
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No account code";
-                    apiResponse.Result = new PaginatedResponse<AccountCode>(new List<AccountCode>(), 0, page, pageSize);
-                    return apiResponse;
+                    return ApiResponse<PaginatedResponse<AccountCode>>.Builder()
+                        .WithMessage("No account code")
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithResult(new PaginatedResponse<AccountCode>(new List<AccountCode>(), 0, page, pageSize))
+                        .Build();
                 }
 
                 // Calculate pagination details
                 var totalRecords = allRecords.Count;
-                //var totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
 
                 // Paginate the data
                 var paginatedData = allRecords
@@ -192,72 +104,36 @@ namespace BC.PAYMENT.API.Controllers
                     .Take(pageSize)
                     .ToList();
 
-                // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Account code fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = new PaginatedResponse<AccountCode>(paginatedData, totalRecords, page, pageSize);
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<PaginatedResponse<AccountCode>>.Builder()
+                    .WithMessage("Account code fetched successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(new PaginatedResponse<AccountCode>(paginatedData, totalRecords, page, pageSize))
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<AccountCode>>(ex.Message);
             }
-
-            return apiResponse;
         }
 
         [HttpGet("analysistypes")]
         public async Task<ApiResponse<List<AnalysisCodeType>>> GetAnalysisType()
         {
-            var apiResponse = new ApiResponse<List<AnalysisCodeType>>();
-
             try
             {
                 var claim = Common.DecodeJwt(HttpContext.User);
-                var result = await _unitOfWork.AnalysisAccounts.GetAnalysisType(claim.DbCode!);
+                var result = await unitOfWork.AnalysisAccounts.GetAnalysisType(claim.DbCode!);
 
-                if (!result.Any())
-                {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "No analysis type";
-                    apiResponse.Result = new List<AnalysisCodeType>();
-                    return apiResponse;
-                }
-
-
-                // Set the API response
-                apiResponse.Success = true;
-                apiResponse.Message = "Analysis code fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = result;
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
+                return ApiResponse<List<AnalysisCodeType>>.Builder()
+                    .WithMessage(result.Any() ? "Analysis code fetched successfully." : "No analysis type")
+                    .WithStatusCode(result.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(result.Any() ? result : new List<AnalysisCodeType>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<AnalysisCodeType>>(ex.Message);
             }
-
-            return apiResponse;
         }
     }
 }

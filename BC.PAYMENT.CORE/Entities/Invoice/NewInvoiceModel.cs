@@ -1,11 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BC.PAYMENT.CORE.Entities.General;
-using BC.PAYMENT.CORE.Enums;
-
 namespace BC.PAYMENT.CORE.Entities.Invoice
 {
     public class NewInvoiceModel : Customer

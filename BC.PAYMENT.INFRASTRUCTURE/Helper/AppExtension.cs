@@ -1,6 +1,3 @@
-﻿using System.Data;
-using System.Reflection;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Helper
 {
     public static class AppExtension

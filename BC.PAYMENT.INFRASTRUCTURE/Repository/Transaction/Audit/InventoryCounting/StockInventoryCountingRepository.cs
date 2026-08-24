@@ -1,12 +1,3 @@
-﻿
-
-using System.Collections;
-using System.Data;
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.StockInventoryCounting;
-using BC.PAYMENT.CORE.Entities.Transaction.Audit.InventoryCounting;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Dapper;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.InventoryCounting
 {
     public class StockInventoryCountingRepository : IStockInventoryCountingRepository

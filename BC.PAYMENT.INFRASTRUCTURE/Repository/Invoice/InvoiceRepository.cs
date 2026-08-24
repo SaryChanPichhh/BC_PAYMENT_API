@@ -1,17 +1,4 @@
-﻿using System.Data;
-using System.Diagnostics;
-using System.Globalization;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.APPLICATION.Interfaces.Invoice;
-using BC.PAYMENT.CORE.DTO.Filter;
-using BC.PAYMENT.CORE.DTO.Invoice;
-using BC.PAYMENT.CORE.Entities.Invoice;
-using BC.PAYMENT.CORE.Enums;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using BC.PAYMENT.INFRASTRUCTURE.Helper;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Configuration;
+using NewInvoiceModel = BC.PAYMENT.CORE.Entities.Invoice.NewInvoiceModel;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice
 {

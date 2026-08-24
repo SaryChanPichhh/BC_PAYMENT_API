@@ -1,10 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BC.PAYMENT.CORE.DTO.CommondityExchange.DailyRefundItems;
-
 namespace BC.PAYMENT.CORE.Entities.CommondityExchange.RepairItem
 {
     public class ItemRepairReceivedModel : RefundItemDto
@@ -25,6 +18,7 @@ namespace BC.PAYMENT.CORE.Entities.CommondityExchange.RepairItem
         public string ItemStatus { get; set; }
         public string RepairToolCode { get; set; }
         public string TransactionCode { get; set; }
+        public string ItemDescription { get; set; }
     }
     
 }

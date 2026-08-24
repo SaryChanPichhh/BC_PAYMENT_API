@@ -1,19 +1,7 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
-using BC.PAYMENT.CORE.Entities.CashFlow.CashFlowData;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CashFlow.CashFlowData
 {
-    public class CashFlowAuditReportRepository : ICashFlowAuditReportRepository
+    public class CashFlowAuditReportRepository(ISqlDataAccess sqlDataAccess) : ICashFlowAuditReportRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public CashFlowAuditReportRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
         public async Task<List<PaymentCashFlowSubmittedModel>> GetPaymentCashFlowAuditReportByDateAsync(string dbCode, DateTime fromDate, DateTime toDate, string status)
         {
             const string sql = @"SELECT DATE Date,SUBMITTED_ID SubmittedId,S.NAME Name,S.AMOUNT Amount,S.CURRENCY_FORMAT CurrencyFormat,S.EXCHANGE_RATE ExchangeRate,S.CREATED_DATE CreatedDate,S.CREATED_BY CreatedBy,
@@ -27,7 +15,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CashFlow.CashFlowData
                 TO_DATE = toDate,
                 STATUS = status,
             };
-            var results = await _sqlDataAccess.LoadData<PaymentCashFlowSubmittedModel, dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadData<PaymentCashFlowSubmittedModel, dynamic>(sql, param);
             return results.ToList();
         }
     }

@@ -1,7 +1,3 @@
-﻿
-
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DailyPayment;
-
 namespace BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice
 {
     public class RejectedInvoiceModel 

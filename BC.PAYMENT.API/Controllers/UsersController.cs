@@ -1,86 +1,27 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.CORE.DTO.Login;
 using BC.PAYMENT.LOGGING;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using System.Net;
+using BC.PAYMENT.CORE.Contracts.Login;
 
 namespace BC.PAYMENT.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UsersController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : ControllerBase
     {
-        #region ===[ Private Members ]=============================================================
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
-
-        #endregion
-
-        #region ===[ Constructor ]=================================================================
-
-        /// <summary>
-        /// Initialize UsersController by injecting an object type of IUnitOfWork
-        /// </summary>
-        public UsersController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
-        {
-            this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
-        }
-
-        #endregion
-
         #region ===[ Public Methods ]==============================================================
-
-        //[HttpGet]
-        //public async Task<ApiResponse<List<User>>> GetAll()
-        //{
-        //    var apiResponse = new ApiResponse<List<User>>();
-
-        //    try
-        //    {
-        //        var data = await _unitOfWork.Users.GetAllAsync();
-        //        apiResponse.Success = true;
-        //        apiResponse.Result = data.ToList();
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        apiResponse.Success = false;
-        //        apiResponse.Message = ex.Message;
-        //        Logger.Instance.Error("SQL Exception:", ex);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        apiResponse.Success = false;
-        //        apiResponse.Message = ex.Message;
-        //        Logger.Instance.Error("Exception:", ex);
-        //    }
-
-        //    return apiResponse;
-        //}
 
         [HttpPost("credentials")]
         public async Task<ApiResponse<LoginResponseDTO>> GetBcUserCredentialAsync([FromBody] LoginRequestDTO requestDto)
         {
-            var apiResponse = new ApiResponse<LoginResponseDTO>();
-
             try
             {
-                var data = await _unitOfWork.Users.GetBcUserCredential(requestDto);
-                if (data == null)
-                {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "Username or password is incorrect";
-
-                    return apiResponse;
-                }
-
+                var data = await unitOfWork.Users.GetBcUserCredential(requestDto);
                 if (BCrypt.Net.BCrypt.Verify(requestDto.Password, data.UserPass))
                 {
                     var claimsDto = new ClaimDTO
@@ -93,44 +34,33 @@ namespace BC.PAYMENT.API.Controllers
                         CurrectDate = data.CurrentDate,
                         InvoiceEntryCode = data.InvoiceEntryCode ?? "",
                     };
-                    Common.GenerateJwtToken(claimsDto, _appSettings);
+                    Common.GenerateJwtToken(claimsDto, appSettings.Value);
                     var loginResponse = new LoginResponseDTO
                     {
-                        Token = Common.GenerateJwtToken(claimsDto, _appSettings),
+                        Token = Common.GenerateJwtToken(claimsDto, appSettings.Value),
                         UserId = data.UserId,
                         Username = data.Username!,
                         DbCode = data.DbCode!,
                     };       
                 
-                    apiResponse.Success = true;
-                    apiResponse.Message = "User fetched successfully!";
-                    apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                    apiResponse.Result = loginResponse;
+                    return ApiResponse<LoginResponseDTO>.Builder()
+                        .WithMessage("User fetched successfully!")
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithResult(loginResponse)
+                        .Build();
                 }
                 else
                 {
-                    apiResponse.Success = false;
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Message = "Username or password is incorrect";
-                    return apiResponse;
+                    return ApiResponse<LoginResponseDTO>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Username or password is incorrect")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("SQL Exception:", ex);
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                apiResponse.Message = ex.Message;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<LoginResponseDTO>(ex.Message);
             }
-
-            return apiResponse;
         }
         #endregion
     }

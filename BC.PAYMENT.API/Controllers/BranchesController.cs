@@ -1,4 +1,4 @@
-﻿using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.General;
@@ -14,63 +14,27 @@ namespace BC.PAYMENT.API.Controllers
     [Helper.Authorize]
     [Route("api/[controller]")]
     [ApiController]
-    public class BranchesController : ControllerBase
+    public class BranchesController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : ControllerBase
     {
-        #region ===[ Private Members ]=============================================================
-
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly AppSettings _appSettings;
-
-        #endregion
-
-        #region ===[ Constructor ]=================================================================
-        public BranchesController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings)
-        {
-            this._unitOfWork = unitOfWork;
-            this._appSettings = appSettings.Value;
-        }
-        #endregion
 
         #region ===[ Public Methods ]==============================================================
         [AllowAnonymous]
         [HttpGet("dbcodes")]
         public async Task<ApiResponse<List<BranchDTO>>> GetLoginBranch([FromQuery]string username,string appCode)
         {
-            var apiResponse = new ApiResponse<List<BranchDTO>>();
-
             try
             {
-                var data = await _unitOfWork.Branches.GetLoginBranchAsync(username,appCode);
-                if (!data.Any())
-                {
-                    apiResponse.Success = true;
-                    apiResponse.Message = "No branches";
-                    apiResponse.StatusCode = (int)HttpStatusCode.BadRequest;
-                    apiResponse.Result = new List<BranchDTO>();
-                    return apiResponse;
-                }
-
-                apiResponse.Success = true;
-                apiResponse.Message = "Branches fetched successfully.";
-                apiResponse.StatusCode = (int)HttpStatusCode.OK;
-                apiResponse.Result = data.ToList();
-            }
-            catch (SqlException ex)
-            {
-                apiResponse.Success = false;
-                apiResponse.Message = ex.Message;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                Logger.Instance.Error("SQL Exception:", ex);
+                var data = await unitOfWork.Branches.GetLoginBranchAsync(username,appCode);
+                return ApiResponse<List<BranchDTO>>.Builder()
+                    .WithMessage(data.Any() ? "Branches fetched successfully." : "No branches")
+                    .WithStatusCode(data.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(data.Any() ? data.ToList() : new List<BranchDTO>())
+                    .Build();
             }
             catch (Exception ex)
             {
-                apiResponse.Success = false;
-                apiResponse.Message = ex.Message;
-                apiResponse.StatusCode = (int)HttpStatusCode.InternalServerError;
-                Logger.Instance.Error("Exception:", ex);
+                return GlobalExceptionHandler.ExceptionError<List<BranchDTO>>(ex.Message);
             }
-
-            return apiResponse;
         }
         #endregion
     }

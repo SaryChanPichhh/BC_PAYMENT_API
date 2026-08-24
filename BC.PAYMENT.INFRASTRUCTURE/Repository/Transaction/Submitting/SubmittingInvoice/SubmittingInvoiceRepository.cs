@@ -1,12 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using Dapper;
-using System.Globalization;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice
 {
     public class SubmittingInvoiceRepository : ISubmittingInvoiceRepository

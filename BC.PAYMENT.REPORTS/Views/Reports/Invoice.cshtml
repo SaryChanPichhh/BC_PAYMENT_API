@@ -1,0 +1,38 @@
+﻿
+@{
+    ViewData["Title"] = "Daily Sale Report";
+    if (Model == null)
+    {
+        <p>No model received!</p>
+    }
+    var viewer = Html.DevExpress().WebDocumentViewer("DailySaleViewer")
+        .Height("1000px")
+        .ClientSideEvents(events => events.CustomizeMenuActions("onCustomizeActions"))
+
+        .Bind(Model); // Triggers your custom resolver
+    
+}
+@viewer.RenderHtml()
+
+<script type="text/javascript">
+        function onCustomizeActions(s, e) {
+        const actions = e.Actions; // All available actions
+        actions.forEach(action => {
+            console.log(`ID: ${action.id}, Text: ${action.text}, Visible: ${action.visible}`);
+        });
+    }
+
+</script>
+@section Scripts {
+    <link href="~/css/dx-reporting-skeleton-screen.css" rel="stylesheet" />
+
+    <link href="~/css/viewer.part.bundle.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/designer.part.bundle.css" />
+
+    <script src="~/js/reporting.thirdparty.bundle.js"></script>
+    <script src="~/js/viewer.part.bundle.js"></script>
+    <script src="~/js/designer.part.bundle.js"></script>
+
+    @viewer.RenderScripts()
+
+}

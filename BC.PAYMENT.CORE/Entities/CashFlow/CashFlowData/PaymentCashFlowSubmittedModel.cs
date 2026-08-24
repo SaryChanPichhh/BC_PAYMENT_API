@@ -1,6 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.DTO.CashFlow.CashFlowData;
-
 namespace BC.PAYMENT.CORE.Entities.CashFlow.CashFlowData
 {
     public class PaymentCashFlowSubmittedModel : PaymentCashFlowDto

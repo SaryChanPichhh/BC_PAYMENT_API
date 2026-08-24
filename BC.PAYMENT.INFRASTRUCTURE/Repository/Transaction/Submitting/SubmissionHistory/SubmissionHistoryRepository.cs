@@ -1,7 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.HistoryApproval;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.HistoryApproval;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.HistoryApproval
 {
     public class SubmissionHistoryRepository : ISubmissionHistoryRepository

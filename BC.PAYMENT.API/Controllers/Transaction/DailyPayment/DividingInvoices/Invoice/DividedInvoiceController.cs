@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
@@ -11,53 +11,41 @@ using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.Invoice
 {
-    public class DividedInvoiceController : BaseApiController
+    public class DividedInvoiceController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public DividedInvoiceController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-
-        }
-
         [HttpGet]
         [Route("{deliverId}/{date}")]
         public async Task<ApiResponse<List<DividedInvoiceModel>>> GetDividedInvoiceByDeliverIdAndDate([Required] string deliverId, [Required] DateTime date)
         {
-            var dividedInvoice = new ApiResponse<List<DividedInvoiceModel>>();
             var credential = Common.DecodeJwt(User);
 
             try
             {
                 var execute =
-                    await _unitOfWork.DividedInvoice.GetDividedInvoicesByDeliveryIdAndDateAsync(credential.DbCode!,
+                    await unitOfWork.DividedInvoice.GetDividedInvoicesByDeliveryIdAndDateAsync(credential.DbCode!,
                         deliverId, date);
                 if (execute.Any())
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    dividedInvoice.Message = $@"Divided Invoice fetched successfully";
-                    dividedInvoice.Success = true;
-                    dividedInvoice.Result = execute;
+                    return ApiResponse<List<DividedInvoiceModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage($@"Divided Invoice fetched successfully")
+                        .Success()
+                        .WithResult(execute)
+                        .Build();
                 }
                 else
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    dividedInvoice.Message = $@"Divided Invoice fetched unsuccessfully";
-                    dividedInvoice.Result = new();
+                    return ApiResponse<List<DividedInvoiceModel>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage($@"Divided Invoice fetched unsuccessfully")
+                        .WithResult(new())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<List<DividedInvoiceModel>>(ex.Message);
             }
-            return dividedInvoice;
         }
 
 
@@ -65,37 +53,33 @@ namespace BC.PAYMENT.API.Controllers.Transaction.DailyPayment.DividingInvoices.I
         [Route("")]
         public async Task<ApiResponse<DividedInvoiceDeleteDto>> DeleteDividedInvoiceByDeliverIdAndDate([FromBody] DividedInvoiceDeleteDto model)
         {
-            var dividedInvoice = new ApiResponse<DividedInvoiceDeleteDto>();
             try
             {
                 var affectedRow =
-                    await _unitOfWork.DividedInvoice.DeleteDividedInvoiceAsync(model.InvoiceId, model.TransactionCode,
+                    await unitOfWork.DividedInvoice.DeleteDividedInvoiceAsync(model.InvoiceId, model.TransactionCode,
                         model.DeliveryId, model.Note);
                 if (affectedRow > 0)
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.OK;
-                    dividedInvoice.Message = $@"Divided Invoice deleted successfully";
-                    dividedInvoice.Success = true;
-                    dividedInvoice.Result = model;
+                    return ApiResponse<DividedInvoiceDeleteDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage($@"Divided Invoice deleted successfully")
+                        .Success()
+                        .WithResult(model)
+                        .Build();
                 }
                 else
                 {
-                    dividedInvoice.StatusCode = (int)HttpStatusCode.BadRequest;
-                    dividedInvoice.Message = $@"Divided Invoice deleted unsuccessfully";
-                    dividedInvoice.Result = new();
+                    return ApiResponse<DividedInvoiceDeleteDto>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage($@"Divided Invoice deleted unsuccessfully")
+                        .WithResult(new())
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Message = $@"Sql Exception : {ex.Message}";
             }
             catch (Exception ex)
             {
-                dividedInvoice.StatusCode = (int)HttpStatusCode.InternalServerError;
-                dividedInvoice.Message = $@"Error Exception : {ex.Message}";
+                return GlobalExceptionHandler.ExceptionError<DividedInvoiceDeleteDto>(ex.Message);
             }
-            return dividedInvoice;
         }
     }
 }

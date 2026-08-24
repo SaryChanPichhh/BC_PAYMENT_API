@@ -1,8 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.DailyReport;
-using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.DailyReport;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport
 {
     public class CheckReturnInvoiceRepository : ICheckReturnInvoiceRepository

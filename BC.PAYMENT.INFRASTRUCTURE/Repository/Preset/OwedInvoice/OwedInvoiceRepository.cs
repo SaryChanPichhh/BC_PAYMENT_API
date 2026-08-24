@@ -1,9 +1,3 @@
-﻿
-using BC.PAYMENT.APPLICATION.Interfaces.Preset.OwedInvoice;
-using BC.PAYMENT.CORE.DTO.Preset.OwedInvoiceDto;
-using BC.PAYMENT.CORE.Entities.Preset.OwedInvoice;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.OwedInvoice
 {
     public class OwedInvoiceRepository : IOwedInvoiceRepository

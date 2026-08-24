@@ -1,11 +1,3 @@
-﻿using BC.PAYMENT.APPLICATION.Interfaces.BaseInterface;
-using BC.PAYMENT.CORE.DTO.Invoice;
-using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Entities.Invoice;
-using BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment;
-using BC.PAYMENT.CORE.Enums;
-using System.Data;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.ProvincialPayment.StockCarPayment
 {
     public  interface ISaleRepresentRepository : IBaseRepository<SaleRepresentModel>

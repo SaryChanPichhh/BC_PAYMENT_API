@@ -1,7 +1,3 @@
-﻿
-using BC.PAYMENT.CORE.DTO.Preset.ExchangeItemAnalysis;
-using BC.PAYMENT.CORE.Entities.Preset.AnnualPurchase;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Preset.AnnualPurchase
 {
     public interface IAnnualPurchaseRepository

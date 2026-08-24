@@ -1,9 +1,3 @@
-﻿
-
-using BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.InvoiceVerify;
-using BC.PAYMENT.CORE.Entities.Transaction.Submitting.InvoiceVerify;
-using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
-
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.InvoiceVerify
 {
     public class MonthlyInvoiceRepository : IMonthlyInvoiceRepository

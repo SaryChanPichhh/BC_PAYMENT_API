@@ -1,41 +1,37 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock;
 using BC.PAYMENT.CORE.Entities.Transaction.Inventory.VerificationStock;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.LOGGING;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
 {
-    public class VerificationRFIDStockController : BaseApiController
+    public class VerificationRFIDStockController(IUnitOfWork unitOfWork) : BaseApiController
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public VerificationRFIDStockController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
         [HttpPost]
         [Route("adjustmentinventory")]
         public async Task<ApiResponse<List<AdjustmentInventoryDto>>> AdjustmentInventoryAsync([FromBody] List<AdjustmentInventoryDto> model)
         {
             var credential = Common.DecodeJwt(User);
-            var saveRecord = new ApiResponse<List<AdjustmentInventoryDto>>();
             try
             {
                 var affectedRow = 0;
                 var i = 1;
                 foreach (var item in model)
                 {
-                    var sequence = await _unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
-                    var movTypes = await _unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!, item.StatusType);
-                    var movRef = await _unitOfWork.Generators.GenerateAdjRefCode(credential.DbCode!,movTypes.MovType, movTypes.RecType);
-                    var itemCost = await _unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, item.ItemCode);
+                    var sequence = await unitOfWork.VerificationStock.GetMaxSequence(credential.DbCode!);
+                    var movTypes = await unitOfWork.VerificationStock.GetRecTypes(credential.DbCode!, item.StatusType);
+                    var movRef = await unitOfWork.Generators.GenerateAdjRefCode(credential.DbCode!,movTypes.MovType, movTypes.RecType);
+                    var itemCost = await unitOfWork.VerificationStock.GetItemCostAsync(credential.DbCode!, item.ItemCode);
                     var inventory = new InventoryAdjustmentModel
                     {
                         Sequence = sequence,
@@ -74,72 +70,58 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                         IdEntered = credential.Username!,
                         IdAlloc = "",
                     };
-                    affectedRow += await _unitOfWork.VerificationStock.AdjustInventory(inventory);
+                    affectedRow += await unitOfWork.VerificationStock.AdjustInventory(inventory);
                 }
                 if (affectedRow > 0)
                 {
-                    saveRecord.Result = model;
-                    saveRecord.StatusCode = (int)HttpStatusCode.OK;
-                    saveRecord.Message = "Adjustment Inventory saved successfully";
-                    saveRecord.Success = true;
+                    return ApiResponse<List<AdjustmentInventoryDto>>.Builder()
+                        .WithResult(model)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Adjustment Inventory saved successfully")
+                        .Build();
                 }
                 else
                 {
-                    saveRecord.StatusCode = (int)HttpStatusCode.BadRequest;
-                    saveRecord.Message = "Adjustment Inventory saved unsuccessfully";
+                    return ApiResponse<List<AdjustmentInventoryDto>>.Builder()
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Adjustment Inventory saved unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                saveRecord.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saveRecord.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                saveRecord.StatusCode = (int)HttpStatusCode.InternalServerError;
-                saveRecord.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<AdjustmentInventoryDto>>(ex.Message);
             }
-            return saveRecord;
         }
 
         [HttpPost]
         [Route("getallstockitembylocationandsubmitcode")]
         public async Task<ApiResponse<List<VerificationStockModel>>> GetAllStockItemByLocationAndSubmitCodeAsync([FromBody] VerificationStockPostDto model)
         {
-            var verificationStock = new ApiResponse<List<VerificationStockModel>>();
             try
             {
-                var result = await _unitOfWork.VerificationRFID.GetAllStockItemByLocationAndSubmitCode(model.DbCode,model.SubmitCode,model.Location);
+                var result = await unitOfWork.VerificationRFID.GetAllStockItemByLocationAndSubmitCode(model.DbCode,model.SubmitCode,model.Location);
                 if (result.Any())
                 {
-                    verificationStock.Result = result;
-                    verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                    verificationStock.Message = "All stock fetched successfully";
-                    verificationStock.Success = true;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(result)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("All stock fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verificationStock.Result = new List<VerificationStockModel>();
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "All stock fetched unsuccessfully";
-                    verificationStock.Success = false;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(new List<VerificationStockModel>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("All stock fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockModel>>(ex.Message);
             }
-            return verificationStock;
         }
         
         [HttpPost]
@@ -147,7 +129,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         public async Task<ApiResponse<VerificationRFIDDto>> SaveRecordStockItemAfterVerify([FromBody] VerificationRFIDDto model)
         {
             var credential = Common.DecodeJwt(User);
-            var verificationStock = new ApiResponse<VerificationRFIDDto>();
             try
             {
                 var itemModel = model.StockForVerification.Select(x => new VerificationStockModel
@@ -164,157 +145,130 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                     CreateBy = credential.Username!,
                     DbCode = credential.DbCode!,
                 }).ToList();
-                var affectedRow = await _unitOfWork.VerificationStock.SaveRecordStockItemAfterVerify(itemModel);
+                var affectedRow = await unitOfWork.VerificationStock.SaveRecordStockItemAfterVerify(itemModel);
                 if (affectedRow > 0 )
                 {
-                    var result = await _unitOfWork.VerificationRFID.UpdateSubmittedStatus(model.SubmittedCodeAndLocation.DbCode, model.SubmittedCodeAndLocation.SubmitCode);
+                    var result = await unitOfWork.VerificationRFID.UpdateSubmittedStatus(model.SubmittedCodeAndLocation.DbCode, model.SubmittedCodeAndLocation.SubmitCode);
                     if (result > 0)
                     {
-                        verificationStock.Result = model;
-                        verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                        verificationStock.Message = "All stock fetched successfully";
-                        verificationStock.Success = true;
+                        return ApiResponse<VerificationRFIDDto>.Builder()
+                            .WithResult(model)
+                            .WithStatusCode((int)HttpStatusCode.OK)
+                            .WithMessage("All stock fetched successfully")
+                            .Build();
                     }
                     else
                     {
-                        verificationStock.Result = new VerificationRFIDDto();
-                        verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                        verificationStock.Message = "All stock fetched unsuccessfully";
-                        verificationStock.Success = false;
+                        return ApiResponse<VerificationRFIDDto>.Builder()
+                            .WithResult(new VerificationRFIDDto())
+                            .WithStatusCode((int)HttpStatusCode.BadRequest)
+                            .WithMessage("All stock fetched unsuccessfully")
+                            .Build();
                     }
                 }
                 else
                 {
-                    verificationStock.Result = new VerificationRFIDDto();
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "All stock fetched unsuccessfully";
-                    verificationStock.Success = false;
+                    return ApiResponse<VerificationRFIDDto>.Builder()
+                        .WithResult(new VerificationRFIDDto())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("All stock fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<VerificationRFIDDto>(ex.Message);
             }
-            return verificationStock;
         }
+
         [HttpGet]
         [Route("getallwarehouse/{dbCode}")]
         public async Task<ApiResponse<List<string>>> GetAllWarehouseAsync([Required] string dbCode)
         {
-            var verificationStock = new ApiResponse<List<string>>();
             try
             {
-                var result = await _unitOfWork.VerificationRFID.GetAllWarehouse(dbCode);
+                var result = await unitOfWork.VerificationRFID.GetAllWarehouse(dbCode);
                 if (result.Any())
                 {
-                    verificationStock.Result = result;
-                    verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                    verificationStock.Message = "Warehouse fetched successfully";
-                    verificationStock.Success = true;
+                    return ApiResponse<List<string>>.Builder()
+                        .WithResult(result)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("Warehouse fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verificationStock.Result = new List<string>();
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "Warehouse fetched unsuccessfully";
-                    verificationStock.Success = false;
+                    return ApiResponse<List<string>>.Builder()
+                        .WithResult(new List<string>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("Warehouse fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<string>>(ex.Message);
             }
-            return verificationStock;
         }
+
         [HttpGet]
         [Route("getrfidsubmitteddetail/{dbCode}")]
         public async Task<ApiResponse<List<VerificationStockModel>>> GetRFIDSubmittedItemDetailAsync([FromBody] VerificationStockPostDto model)
         {
-            var verificationStock = new ApiResponse<List<VerificationStockModel>>();
             try
             {
-                var result = await _unitOfWork.VerificationRFID.GetRFIDSubmittedItemDetail(model.DbCode,model.SubmitCode,model.Location);
+                var result = await unitOfWork.VerificationRFID.GetRFIDSubmittedItemDetail(model.DbCode,model.SubmitCode,model.Location);
                 if (result.Any())
                 {
-                    verificationStock.Result = result;
-                    verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                    verificationStock.Message = "RFID detail fetched successfully";
-                    verificationStock.Success = true;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(result)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("RFID detail fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verificationStock.Result = new List<VerificationStockModel>();
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "RFID detail fetched unsuccessfully";
-                    verificationStock.Success = false;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(new List<VerificationStockModel>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("RFID detail fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockModel>>(ex.Message);
             }
-            return verificationStock;
         }
+
         [HttpGet]
         [Route("getsubmittedcode/{dbCode}/{location}")]
         public async Task<ApiResponse<List<VerificationStockModel>>> GetAllSubmitCodeEntriesAsync([Required] string dbCode, [Required] string location)
         {
-            var verificationStock = new ApiResponse<List<VerificationStockModel>>();
             try
             {
-                var result = await _unitOfWork.VerificationRFID.GetAllSubmitCodeEntries(dbCode, location);
+                var result = await unitOfWork.VerificationRFID.GetAllSubmitCodeEntries(dbCode, location);
                 if (result.Any())
                 {
-                    verificationStock.Result = result;
-                    verificationStock.StatusCode = (int)HttpStatusCode.OK;
-                    verificationStock.Message = "All stock fetched successfully";
-                    verificationStock.Success = true;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(result)
+                        .WithStatusCode((int)HttpStatusCode.OK)
+                        .WithMessage("All stock fetched successfully")
+                        .Build();
                 }
                 else
                 {
-                    verificationStock.Result = new List<VerificationStockModel>();
-                    verificationStock.StatusCode = (int)HttpStatusCode.BadRequest;
-                    verificationStock.Message = "All stock fetched unsuccessfully";
-                    verificationStock.Success = false;
+                    return ApiResponse<List<VerificationStockModel>>.Builder()
+                        .WithResult(new List<VerificationStockModel>())
+                        .WithStatusCode((int)HttpStatusCode.BadRequest)
+                        .WithMessage("All stock fetched unsuccessfully")
+                        .Build();
                 }
-            }
-            catch (SqlException ex)
-            {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Sql Exception : {ex.Message}";
-                Logger.Instance.Error("Sql Exception", ex);
             }
             catch (Exception ex)
             {
-                verificationStock.StatusCode = (int)HttpStatusCode.InternalServerError;
-                verificationStock.Message = $@"Error Exception : {ex.Message}";
-                Logger.Instance.Error("Error Exception", ex);
+                return GlobalExceptionHandler.ExceptionError<List<VerificationStockModel>>(ex.Message);
             }
-            return verificationStock;
         }
     }
 }

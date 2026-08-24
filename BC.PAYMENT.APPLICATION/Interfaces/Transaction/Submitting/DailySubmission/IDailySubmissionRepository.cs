@@ -1,5 +1,3 @@
-﻿using BC.PAYMENT.CORE.Entities.Transaction.Submitting.DailySubmission;
-
 namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.DailySubmission
 {
     public interface IDailySubmissionRepository
