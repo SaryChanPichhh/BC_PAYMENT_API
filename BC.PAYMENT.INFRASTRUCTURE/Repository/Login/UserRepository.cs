@@ -1,14 +1,21 @@
 using BC.PAYMENT.CORE.Contracts.Login;
 
+using Microsoft.Extensions.Configuration;
+
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
 {
     public class UserRepository : IUserRepository
     {
+        #region SuperAdminCredential Members
+        private readonly string SuperAdmin;
+        private readonly string SuperAdminPassword;
+        #endregion
+        
+        
 
         #region ===[ Private Members ]=============================================================
         private readonly ISqlDataAccess _sqlDataAccess;
         private readonly IInvoiceClosingEntryRepository _invoiceClosingEntryRepository;
-
         #endregion
 
         #region ===[ Constructor ]=================================================================
@@ -17,6 +24,9 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
         {
             _sqlDataAccess = sqlDataAccess;
             _invoiceClosingEntryRepository = invoiceClosingEntryRepository;
+
+            SuperAdmin = CORE.Singleton.Instance.Username ?? "BCSA";
+            SuperAdminPassword = CORE.Singleton.Instance.UserPassword ?? "Bc@dmin";
         }
 
         #endregion
@@ -29,7 +39,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
             return result.ToList();
         }
 
-        public async Task<User> GetBcUserCredential(LoginRequestDTO requestDto)
+        public async Task<User?> GetBcUserCredential(LoginRequestDTO requestDto)
         {
             try
             {
@@ -40,7 +50,26 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
                     DB_CODE = requestDto.DbCode,
                     COMPANYCODE = requestDto.CompanyCode,
                 };
-                var result = await _sqlDataAccess.LoadSingleData<User, dynamic>(UserStoreProcedures.GetCredential,param);
+                User user;
+                if (requestDto.Username.Equals(SuperAdmin)&&requestDto.Password.Equals(SuperAdminPassword))
+                {
+                    user = new User
+                    {
+                        Username = requestDto.Username, 
+                        DbCode =  requestDto.DbCode,
+                        Role = "ADMIN",
+                        CompanyCode = requestDto.CompanyCode,
+                        CurrentDate = DateTime.Now,
+                        Name = requestDto.Username,   AppCode = requestDto.AppCode,
+                    };
+                }
+                else
+                {
+                    user = await _sqlDataAccess.LoadSingleData<User, dynamic>(UserStoreProcedures.GetCredential,param);
+                    if (user is null)
+                        return user;
+                    user.Role = "USER";
+                }
                 if (requestDto.AppCode == "PYS")
                 {
                     var entrycode = await _invoiceClosingEntryRepository.CheckIsEntriesIsAlreadyOpenAsync(requestDto.DbCode);
@@ -49,20 +78,19 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
                         var generateOpeningEntryCodeAsync = await _invoiceClosingEntryRepository.GenerateOpeningEntryCodeAsync(requestDto.DbCode);
                         await _invoiceClosingEntryRepository.CreateClosingEntryAsync(new InvoiceClosingEntriesModel()
                         {
+                            DbCode =  requestDto.DbCode,
                             IsActive = true,
                             CreatedBy = "System",
-                            CreatedDate = DateTime.Now,
+                            CreatedAt = DateTime.Now,
                             Code = generateOpeningEntryCodeAsync,
                             Description = "Auto Generate Opening Entry By System",
-                        }, requestDto.DbCode);
+                        });
                     }
                     var openingEntryCodeByDbCodeAsync = await _invoiceClosingEntryRepository.GetOpeningEntryCodeByDbCodeAsync(requestDto.DbCode);
-                    result.InvoiceEntryCode = openingEntryCodeByDbCodeAsync;
+                    user.InvoiceEntryCode = openingEntryCodeByDbCodeAsync;
+                    user.AppCode =  requestDto.AppCode;
                 }
-
-
-                return result;
-
+                return user;
             }
             catch (SqlException e)
             {
@@ -74,6 +102,18 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
         }
         public async Task<User> GetUserByIdAsync(ContextDTO contextDto)
         {
+            if (contextDto.UserId == 0)
+            {
+                return new User
+                {
+                    UserId = 0,
+                    Username = SuperAdmin,
+                    DbCode = contextDto.DbCode,
+                    Role = "ADMIN",
+                    AppCode = contextDto.AppCode
+                };
+            }
+
             var param = new
             {
                 USER_ID = contextDto.UserId,
@@ -95,16 +135,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Login
             return (await _sqlDataAccess.LoadSingleData<string, dynamic>(sql, param));
         }
 
-        public async Task<Dictionary<string, string>> IsExistsUserName(string username)
+        public async Task<bool> IsExistsUserName(string username)
         {
-            if (string.IsNullOrEmpty(username))
-            {
-                return new Dictionary<string, string>();
-            }
-            var execute = await _sqlDataAccess.LoadData<dynamic,dynamic>(UserStoreProcedures.IsExistsUser
+            var execute = await _sqlDataAccess.LoadSingleData<bool,dynamic>(UserStoreProcedures.IsExistsUser
                 ,new {APP_CODE ="PYS", USER_NAME = username});
-            var convert = execute.ToDictionary(x=>(string)x.DbCode,y=>(string)y.DbName) ;
-            return convert;
+            return execute;
         }
 
         //public async Task<List<User>> GetBcUserCredential(string username)

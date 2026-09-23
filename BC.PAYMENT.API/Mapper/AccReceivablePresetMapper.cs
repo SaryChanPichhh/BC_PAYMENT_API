@@ -1,4 +1,5 @@
-﻿using BC.PAYMENT.CORE.DTO.General;
+﻿using BC.PAYMENT.CORE.Contracts.General;
+using BC.PAYMENT.CORE.DTO.General;
 using BC.PAYMENT.CORE.DTO.Prepare.Account;
 using BC.PAYMENT.CORE.Entities.Prepare.Account;
 

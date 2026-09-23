@@ -1,6 +1,4 @@
-﻿
-
-namespace BC.PAYMENT.CORE.DTO.General
+﻿namespace BC.PAYMENT.CORE.Contracts.General
 {
     public class MarketDto
     {

@@ -1,4 +1,4 @@
-namespace BC.PAYMENT.CORE.DTO.Invoice
+namespace BC.PAYMENT.CORE.Contracts.Invoice
 {
     public record OldInvoiceDTO
     {

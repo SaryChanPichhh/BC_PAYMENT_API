@@ -1,7 +1,15 @@
+using BC.PAYMENT.APPLICATION.Interfaces.ConfirmBalance;
+using BC.PAYMENT.APPLICATION.Interfaces.Expense;
+using BC.PAYMENT.APPLICATION.Interfaces.StockCar;
+using BC.PAYMENT.APPLICATION.Interfaces.Submit;
 using BC.PAYMENT.APPLICATION.Interfaces.ViewStock;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.ConfirmBalance;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Expense;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Item;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.StockCar;
+using BC.PAYMENT.INFRASTRUCTURE.Repository.Submit;
 using BC.PAYMENT.INFRASTRUCTURE.Repository.ViewStock;
-using DividedInvoiceRepository = BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.Invoice.DividedInvoiceRepository;
-using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Payment.IDividedInvoiceRepository;
+using DividedInvoiceRepository = BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice.DividedInvoiceRepository;
 
 namespace BC.PAYMENT.INFRASTRUCTURE
 {
@@ -16,11 +24,14 @@ namespace BC.PAYMENT.INFRASTRUCTURE
             services.AddTransient<IInvoiceRepository, InvoiceRepository>();
             services.AddTransient<ICustomerRepository, CustomerRepository>();
             services.AddTransient<IAnalysisAccountRepository, AnalysisAccountRepository>();
-            services.AddTransient<IDividedInvoiceRepository, Repository.Payment.DividedInvoiceRepository>();
+            services.AddTransient<APPLICATION.Interfaces.Payment.IDividedInvoiceRepository, Repository.Payment.DividedInvoiceRepository>();
+            services.AddTransient<APPLICATION.Interfaces.Payment.IPaymentRepository, Repository.Payment.PaymentRepository>();
             services.AddTransient<IDeliveryRepository, DeliveryRepository>();
             services.AddTransient<IAreaRepository, AreaRepository>();
             services.AddTransient<IMarketRepository, MarketRepository>();
             services.AddTransient<IEmployeeRepository, EmployeeRepository>();
+            services.AddTransient<IExpenseTypeRepository, ExpenseTypeRepository>();
+            services.AddTransient<IExpenseRepository, ExpenseRepository>();
             // Prepare 
                 // Preset
                 services.AddTransient<IDistrictRepository,DistrictRepository>();
@@ -33,17 +44,15 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                 // Dividing Invoices
                     services.AddTransient<INewInvoiceRepository, NewInvoiceRepository>();
                     services.AddTransient<IChangeInvoiceRepository, ChangeInvoiceRepository>();
-                    services.AddTransient<APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice.IDividedInvoiceRepository, DividedInvoiceRepository>();
-                    services.AddTransient<IInvoiceReportRepository, InvoiceReportRepository>();
-                    services.AddTransient<IIssuanceInvoiceRepository, IssuanceRepository>();
-                    services.AddTransient<INewInvoiceRepository, NewInvoiceRepository>();
+                    services.AddTransient<APPLICATION.Interfaces.Invoice.IDividedInvoiceRepository, DividedInvoiceRepository>();
+                    services.AddTransient<IOldInvoiceRepository, OldInvoiceRepository>();
+                    services.AddTransient<IPaymentInvoiceRepository, PaymentInvoiceRepository>();
                     services.AddTransient<IReturnInvoiceRepository, ReturnInvoiceRepository>();
                     services.AddTransient<ICheckReturnInvoiceRepository, CheckReturnInvoiceRepository>();
                 // Delivery Paid
                     services.AddTransient<IDeliveryPaidRepository, DeliveryPaidRepository>();
-                // Daily Payment
-                    services.AddTransient<IDailyPaymentRepository, DailyPaymentRepository>();
                 // Account Receivable
+                    services.AddTransient<IConfirmBalanceRepository, ConfirmBalanceRepository>();
                     services.AddTransient<IConfirmAccountReceivableRepository, ConfirmAccountReceivableRepository>();
                     services.AddTransient<ISubmittingInvoiceRepository, SubmittingInvoiceRepository>();
                     services.AddTransient<IAccountReceivableRepository, AccountReceivableRepository>();
@@ -55,6 +64,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<IMonthlyInvoiceRepository, MonthlyInvoiceRepository>();
                     services.AddTransient<ISubmissionHistoryRepository, SubmissionHistoryRepository>();
                     services.AddTransient<IDailySubmissionRepository, DailySubmissionRepository>();
+                    services.AddTransient<ISubmitExpenseRepository, SubmitExpenseRepository>();
                     // Audit
                         // Stock Inventory Counting
                     services.AddTransient<IStockInventoryCountingRepository, StockInventoryCountingRepository>();
@@ -110,6 +120,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<ICarPaymentRepository,CarPaymentRepository>();
 
                     services.AddTransient<IUnitOfWork, UnitOfWork>();
+                    services.AddTransient<IGeneralRepository, GeneralRepository>();
                     services.AddTransient<IWarehouseRepository, WarehouseRepository>();
                     services.AddTransient<IItemRepository, ItemRepository>();
                     services.AddTransient<IGeneratorRepository, GeneratorRepository>();
@@ -124,10 +135,24 @@ namespace BC.PAYMENT.INFRASTRUCTURE
                     services.AddTransient<IClosingInventoryRepository, ClosingInventoryRepository>();
                     services.AddTransient<IItemSaleStockRepository, ItemSaleStockRepository>();
                     services.AddTransient<IViewStockupRepository, ViewStocRepository>();
+                    services.AddTransient<IStockCountingRepository, StockCountingRepository>();
+                    services.AddTransient<ITemplateRepository, TemplateRepository>();
+                    services.AddTransient<IStockCarInvoiceRepository, StockCarInvoiceRepository>();
+                    services.AddTransient<ITransferMoneyRepository, TransferMoneyRepository>();
+                    services.AddTransient<IStockCarExpenseRepository, StockCarExpenseRepository>();
+                    services.AddTransient<IStockCarPaymentInvoiceRepository, StockCarPaymentInvoiceRepository>();
                     
             
             // validate Schema
             services.AddValidatorsFromAssemblyContaining<AccReceivablePresetValidate>();
+            services.AddValidatorsFromAssemblyContaining<ChangeInvoiceValidate>();
+            services.AddValidatorsFromAssemblyContaining<DividedInvoiceValidate>();
+            services.AddValidatorsFromAssemblyContaining<InvoiceClosingEntriesValidate>();
+            services.AddValidatorsFromAssemblyContaining<PaymentInvoiceValidate>();
+            services.AddValidatorsFromAssemblyContaining<MarketValidate>();
+            services.AddValidatorsFromAssemblyContaining<OldInvoiceValidate>();
+            services.AddValidatorsFromAssemblyContaining<UpdatePaymentInvoiceValidate>();
+            services.AddValidatorsFromAssemblyContaining<ConfirmBalanceValidate>();
         }
     }
 }

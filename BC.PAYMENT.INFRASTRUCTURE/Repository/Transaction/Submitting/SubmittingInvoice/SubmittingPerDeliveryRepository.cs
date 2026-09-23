@@ -1,14 +1,7 @@
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice
 {
-    public class SubmittingPerDeliveryRepository : ISubmittingPerDeliveryRepository
+    public class SubmittingPerDeliveryRepository(ISqlDataAccess sqlDataAccess) : ISubmittingPerDeliveryRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public SubmittingPerDeliveryRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
         public async Task<List<ExpenseDetailModel>> GetSubmittedInvoicesAsync(string dbCode, string fromDate, string toDate)
         {
             var sql = $@"SELECT ID,EXCHANGE ExchangeRate,D.DELIVERIES_NAME DeliveryName,TAB1.PAID SubTotal,SUM(DOLLAR) Dollar,SUM(RIEL) Riel,SUM(EXP_AMOUNT_1+EXP_AMOUNT_2+EXP_AMOUNT_3) ExpenseRiel,(SUM(EXP_AMOUNT_1+EXP_AMOUNT_2+EXP_AMOUNT_3)/EXCHANGE) ExpenseDollar,SUM(TOTAL) TOTAL,MONEY_BIAS Misaligned,EXPNSE_DESCRIPTION ExpenseDescription
@@ -21,10 +14,9 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.Submitting
                 FROM_DATE = fromDate,
                 TO_DATE = toDate
             };
-            var execute = await _sqlDataAccess.LoadData<ExpenseDetailModel, dynamic>(sql, param);
+            var execute = await sqlDataAccess.LoadData<ExpenseDetailModel, dynamic>(sql, param);
             return execute.ToList();
         }
-
         public async Task<int> AddNewSubmittedInvoicesAsync(ExpenseDetailModel model)
         {
             var sql = $@"INSERT INTO BCSUBMITTED_PAID_DETAIL VALUES(@PAID_DETAIL_ID,@DOLLAR,@RIEL,@EXCHANGE,@TOTAL,@EXPENSE_RIEL,@MONEY_BIAS,@EXPENSE_DOLLAR
@@ -45,7 +37,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.Submitting
                 SUBMITTED_DATE = model.CreateDate.ToString("yyyy-MM-dd"),
                 SUBMITTED_BY = model.CreateBy
             };
-            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
+            var affectedRow = await sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;
         }
     }

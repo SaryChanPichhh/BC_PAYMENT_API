@@ -12,23 +12,23 @@ using System.Net;
 namespace BC.PAYMENT.API.Controllers
 {
     [Helper.Authorize]
-    [Route("api/[controller]")]
+    [Route("api/v2/[controller]")]
     [ApiController]
     public class BranchesController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : ControllerBase
     {
 
         #region ===[ Public Methods ]==============================================================
         [AllowAnonymous]
-        [HttpGet("dbcodes")]
-        public async Task<ApiResponse<List<BranchDTO>>> GetLoginBranch([FromQuery]string username,string appCode)
+        [HttpGet("")]
+        public async Task<ApiResponse<List<BranchDTO>>> GetLoginBranch([FromQuery]string userName,string appCode)
         {
             try
             {
-                var data = await unitOfWork.Branches.GetLoginBranchAsync(username,appCode);
+                var data = await unitOfWork.Branches.GetLoginBranchAsync(userName,appCode);
                 return ApiResponse<List<BranchDTO>>.Builder()
-                    .WithMessage(data.Any() ? "Branches fetched successfully." : "No branches")
-                    .WithStatusCode(data.Any() ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
-                    .WithResult(data.Any() ? data.ToList() : new List<BranchDTO>())
+                    .WithMessage(data.Count != 0 ? "Branches fetched successfully." : "No branches")
+                    .WithStatusCode(data.Count != 0 ? (int)HttpStatusCode.OK : (int)HttpStatusCode.BadRequest)
+                    .WithResult(data.Count != 0 ? data.ToList() : new List<BranchDTO>())
                     .Build();
             }
             catch (Exception ex)

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using BC.ACCOUNTING.REPORT.Models;
+using BC.PAYMENT.CORE.Contracts.General;
 using BC.PAYMENT.CORE.DTO.General;
 using Microsoft.IdentityModel.Tokens;
 

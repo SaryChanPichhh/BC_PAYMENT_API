@@ -1,4 +1,4 @@
-﻿namespace BC.PAYMENT.CORE.DTO.General
+﻿namespace BC.PAYMENT.CORE.Contracts.General
 {
     public record ClaimDTO
     {
@@ -10,5 +10,6 @@
         public DateTime CurrectDate { get; set; }
         public string? InvoiceEntryCode { get; set; }
         public string? Period { get; set; }
+        public string? Role { get; set; }
     }
 }

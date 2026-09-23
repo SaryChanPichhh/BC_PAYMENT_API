@@ -1,4 +1,8 @@
-using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice.IDividedInvoiceRepository;
+using BC.PAYMENT.APPLICATION.Interfaces.ConfirmBalance;
+using BC.PAYMENT.APPLICATION.Interfaces.Expense;
+using BC.PAYMENT.APPLICATION.Interfaces.StockCar;
+using BC.PAYMENT.APPLICATION.Interfaces.Submit;
+using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Invoice.IDividedInvoiceRepository;
 
 namespace BC.PAYMENT.APPLICATION.Interfaces.General
 {
@@ -8,6 +12,7 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         IGeneratorRepository Generators { get; }
 
         #region General
+        IGeneralRepository GeneralRepository { get; }
         IUserRepository Users { get; }
         IBranchRepository Branches { get; }
         ICustomerRepository Customers { get; }
@@ -16,10 +21,15 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         Payment.IDividedInvoiceRepository DividedInvoices { get; }
         IDeliveryRepository Deliveries { get; }
         IMarketRepository Markets { get; }
+        IAreaRepository Areas { get; }
         IWarehouseRepository Warehouses { get; }
         IItemRepository Items { get; }
         IEmployeeRepository Employee { get; }
-
+        IInvoiceClosingEntryRepository InvoiceClosingEntry { get; }
+        IExpenseTypeRepository ExpenseTypes { get; }
+        IExpenseRepository Expense { get; }
+        IExpenseRepository Expenses => Expense;
+        IExpenseRepository ExpenseRepository => Expense;
         #endregion
 
         #region Prepare
@@ -36,18 +46,16 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         INewInvoiceRepository NewInvoice { get; }
         IChangeInvoiceRepository ChangeInvoice { get; }
         IReturnInvoiceRepository ReturnInvoice { get; }
-        IIssuanceInvoiceRepository IssuanceInvoice { get; }
         IDividedInvoiceRepository DividedInvoice { get; }
-        IInvoiceReportRepository InvoiceReport { get; }
         ICheckReturnInvoiceRepository CheckReturnInvoice { get; }
         #endregion
 
         #region Daily Payment
         IDeliveryPaidRepository DeliveryPaid { get; }
-        IDailyPaymentRepository DailyPayment { get; }
         #endregion
 
         #region Submitting
+        IConfirmBalanceRepository ConfirmBalance { get; }
         IConfirmAccountReceivableRepository ConfirmAccountReceivable { get; }
         ISubmittingInvoiceRepository SubmittingInvoice { get; }
         IAccountReceivableRepository AccountReceivable { get; }
@@ -59,6 +67,7 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         IMonthlyInvoiceRepository InvoiceVerify { get; }
         ISubmissionHistoryRepository HistoryApproval { get; }
         IDailySubmissionRepository Approve { get; set; }
+        ISubmitExpenseRepository SubmitExpense { get; }
 
         #endregion
 
@@ -68,6 +77,11 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         #endregion
 
         #region Provincial Payment
+        IStockCarInvoiceRepository StockCarInvoice { get; }
+        ITemplateRepository Template { get; }
+        ITransferMoneyRepository TransferMoney { get; }
+        IStockCarExpenseRepository StockCarExpense { get; }
+        IStockCarPaymentInvoiceRepository StockCarPaymentInvoice { get; }
         ISaleRepresentRepository SaleRepresent { get; }
         IReviewReportRepository ReviewReport { get; }
         ICheckingStockCarPaymentRepository CheckingStockCarPayment { get; }
@@ -142,6 +156,14 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General
         IInventoryTrackingRepository InventoryTracking { get; }
         IWarehousePresetRepository WarehousePreset { get; }
         IOpeningBalanceRepository OpeningBalance { get; }
+        IStockCountingRepository StockCounting { get; }
+
+        #endregion
+
+        #region Invoice
+
+        IOldInvoiceRepository OldInvoice { get; }
+        IPaymentInvoiceRepository PaymentInvoice { get; }
 
         #endregion
     }

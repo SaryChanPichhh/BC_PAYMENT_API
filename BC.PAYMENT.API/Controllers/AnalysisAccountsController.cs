@@ -1,18 +1,9 @@
-using BC.PAYMENT.API.Helper;
-using BC.PAYMENT.API.Models;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.Accounting;
-using BC.PAYMENT.CORE.Entities.Accounting;
-using BC.PAYMENT.LOGGING;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
-using System.Net;
-using BC.PAYMENT.CORE.Entities;
+
+
 
 namespace BC.PAYMENT.API.Controllers
 {
-    [Authorize]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class AnalysisAccountsController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : BaseApiController
     {
 

@@ -2,8 +2,9 @@ using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
+using BC.PAYMENT.CORE.Contracts.Items;
+using BC.PAYMENT.CORE.Contracts.Response.Item;
 using BC.PAYMENT.CORE.DTO.General;
-using BC.PAYMENT.CORE.DTO.Items;
 using BC.PAYMENT.CORE.DTO.Transaction.Inventory.VerificationStock;
 using BC.PAYMENT.LOGGING;
 using Microsoft.AspNetCore.Http;
@@ -71,7 +72,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
         
         [HttpGet]
         [Route("getitems")]
-        public async Task<ApiResponse<List<ItemDto>>> GetItemListAsync()
+        public async Task<ApiResponse<List<ItemResponse>>> GetItemListAsync()
         {
             var credential = Common.DecodeJwt(User);
             try
@@ -79,7 +80,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                 var execute = await _unitOfWork.Items.GetItemListAsync(credential.DbCode);
                 if (execute.Any())
                 {
-                    return ApiResponse<List<ItemDto>>.Builder()
+                    return ApiResponse<List<ItemResponse>>.Builder()
                         .WithStatusCode((int)HttpStatusCode.OK)
                         .WithMessage("Items fetched successfully")
                         .WithResult(execute)
@@ -88,7 +89,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
                 }
                 else
                 {
-                    return ApiResponse<List<ItemDto>>.Builder()
+                    return ApiResponse<List<ItemResponse>>.Builder()
                         .WithStatusCode((int)HttpStatusCode.BadRequest)
                         .WithMessage("Items fetched unsuccessfully")
                         .Build();
@@ -96,7 +97,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Inventory
             }
             catch (Exception ex)
             {
-                return GlobalExceptionHandler.ExceptionError<List<ItemDto>>(ex.Message);
+                return GlobalExceptionHandler.ExceptionError<List<ItemResponse>>(ex.Message);
             }
         }
         

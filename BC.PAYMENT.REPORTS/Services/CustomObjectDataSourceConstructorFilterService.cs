@@ -1,5 +1,5 @@
 using System.Reflection;
-using BC.ACCOUNTING.CORE.Entities;
+using BC.PAYMENT.CORE.Entities;
 using DevExpress.DataAccess.Web;
 
 namespace BC.PAYMENT.REPORTS.Services;

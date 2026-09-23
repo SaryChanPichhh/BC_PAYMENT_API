@@ -3,7 +3,10 @@ using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.Expense;
+using BC.PAYMENT.CORE.Contracts.Criteria;
+using BC.PAYMENT.CORE.Contracts.Invoice;
+using BC.PAYMENT.CORE.Contracts.Request.Invoice;
+using BC.PAYMENT.CORE.Contracts.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.CORE.DTO.Invoice;
 using BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment;
 using BC.PAYMENT.CORE.Entities.Expense;
@@ -160,16 +163,16 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
 
         #region Stock Car Invoice 
         [HttpGet]
-        [Route("getinvoicebytemplateid/{invoiceTypes}/{templateId}")]
-        public async Task<ApiResponse<List<StockCarInvoicesModel>>> GetNewInvoiceAsync([Required] InvoiceTypes invoiceTypes , [Required] int templateId)
+        [Route("getinvoicebytemplateid/{invoiceType}/{templateId}")]
+        public async Task<ApiResponse<List<StockCarInvoiceModel>>> GetNewInvoiceAsync([Required] InvoiceStatus invoiceType , [Required] int templateId)
         {
             var credential = Common.DecodeJwt(User);
             try
             {
-                var stockCarInvoiceList = await unitOfWork.SaleRepresent.GetAllInvoiceByInvoiceTypeAsync(credential.DbCode!,invoiceTypes,templateId);
+                var stockCarInvoiceList = await unitOfWork.SaleRepresent.GetAllInvoiceByInvoiceTypeAsync(credential.DbCode!,invoiceType,templateId);
                 if (stockCarInvoiceList.Any())
                 {
-                    return ApiResponse<List<StockCarInvoicesModel>>.Builder()
+                    return ApiResponse<List<StockCarInvoiceModel>>.Builder()
                         .WithResult(stockCarInvoiceList)
                         .WithStatusCode((int)HttpStatusCode.OK)
                         .WithMessage("Stock Car Invoice fetched successfully")
@@ -177,7 +180,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
                 }
                 else
                 {
-                    return ApiResponse<List<StockCarInvoicesModel>>.Builder()
+                    return ApiResponse<List<StockCarInvoiceModel>>.Builder()
                         .WithStatusCode((int)HttpStatusCode.BadRequest)
                         .WithMessage("Stock Car Invoice fetched unsuccessfully")
                         .Build();
@@ -185,7 +188,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
             }
             catch (Exception ex)
             {
-                return GlobalExceptionHandler.ExceptionError<List<StockCarInvoicesModel>>(ex.Message);
+                return GlobalExceptionHandler.ExceptionError<List<StockCarInvoiceModel>>(ex.Message);
             }
         }
 
@@ -256,7 +259,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         {
             try
             {
-                var stockCarInvoiceModel = new StockCarInvoicesModel
+                var stockCarInvoiceModel = new StockCarInvoiceModel
                 {
                     InvoiceId = model.InvoiceId,
                     InvoiceValue = model.InvoiceValue,
@@ -289,7 +292,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         #region OldInvoice
         [HttpPost]
         [Route("getoldinvoicesbyall")]
-        public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetOldInvoiceByAllAsync([FromBody] OldInvoiceRequestDto model)
+        public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetOldInvoiceByAllAsync([FromBody] OldInvoiceCriteria model)
         {
             var credential = Common.DecodeJwt(User);
             try
@@ -319,7 +322,7 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPaym
         
         [HttpPost]
         [Route("getoldinvoicesbyrange")]
-        public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetOldInvoiceByRangeAsync([FromBody] OldInvoiceRequestDto model)
+        public async Task<ApiResponse<List<OldInvoiceResponeDto>>> GetOldInvoiceByRangeAsync([FromBody] OldInvoiceCriteria model)
         {
             var credential = Common.DecodeJwt(User);
             try

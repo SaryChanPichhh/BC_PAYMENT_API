@@ -32,9 +32,9 @@ namespace BC.PAYMENT.TEST.Repositories
         {
             // Arrange
             var dbCode = "DB01";
-            var mockMarkets = new List<Market> { new Market { MarketID = "M01" } };
+            var mockMarkets = new List<MarketResponse> { new MarketResponse { MarketId = "1" } };
             _mockSqlDataAccess
-                .Setup(db => db.LoadData<Market, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+                .Setup(db => db.LoadData<MarketResponse, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
                 .ReturnsAsync(mockMarkets);
 
             // Act
@@ -66,7 +66,7 @@ namespace BC.PAYMENT.TEST.Repositories
         public async Task GetMarketByDbCodeAsync_ReturnsMarketResponses()
         {
             // Arrange
-            var mockMarkets = new List<MarketResponse> { new MarketResponse { MarketId = 1 } };
+            var mockMarkets = new List<MarketResponse> { new MarketResponse { MarketId = "1" } };
             _mockSqlDataAccess
                 .Setup(db => db.LoadData<MarketResponse, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
                 .ReturnsAsync(mockMarkets);
@@ -77,6 +77,23 @@ namespace BC.PAYMENT.TEST.Repositories
             // Assert
             Assert.NotNull(result);
             Assert.Single(result);
+        }
+
+        [Fact]
+        public async Task GetMarketByMarketIdAsync_ReturnsMarketResponse()
+        {
+            // Arrange
+            var mockMarket = new MarketResponse { MarketId = "1" };
+            _mockSqlDataAccess
+                .Setup(db => db.LoadSingleData<MarketResponse, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+                .ReturnsAsync(mockMarket);
+
+            // Act
+            var result = await _repository.GetMarketByMarketIdAsync("DB01", "1");
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("1", result.MarketId);
         }
 
         [Fact]
@@ -140,6 +157,29 @@ namespace BC.PAYMENT.TEST.Repositories
             {
                 Assert.Equal(3, result.Length);
             }
+        }
+
+        [Fact]
+        public async Task GenerateMarketIdAsync_ReturnsNewId()
+        {
+            // Arrange
+            _mockSqlDataAccess
+                .Setup(db => db.LoadSingleData<string, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+                .ReturnsAsync("MK-002");
+
+            // Act
+            var result = await _repository.GenerateMarketIdAsync();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("MK-002", result);
+        }
+
+        [Fact]
+        public async Task GetDeliveryImage_ThrowsNotImplementedException()
+        {
+            // Act & Assert
+            await Assert.ThrowsAsync<NotImplementedException>(() => _repository.GetDeliveryImage("123"));
         }
     }
 }

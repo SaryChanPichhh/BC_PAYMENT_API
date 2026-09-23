@@ -1,14 +1,7 @@
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport
 {
-    public class CheckReturnInvoiceRepository : ICheckReturnInvoiceRepository
+    public class CheckReturnInvoiceRepository(ISqlDataAccess sqlDataAccess) : ICheckReturnInvoiceRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public CheckReturnInvoiceRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
         public async Task<List<PaymentInvoiceModel>> GetAllNewAndChangeDividedInvoiceByDate(string dbCode, DateTime fromDate, DateTime toDate)
         {
             var sql =
@@ -22,14 +15,14 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Dividing
                 LEFT JOIN (SELECT ADD_CODE,STORE +' '+ MARKET_KHMER_NAME Market FROM SIADD SI INNER JOIN TB_BCMARKET M ON M.MARKET_ID = SI.MARKET_ID
                 WHERE SI.DB_CODE = @DB_CODE AND M.DB_CODE = @DB_CODE) TAB ON TAB.ADD_CODE = N.CUSTOMER_CODE
                 WHERE D.STATUS = '1' AND N.DB_CODE = @DB_CODE AND D.DB_CODE = @DB_CODE
-                AND D.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND N.STATUS IN ('C','N')";
+                AND D.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND N.STATUS IN ('C','N');";
             var param = new
             {
                 DB_CODE = dbCode,
                 FROM_DATE = fromDate,
                 TO_DATE = toDate
             };
-            var execute = await _sqlDataAccess.LoadData<PaymentInvoiceModel, dynamic>(sql, param);
+            var execute = await sqlDataAccess.LoadData<PaymentInvoiceModel, dynamic>(sql, param);
             return execute.ToList();
         }
     }

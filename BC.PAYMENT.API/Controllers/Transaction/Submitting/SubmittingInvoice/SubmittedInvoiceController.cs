@@ -4,6 +4,7 @@ using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
+using BC.PAYMENT.CORE.Contracts.Response.SubmitInvoice;
 using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -43,34 +44,6 @@ namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.SubmittingInvoice
             }
         }
         
-        [HttpPut]
-        [Route("updatesubmiitedinvoicefrompendingtoreject/{submittedId}")]
-        public async Task<ApiResponse<string>> UpdateSubmittedInvoiceFromPendingToRejectAsync([Required]string submittedId)
-        {
-            var credential = Common.DecodeJwt(User);
-            try
-            {
-                var affectedRow = await unitOfWork.SubmittedInvoice.UpdateInvoiceFromPendingToCancelAsync(credential.DbCode!,credential.Username!,submittedId);
-                if (affectedRow > 0)
-                {
-                    return ApiResponse<string>.Builder()
-                        .WithMessage("Submitted Invoices updated successfully")
-                        .WithStatusCode((int)HttpStatusCode.OK)
-                        .WithResult(submittedId)
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<string>.Builder()
-                        .WithMessage("Submitted Invoices updated unsuccessfully")
-                        .WithStatusCode((int)HttpStatusCode.BadRequest)
-                        .Build();
-                }
-            }
-            catch (Exception ex)
-            {
-                return GlobalExceptionHandler.ExceptionError<string>(ex.Message);
-            }
-        }
+        
     }
 }

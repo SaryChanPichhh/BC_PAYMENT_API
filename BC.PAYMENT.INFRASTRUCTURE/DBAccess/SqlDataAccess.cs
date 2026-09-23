@@ -15,8 +15,17 @@ namespace BC.PAYMENT.INFRASTRUCTURE.DBAccess
 
 
             var transaction = connection.BeginTransaction();
-
-            return await connection.ExecuteAsync(storedProcedure, parameters, commandType: commandType);
+            try 
+            {
+                var result = await connection.ExecuteAsync(storedProcedure, parameters, transaction: transaction, commandType: commandType);
+                transaction.Commit();
+                return result;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public T ExecuteScalar<T, TU>(string query, TU parameters, CommandType commandType = CommandType.Text, string connectionString = "Default")

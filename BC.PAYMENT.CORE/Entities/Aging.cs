@@ -1,4 +1,4 @@
-namespace BC.ACCOUNTING.CORE.Entities
+namespace BC.PAYMENT.CORE.Entities
 {
     public class Aging
     {

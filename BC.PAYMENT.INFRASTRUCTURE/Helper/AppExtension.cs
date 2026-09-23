@@ -6,13 +6,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Helper
         {
             var dataTable = new DataTable();
             var properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
             foreach (var prop in properties)
             {
                 var columnType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
                 dataTable.Columns.Add(prop.Name, columnType);
             }
-
             foreach (var item in list)
             {
                 var row = dataTable.NewRow();
@@ -23,7 +21,6 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Helper
                 }
                 dataTable.Rows.Add(row);
             }
-
             return dataTable;
         }
     }

@@ -760,6 +760,7 @@
         "dependencies": {
           "FluentValidation": "12.1.1",
           "FluentValidation.DependencyInjectionExtensions": "12.1.1",
+          "Microsoft.Extensions.Configuration.Abstractions": "9.0.0",
           "System.Drawing.Common": "8.0.15"
         },
         "compile": {

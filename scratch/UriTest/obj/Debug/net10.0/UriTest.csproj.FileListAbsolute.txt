@@ -1,0 +1,14 @@
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\bin\Debug\net10.0\UriTest.exe
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\bin\Debug\net10.0\UriTest.deps.json
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\bin\Debug\net10.0\UriTest.runtimeconfig.json
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\bin\Debug\net10.0\UriTest.dll
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\bin\Debug\net10.0\UriTest.pdb
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.GeneratedMSBuildEditorConfig.editorconfig
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.AssemblyInfoInputs.cache
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.AssemblyInfo.cs
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.csproj.CoreCompileInputs.cache
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.dll
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\refint\UriTest.dll
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.pdb
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\UriTest.genruntimeconfig.cache
+D:\TD System\TD Api\BC.PAYMENT.SYSTEM\scratch\UriTest\obj\Debug\net10.0\ref\UriTest.dll

@@ -1,4 +1,4 @@
-namespace BC.PAYMENT.CORE.DTO.Payment
+namespace BC.PAYMENT.CORE.Contracts.Payment
 {
     public record InvoiceExpenseDTO
     {
@@ -9,7 +9,7 @@ namespace BC.PAYMENT.CORE.DTO.Payment
         public string? DbCode { get; set; }
 
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } 
 
         [Required]
         public string Description { get; set; }

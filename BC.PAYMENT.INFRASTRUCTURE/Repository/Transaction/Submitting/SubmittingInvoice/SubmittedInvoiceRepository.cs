@@ -1,14 +1,9 @@
+using BC.PAYMENT.CORE.Contracts.Response.SubmitInvoice;
+
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice
 {
-    public class SubmittedInvoiceRepository : ISubmittedInvoiceRepository
+    public class SubmittedInvoiceRepository(ISqlDataAccess sqlDataAccess) : ISubmittedInvoiceRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public SubmittedInvoiceRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
         public async Task<List<SubmittedInvoiceModel>> GetAllNotSubmitPaidInvoice(string dbCode, string fromDate, string toDate)
         {
             var sql = $@"SELECT S.ID,DE.DELIVERIES_KHMER,N.CUSTOMER_CODE,ACC_NAME_KH,N.TRANSACTION_REF,1.00 AS 'AMOUNT',S.MONEY,PAID,HEADER_TRANSACTION_VALUES - PAID TOTAL,SUBMITTED_DATE,SUBMITTED_BY,N'កំពុងដំណើរការ' STATUS,
@@ -24,7 +19,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.Submitting
                 FROM_DATE = fromDate,
                 TO_DATE = toDate
             };
-            var execute = await _sqlDataAccess.LoadData<SubmittedInvoiceModel, dynamic>(sql, param);
+            var execute = await sqlDataAccess.LoadData<SubmittedInvoiceModel, dynamic>(sql, param);
             return execute.ToList();
         }
 
@@ -39,8 +34,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.Submitting
                 UPDATED_DATE = DateTime.Now
             };
 
-            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
+            var affectedRow = await sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;
         }
+
+        
     }
 }

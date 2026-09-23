@@ -1,4 +1,4 @@
-namespace BC.PAYMENT.CORE.DTO.Expense
+namespace BC.PAYMENT.CORE.Contracts.Expense
 {
     public class ExpenseDto
     {

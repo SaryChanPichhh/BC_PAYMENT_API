@@ -1,28 +1,13 @@
+using BC.PAYMENT.APPLICATION.Interfaces.Inventory;
+using BC.PAYMENT.CORE.Contracts.Response.Inventory;
+using BC.PAYMENT.CORE.Entities.Inventory.Inventory;
+using BC.PAYMENT.INFRASTRUCTURE.DBAccess;
+using System.Diagnostics;
+
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory
 {
-    public class InventoryRepository : IInventoryRepository
+    public class InventoryRepository(ISqlDataAccess sqlDataAccess) : IInventoryRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public InventoryRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-        
-        public async Task<List<InventoryModel>> GetInventoryAllBranchesAsync()
-        {
-            var getAllBranchesQuery = $@"SELECT DB_CODE FROM SIDBINFO WHERE DB_STAT = 'A';";
-            var response = await _sqlDataAccess.LoadData<string, dynamic>(getAllBranchesQuery,new{});
-            var sql = "";
-            foreach (var dbCode in response)
-            {
-                 sql +=GenerateSql(dbCode) + " UNION ";
-            }
-            var substring = sql.Substring(0, sql.Length - 6);
-            var execute = await _sqlDataAccess.LoadData<InventoryModel, dynamic>(substring, new { });
-            return execute.ToList();
-        }
-
         public async Task<List<dynamic>> GetInventoryByMultiWarehouseAsync(Dictionary<string, List<string>> dbCodeAndWarehouses)
         {
             var sql = "";
@@ -77,7 +62,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory
                     ) AS PivotTable";
             Debug.WriteLine(finalSql);
             var results =
-                await _sqlDataAccess.LoadData<dynamic, dynamic>(finalSql,
+                await sqlDataAccess.LoadData<dynamic, dynamic>(finalSql,
                     new { });
 
             return results.ToList();
@@ -125,5 +110,19 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory
                 return string.Empty;
             }
         }
+
+        public async Task<List<InventoryResponse>> GetInventoryByLocationAsync(string dbCode, string location)
+        {
+            var param = new
+            {
+                LOCATION = location,
+                DB_CODE = dbCode
+            };
+            var criteria = $@"AND LOCATION = @LOCATION";
+            var results = await sqlDataAccess.LoadData<InventoryResponse, dynamic>
+                (InventoryQueries.GetInventory(dbCode,criteria:criteria), param);
+            return results.ToList();
+        }
     }
 }
+

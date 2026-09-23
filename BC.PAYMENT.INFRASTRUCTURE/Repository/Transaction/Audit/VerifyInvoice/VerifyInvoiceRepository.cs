@@ -19,7 +19,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Audit.VerifyInvoice
             return execute.ToList();
         }
 
-        public async Task<int> InsertVerifyInvoicesAsync(List<OldInvoicesModel> model)
+        public async Task<int> InsertVerifyInvoicesAsync(List<OldInvoiceModel> model)
         {
             var affectedRow = 0;
             var sql =

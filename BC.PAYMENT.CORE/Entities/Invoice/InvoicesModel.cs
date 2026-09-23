@@ -7,7 +7,7 @@ namespace BC.PAYMENT.CORE.Entities.Invoice
         public string? DbCode { get; set; }
         public string? InvoiceCode { get; set; }
         public double InvoiceAmount { get; set; }
-        public InvoiceTypes InvoiceTypes { get; set; }
+        public InvoiceType InvoiceType { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? CustomField1 { get; set; }
         public bool? IsDivided { get; set; }
@@ -19,13 +19,13 @@ namespace BC.PAYMENT.CORE.Entities.Invoice
         public string? CreatedBy { get; set; }
     }
 
-    public class StockCarInvoicesModel : Invoices
+    public class StockCarInvoiceModel : Invoice
     {
         public int Period { get; set; }
         public string? CreatedBy { get; set; }
         public string? EmployeeId { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime TransactionDate { get; set; }
-        public InvoiceTypes InvoiceType { get; set; }
+        public InvoiceStatus InvoiceType { get; set; }
     }
 }

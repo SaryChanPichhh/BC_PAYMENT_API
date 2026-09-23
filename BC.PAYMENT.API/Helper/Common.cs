@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BC.PAYMENT.CORE.Contracts.General;
 using BC.PAYMENT.CORE.DTO.General;
 
 namespace BC.PAYMENT.API.Helper
@@ -36,31 +37,32 @@ namespace BC.PAYMENT.API.Helper
         public static string GenerateJwtToken(ClaimDTO request, AppSettings appSettings)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, appSettings.Subject),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("UserId", request.UserId.ToString()),
-                new Claim("Username", request.Username!),
-                new Claim("DbCode", request.DbCode!),
-                new Claim("AppCode", request.AppCode!),
-                new Claim("CompanyCode", request.CompanyCode!),
-                new Claim("CurrentDate", request.CurrectDate.ToString("MM/dd/yyyy")),
-                new Claim("InvoiceEntryCode", request.InvoiceEntryCode),
-            };
+                var claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Sub, appSettings.Subject),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim("UserId", request.UserId.ToString()),
+                    new Claim("Username", request.Username!),
+                    new Claim("DbCode", request.DbCode!),
+                    new Claim("AppCode", request.AppCode!),
+                    new Claim("CompanyCode", request.CompanyCode!),
+                    new Claim("CurrentDate", request.CurrectDate.ToString("MM/dd/yyyy")),
+                    new Claim("InvoiceEntryCode", request.InvoiceEntryCode),
+                    new Claim("Role", request.Role),
+                };
            
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.PYS_Key));
-            var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettings.PYS_Key));
+                var signIn = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             
-            var tokenDescriptor = new JwtSecurityToken(
-                appSettings.Issuer,
-                appSettings.Audience,
-                claims,
-                expires: DateTime.UtcNow.AddDays(1000),
-                signingCredentials: signIn
+                var tokenDescriptor = new JwtSecurityToken(
+                    appSettings.Issuer,
+                    appSettings.Audience,
+                    claims,
+                    expires: DateTime.UtcNow.AddDays(1000),
+                    signingCredentials: signIn
                 );
-            var token = tokenHandler.WriteToken(tokenDescriptor);
-            return (token);
+                var token = tokenHandler.WriteToken(tokenDescriptor);
+                return (token);
         }
 
         public static ClaimDTO DecodeJwt(ClaimsPrincipal user)

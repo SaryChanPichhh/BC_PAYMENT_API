@@ -17,5 +17,7 @@ namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Inv
                 "C" => "វិក្កយប័ត្រដូរ",
                 _ => "វិក្កយប័ត្រថ្មី"
             };
+
+        public bool IsExists { get; set; }
     }
 }

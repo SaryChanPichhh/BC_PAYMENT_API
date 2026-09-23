@@ -2,16 +2,9 @@ using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Payment.IDiv
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
 {
-    public class DividedInvoiceRepository : IDividedInvoiceRepository
+    public class DividedInvoiceRepository(ISqlDataAccess sqlDataAccess) : IDividedInvoiceRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public DividedInvoiceRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<Invoices>> GetInvoices(IssueInvoiceExclusionFilterDTO dto)
+        public async Task<List<CORE.Entities.Invoice.Invoice>> GetInvoices(IssueInvoiceExclusionFilterDTO dto)
         {
             var sql = "[PM_SELECT_TRANSACTIONS_WITH_EXCLUSION]";
             var param = new
@@ -22,11 +15,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
                 OFF_SET = dto.Page,
                 PAGESIZE = dto.PageSize,
             };
-            var result = await _sqlDataAccess.LoadData<Invoices, dynamic>(sql, param, CommandType.StoredProcedure);
+            var result = await sqlDataAccess.LoadData<CORE.Entities.Invoice.Invoice, dynamic>(sql, param, CommandType.StoredProcedure);
             return result.ToList();
         }
 
-        public async Task<List<Invoices>> GetInvoices(IssueInvoiceFilterDTO dto)
+        public async Task<List<CORE.Entities.Invoice.Invoice>> GetInvoices(IssueInvoiceFilterDTO dto)
         {
             var sql = "PM_SELECT_TRANSACTIONS";
             var param = new
@@ -36,7 +29,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
                 OFF_SET = dto.Page,
                 PAGESIZE = dto.PageSize,
             };
-            var result = await _sqlDataAccess.LoadData<Invoices, dynamic>(sql, param, CommandType.StoredProcedure);
+            var result = await sqlDataAccess.LoadData<CORE.Entities.Invoice.Invoice, dynamic>(sql, param, CommandType.StoredProcedure);
             return result.ToList();
         }
 
@@ -50,7 +43,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
             var param = new DynamicParameters();
             param.Add("@INVOICES", dataTable.AsTableValuedParameter("ISSUE_INVOICE")); // Specify table type name
 
-            var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param, CommandType.StoredProcedure);
+            var rowAffected = await sqlDataAccess.ExecuteAsync(sql, param, CommandType.StoredProcedure);
             return rowAffected;
         }
 
@@ -62,11 +55,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
                 DB_CODE = dbCode,
                 DATE = date
             };
-            var result = await _sqlDataAccess.LoadData<Delivery, dynamic>(sql, param, CommandType.StoredProcedure);
+            var result = await sqlDataAccess.LoadData<Delivery, dynamic>(sql, param, CommandType.StoredProcedure);
             return result.ToList();
         }
 
-        public async Task<List<Invoices>> GetDividedInvoice(string dbCode,string deliveryId, DateTime date)
+        public async Task<List<CORE.Entities.Invoice.Invoice>> GetDividedInvoice(string dbCode,string deliveryId, DateTime date)
         {
             var sql = "PM_SELECT_DIVIDEDINVOICE";
             var param = new
@@ -75,7 +68,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
                 DELIVERY_ID = deliveryId,
                 DATE = date
             };
-            var result = await _sqlDataAccess.LoadData<Invoices, dynamic>(sql, param, CommandType.StoredProcedure);
+            var result = await sqlDataAccess.LoadData<CORE.Entities.Invoice.Invoice, dynamic>(sql, param, CommandType.StoredProcedure);
             return result.ToList();
         }
 
@@ -87,7 +80,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Payment
                 DB_CODE = dbCode,
                 DATE = date
             };
-            var result = await _sqlDataAccess.LoadData<DividedInvoiceSummary, dynamic>(sql, param, CommandType.StoredProcedure);
+            var result = await sqlDataAccess.LoadData<DividedInvoiceSummary, dynamic>(sql, param, CommandType.StoredProcedure);
             return result.ToList();
         }
     }

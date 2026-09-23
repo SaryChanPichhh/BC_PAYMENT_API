@@ -1,0 +1,16 @@
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Authorization;
+global using BC.PAYMENT.API.Helper;
+global using BC.PAYMENT.API.Models;
+global using BC.PAYMENT.APPLICATION.Interfaces.General;
+global using BC.PAYMENT.CORE.Entities.General;
+global using System.Net;
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading.Tasks;
+global using BC.PAYMENT.CORE.DTO.Accounting;
+global using BC.PAYMENT.CORE.Entities.Accounting;
+global using Microsoft.Extensions.Options;
+global using System.Globalization;
+global using Microsoft.Data.SqlClient;

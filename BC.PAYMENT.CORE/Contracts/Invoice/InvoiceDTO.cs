@@ -1,16 +1,13 @@
-namespace BC.PAYMENT.CORE.DTO.Invoice
+namespace BC.PAYMENT.CORE.Contracts.Invoice
 {
     public class InvoiceDTO
     {
         [JsonIgnore]
         public string? DbCode { get; set; }
-
         [Required]
         public required string TransactionCode { get; set; }
-
         [JsonIgnore]
         public string? EntryCode { get; set; }
-
         [JsonIgnore]
         public string? CreatedBy { get; set; }
     }

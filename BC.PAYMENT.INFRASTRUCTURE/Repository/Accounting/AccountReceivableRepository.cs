@@ -1,16 +1,10 @@
+using BC.PAYMENT.CORE.Contracts.Request.AccountReceivable;
 using static BC.PAYMENT.CORE.Entities.Accounting.AccountReceivableModel;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
 {
-    public class AccountReceivableRepository : IAccountReceivableRepository
+    public class AccountReceivableRepository(IDbConnection dbConnection, ISqlDataAccess sqlDataAccess) : IAccountReceivableRepository
     {
-        private readonly IDbConnection _dbConnection;
-        private readonly ISqlDataAccess _sqlDataAccess;
-        public AccountReceivableRepository(IDbConnection dbConnection, ISqlDataAccess sqlDataAccess)
-        {
-            _dbConnection = dbConnection;
-            _sqlDataAccess = sqlDataAccess;
-        }
         public async Task<List<AccountReceivablePatternModel>> GetAccountReceivablePatterns(string dbCode)
         {
             const string sql = @"SELECT 
@@ -31,7 +25,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
         CREATED_BY CreatedBy
         FROM BCDATA WHERE DB_CODE = @DB_CODE AND DATA_TYPE = @DATA_TPYE";
             var param = new { DB_CODE = dbCode, DATA_TPYE = "ACCOUNT RECEIVABLE" };
-            var results = await _sqlDataAccess.LoadData<AccountReceivablePatternModel, dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadData<AccountReceivablePatternModel, dynamic>(sql, param);
             return results.ToList();
         }
 
@@ -39,21 +33,21 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
         {
             const string sql = @"SELECT JNLT_CODE,JNLT_DESC FROM SIJNLTYP WHERE DB_CODE = @DB_CODE";
             var param = new { DB_CODE = dbCode };
-            var results = await _sqlDataAccess.LoadData<dynamic, dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadData<dynamic, dynamic>(sql, param);
             return results;
         }
 
         public async Task<int> GetJournalIdByDbCode(string dbCode)
         {
             var sql = $@"SELECT MAX(JRNAL_NO) FROM {dbCode}SILEDG";
-            var results = await _sqlDataAccess.ExecuteScalarAsync<int, dynamic>(sql, new { });
+            var results = await sqlDataAccess.ExecuteScalarAsync<int, dynamic>(sql, new { });
             return results;
         }
 
         public async Task<int> GetAllocReferenceByDbCode(string dbCode)
         {
             var sql = $@"SELECT MAX(ALLOC_REF) FROM {dbCode}SILEDG";
-            var results = await _sqlDataAccess.ExecuteScalarAsync<int, dynamic>(sql, new { });
+            var results = await sqlDataAccess.ExecuteScalarAsync<int, dynamic>(sql, new { });
             return results;
         }
 
@@ -68,13 +62,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
                 REFERENCE = referenceNo
             }; 
             // Check connection status
-            if (_dbConnection.State != ConnectionState.Open)
+            if (dbConnection.State != ConnectionState.Open)
             {
-                 _dbConnection.Open();
+                 dbConnection.Open();
             }
 
             // Get the current account receivable record from database
-            var results = (await _dbConnection.QueryAsync<SILEDG>(sql, param)).ToList();
+            var results = (await dbConnection.QueryAsync<SILEDG>(sql, param)).ToList();
             // Check if the account receivable record is found or has been allocated
             if (results.Count is 0 or > 1)
             {
@@ -90,7 +84,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
             }
 
             // Start transaction
-            using var transaction = _dbConnection.BeginTransaction();
+            using var transaction = dbConnection.BeginTransaction();
             var rowAffected = 0;
             try
             {
@@ -102,7 +96,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
                     ACC_CODE = customerCode,
                     REFERENCE = referenceNo
                 };
-                rowAffected += await _dbConnection.ExecuteAsync(sqlDelete, paramDelete, transaction);
+                rowAffected += await dbConnection.ExecuteAsync(sqlDelete, paramDelete, transaction);
                 sql =
                     @$"INSERT INTO {dbCode}SILEDG (ACC_CODE, ACC_PERIOD, TRANS_DATE, JRNAL_NO, JRNAL_LINE, AMOUNT, D_C, JRNAL_TYPE, REFERENCE,
                        DESCRIPTN, ENTRY_DATE, ENTRY_PRD, DUE_DATE, ALLOCATION, ALLOC_REF, ALLOC_DATE, ALLOC_PERIOD,
@@ -120,16 +114,16 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
                     {
                         firstOrDefault.AMOUNT = currentAmount;
                         var parameters = new DynamicParameters(firstOrDefault);
-                        rowAffected += await _dbConnection.ExecuteAsync(sql, parameters, transaction);
+                        rowAffected += await dbConnection.ExecuteAsync(sql, parameters, transaction);
                     }
                     else
                     {
-                        var maxJournalLine = await _dbConnection.ExecuteScalarAsync<int>($@"SELECT MAX(JRNAL_LINE) FROM {dbCode}SILEDG WHERE REFERENCE = @REFERENCE AND ACC_CODE = @ACC_CODE", new { ACC_CODE = customerCode, REFERENCE = referenceNo }, transaction);
+                        var maxJournalLine = await dbConnection.ExecuteScalarAsync<int>($@"SELECT MAX(JRNAL_LINE) FROM {dbCode}SILEDG WHERE REFERENCE = @REFERENCE AND ACC_CODE = @ACC_CODE", new { ACC_CODE = customerCode, REFERENCE = referenceNo }, transaction);
                         firstOrDefault.AMOUNT = splitAmount;
                         firstOrDefault.ALLOCATION = "A";
                         firstOrDefault.JRNAL_LINE = maxJournalLine + 1;
                         var parameters = new DynamicParameters(firstOrDefault);
-                        rowAffected += await _dbConnection.ExecuteAsync(sql, parameters, transaction);
+                        rowAffected += await dbConnection.ExecuteAsync(sql, parameters, transaction);
                     }
                 }
                 if (rowAffected == 3)
@@ -152,19 +146,19 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
             }
         }
 
-        public async Task<int> InsertAccountReceivable(AccountReceivableParameter model,bool isAccountsReceivableCompleted = false)
+        public async Task<int> InsertAccountReceivable(SiLedgerRequest request,bool isAccountsReceivableCompleted = false)
         {
-            if(_dbConnection.State == ConnectionState.Closed) _dbConnection.Open();
-            var results = await GetAccountReceivablePatterns(model.DbCode);
+            if(dbConnection.State == ConnectionState.Closed) dbConnection.Open();
+            var results = await GetAccountReceivablePatterns(request.DbCode);
             if (results.Count != 2) return 0;
-            var maxJournalId = await GetJournalIdByDbCode(model.DbCode);
-            var maxAllocReference = await GetAllocReferenceByDbCode(model.DbCode);
+            var maxJournalId = await GetJournalIdByDbCode(request.DbCode);
+            var maxAllocReference = await GetAllocReferenceByDbCode(request.DbCode);
             maxJournalId++;
             maxAllocReference++;
             var rowAffected = 0;
             var journalLine = 0;
-            using var transaction = _dbConnection.BeginTransaction();
-            var procedureName = $"{model.DbCode}SI_INSERT_SILEDG";
+            using var transaction = dbConnection.BeginTransaction();
+            var procedureName = $"{request.DbCode}SI_INSERT_SILEDG";
             foreach (var accountReceivablePatternModel in results)
             {
                 journalLine++;
@@ -172,127 +166,127 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
                 {
                     var param = new
                     {
-                        ACC_CODE_1 = model.ACC_CODE,
-                        model.ACC_PERIOD_2,
-                        model.TRANS_DATE_3,
+                        ACC_CODE_1 = request.ACC_CODE,
+                        request.ACC_PERIOD_2,
+                        request.TRANS_DATE_3,
                         JRNAL_NO_4 = maxJournalId,
                         JRNAL_LINE_5 = journalLine,
-                        AMOUNT_6 = model.AMOUNT_6 * -1,
+                        AMOUNT_6 = request.AMOUNT_6 * -1,
                         D_C_7 = "C",
                         JRNAL_TYPE_8 = accountReceivablePatternModel.JournalType,
-                        model.REFERENCE_9,
-                        model.DESCRIPTN_10,
-                        model.ENTRY_DATE_11,
-                        model.ENTRY_PRD_12,
-                        model.DUE_DATE_13,
+                        request.REFERENCE_9,
+                        request.DESCRIPTN_10,
+                        request.ENTRY_DATE_11,
+                        request.ENTRY_PRD_12,
+                        request.DUE_DATE_13,
                         ALLOCATION_14 = "A",
                         ALLOC_REF_15 = maxAllocReference,
                         ALLOC_DATE_16 = DateTime.Today.ToString("MM/dd/yyyy"),
-                        model.ALLOC_PERIOD_17,
-                        model.ALLOC_USER_18,
-                        model.ASSET_CODE_19,
+                        request.ALLOC_PERIOD_17,
+                        request.ALLOC_USER_18,
+                        request.ASSET_CODE_19,
                         ASSET_UPDT_20 = "N",
-                        model.CONV_CODE_21,
-                        model.CONV_SIGN_22,
+                        request.CONV_CODE_21,
+                        request.CONV_SIGN_22,
                         CONV_RATE_23 = "0.00000",
                         OTHER_AMT_24 = "0.00000",
-                        model.LOSS_GAIN_25,
-                        model.ANAL_T0_26,
-                        model.ANAL_T1_27,
-                        model.ANAL_T2_28,
-                        model.ANAL_T3_29,
-                        model.ANAL_T4_30,
-                        model.ANAL_T5_31,
-                        model.ANAL_T6_32,
-                        model.ANAL_T7_33,
-                        model.ANAL_T8_34,
-                        model.ANAL_T9_35,
-                        model.TRAN_DESC1_36,
-                        model.TRAN_DESC2_37,
-                        model.TRAN_DESC3_38,
-                        model.TRAN_DESC4_39,
-                        model.TRAN_DESC5_40,
-                        model.TRAN_DESC6_41,
-                        model.ALLOC_IN_PROG_42,
+                        request.LOSS_GAIN_25,
+                        request.ANAL_T0_26,
+                        request.ANAL_T1_27,
+                        request.ANAL_T2_28,
+                        request.ANAL_T3_29,
+                        request.ANAL_T4_30,
+                        request.ANAL_T5_31,
+                        request.ANAL_T6_32,
+                        request.ANAL_T7_33,
+                        request.ANAL_T8_34,
+                        request.ANAL_T9_35,
+                        request.TRAN_DESC1_36,
+                        request.TRAN_DESC2_37,
+                        request.TRAN_DESC3_38,
+                        request.TRAN_DESC4_39,
+                        request.TRAN_DESC5_40,
+                        request.TRAN_DESC6_41,
+                        request.ALLOC_IN_PROG_42,
                         HOLD_REF_43 = "0",
-                        model.HOLD_USER_CODE_44,
-                        model.USER_CREA_45,
-                        model.USER_UPDT_46,
-                        model.DATE_UPDT_47,
+                        request.HOLD_USER_CODE_44,
+                        request.USER_CREA_45,
+                        request.USER_UPDT_46,
+                        request.DATE_UPDT_47,
                     };
                     rowAffected +=
-                        await _dbConnection.ExecuteAsync(procedureName, param, transaction, commandType: CommandType.StoredProcedure);
+                        await dbConnection.ExecuteAsync(procedureName, param, transaction, commandType: CommandType.StoredProcedure);
                 }
                 else
                 {
                     var param = new
                     {
                         ACC_CODE_1 = accountReceivablePatternModel.AccountCode,
-                        model.ACC_PERIOD_2,
-                        model.TRANS_DATE_3,
+                        request.ACC_PERIOD_2,
+                        request.TRANS_DATE_3,
                         JRNAL_NO_4 = maxJournalId,
                         JRNAL_LINE_5 = journalLine,
-                        model.AMOUNT_6,
+                        request.AMOUNT_6,
                         D_C_7 = "D",
                         JRNAL_TYPE_8 = accountReceivablePatternModel.JournalType,
-                        model.REFERENCE_9,
-                        model.DESCRIPTN_10,
-                        model.ENTRY_DATE_11,
-                        model.ENTRY_PRD_12,
-                        model.DUE_DATE_13,
+                        request.REFERENCE_9,
+                        request.DESCRIPTN_10,
+                        request.ENTRY_DATE_11,
+                        request.ENTRY_PRD_12,
+                        request.DUE_DATE_13,
                         ALLOCATION_14 = "",
-                        model.ALLOC_REF_15,
+                        request.ALLOC_REF_15,
                         ALLOC_DATE_16 = "",
                         ALLOC_PERIOD_17 = "0",
-                        model.ALLOC_USER_18,
+                        request.ALLOC_USER_18,
                         ASSET_CODE_19 = "",
                         ASSET_UPDT_20 = "N",
-                        model.CONV_CODE_21,
-                        model.CONV_SIGN_22,
-                        model.CONV_RATE_23,
-                        model.OTHER_AMT_24,
-                        model.LOSS_GAIN_25,
-                        model.ANAL_T0_26,
-                        model.ANAL_T1_27,
-                        model.ANAL_T2_28,
-                        model.ANAL_T3_29,
-                        model.ANAL_T4_30,
-                        model.ANAL_T5_31,
-                        model.ANAL_T6_32,
-                        model.ANAL_T7_33,
-                        model.ANAL_T8_34,
-                        model.ANAL_T9_35,
-                        model.TRAN_DESC1_36,
-                        model.TRAN_DESC2_37,
-                        model.TRAN_DESC3_38,
-                        model.TRAN_DESC4_39,
-                        model.TRAN_DESC5_40,
-                        model.TRAN_DESC6_41,
-                        model.ALLOC_IN_PROG_42,
-                        model.HOLD_REF_43,
-                        model.HOLD_USER_CODE_44,
-                        model.USER_CREA_45,
-                        model.USER_UPDT_46,
-                        model.DATE_UPDT_47,
+                        request.CONV_CODE_21,
+                        request.CONV_SIGN_22,
+                        request.CONV_RATE_23,
+                        request.OTHER_AMT_24,
+                        request.LOSS_GAIN_25,
+                        request.ANAL_T0_26,
+                        request.ANAL_T1_27,
+                        request.ANAL_T2_28,
+                        request.ANAL_T3_29,
+                        request.ANAL_T4_30,
+                        request.ANAL_T5_31,
+                        request.ANAL_T6_32,
+                        request.ANAL_T7_33,
+                        request.ANAL_T8_34,
+                        request.ANAL_T9_35,
+                        request.TRAN_DESC1_36,
+                        request.TRAN_DESC2_37,
+                        request.TRAN_DESC3_38,
+                        request.TRAN_DESC4_39,
+                        request.TRAN_DESC5_40,
+                        request.TRAN_DESC6_41,
+                        request.ALLOC_IN_PROG_42,
+                        request.HOLD_REF_43,
+                        request.HOLD_USER_CODE_44,
+                        request.USER_CREA_45,
+                        request.USER_UPDT_46,
+                        request.DATE_UPDT_47,
                     };
                     rowAffected +=
-                        await _dbConnection.ExecuteAsync(procedureName, param, transaction, commandType: CommandType.StoredProcedure);
+                        await dbConnection.ExecuteAsync(procedureName, param, transaction, commandType: CommandType.StoredProcedure);
                 }
             }
             if (isAccountsReceivableCompleted)
             {
                 var sql =
-                    @$"UPDATE {model.DbCode}SILEDG SET ALLOCATION=@ALLOCATION,ALLOC_REF=@ALLOC_REF,ALLOC_DATE=@ALLOC_DATE,ALLOC_PERIOD=@ALLOC_PERIOD WHERE ACC_CODE = @ACCOUNT_CODE AND REFERENCE = @REFERENCE AND ALLOCATION = ''";
+                    @$"UPDATE {request.DbCode}SILEDG SET ALLOCATION=@ALLOCATION,ALLOC_REF=@ALLOC_REF,ALLOC_DATE=@ALLOC_DATE,ALLOC_PERIOD=@ALLOC_PERIOD WHERE ACC_CODE = @ACCOUNT_CODE AND REFERENCE = @REFERENCE AND ALLOCATION = ''";
                 var paramUpdate = new
                 {
                     ALLOCATION = "A",
                     ALLOC_REF = maxAllocReference,
                     ALLOC_DATE = DateTime.Today.ToString("MM/dd/yyyy"),
-                    ALLOC_PERIOD = model.ALLOC_PERIOD_17,
-                    ACCOUNT_CODE = model.ACC_CODE,
-                    REFERENCE = model.REFERENCE_9
+                    ALLOC_PERIOD = request.ALLOC_PERIOD_17,
+                    ACCOUNT_CODE = request.ACC_CODE,
+                    REFERENCE = request.REFERENCE_9
                 };
-                rowAffected += await _dbConnection.ExecuteAsync(sql, paramUpdate, transaction);
+                rowAffected += await dbConnection.ExecuteAsync(sql, paramUpdate, transaction);
             }
             if (rowAffected is 2 or 3)
             {
@@ -302,7 +296,6 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Accounting
             {
                 transaction.Rollback();
             }
-
             return rowAffected ;
         }
     }

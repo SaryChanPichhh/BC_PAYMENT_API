@@ -20,35 +20,6 @@ namespace BC.PAYMENT.API.Controllers.Inventory.Inventory
         {
             _unitOfWork = unitOfWork;
         }
-        [HttpGet]
-        [Route("getinventoryallbranches")]
-        public async Task<ApiResponse<List<InventoryModel>>> GetInventoryAllBranchesAsync()
-        {
-            try
-            {
-                var data = await _unitOfWork.Inventory.GetInventoryAllBranchesAsync();
-                var execute =  data.OrderBy(x=>x.DbCode).ToList();
-                if (execute.Any())
-                {
-                    return ApiResponse<List<InventoryModel>>.Builder()
-                        .WithResult(execute)
-                        .WithStatusCode(StatusCodes.Status200OK)
-                        .WithMessage("Inventory fetched successfully")
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<List<InventoryModel>>.Builder()
-                        .WithStatusCode(StatusCodes.Status200OK)
-                        .WithMessage("Inventory fetched unsuccessfully")
-                        .Build();
-                }
-            }
-            catch (Exception ex)
-            {
-                return GlobalExceptionHandler.ExceptionError<List<InventoryModel>>(ex.Message);
-            }
-        }
         
         [HttpGet]
         [Route("getinventorybymultiwarehouse")]

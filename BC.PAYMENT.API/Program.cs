@@ -11,6 +11,9 @@ using System.Text.Json.Serialization;
 using BC.PAYMENT.INFRASTRUCTURE;
 using Microsoft.Data.SqlClient;
 using Serilog;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using BC.PAYMENT.CORE;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,10 +44,29 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
+// Configure Rate Limiting
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    
+    // IP-based rate limiting (100 requests per minute per IP)
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 100,
+                QueueLimit = 0,
+                Window = TimeSpan.FromMinutes(1)
+            }));
+});
+
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("SharedConfig/appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.ApplicationName}.json", optional: true, reloadOnChange: true)  // Keep API-specific settings
+    .AddJsonFile("secrets.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Enforce lowercase URLs for all generated routes.
@@ -125,7 +147,10 @@ builder.Services.AddSwaggerGen(options =>
 
 
 var app = builder.Build();
-
+Singleton.Instance.Role = builder.Configuration["AdminRole"];
+Singleton.Instance.Username = builder.Configuration["AdminUsername"];
+Singleton.Instance.UserPassword = builder.Configuration["AdminPassword"];
+Singleton.Instance.AppCode = builder.Configuration["AppCode"];
 var enableApiDocs = builder.Configuration.GetValue<bool>("EnableApiDocs");
 
 // Configure the HTTP request pipeline.
@@ -155,6 +180,7 @@ if (app.Environment.IsDevelopment() || enableApiDocs)
 app.UseHttpsRedirection();  // Must be first
 
 app.UseRouting();
+app.UseRateLimiter();
 
 // global cors policy — must come after UseRouting
 app.UseCors(x => x
@@ -162,10 +188,10 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowAnyHeader());
 
+app.UseAuthentication();
+app.UseAuthorization();
 // custom jwt auth middleware
 app.UseMiddleware<JwtMiddlewares>();
-//app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapControllers();
 

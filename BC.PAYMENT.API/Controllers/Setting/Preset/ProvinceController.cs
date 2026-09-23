@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Net;
-using BC.PAYMENT.API.Helper;
-using BC.PAYMENT.API.Models;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.Prepare.Preset;
-using BC.PAYMENT.CORE.Entities.Prepare.Preset;
-using Microsoft.AspNetCore.Mvc;
+using BC.PAYMENT.CORE.Contracts.Request.Province;
+using BC.PAYMENT.CORE.Contracts.Response.Province;
+using BC.PAYMENT.CORE.Contracts.Setting.Preset;
+using BC.PAYMENT.CORE.Entities.Setting.Preset;
 
 namespace BC.PAYMENT.API.Controllers.Setting.Preset
 {
@@ -13,32 +10,16 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
     {
         [HttpGet]
         [Route("")]
-        public async Task<ApiResponse<List<ProvinceModel>>> GetProvinceAsync([Required] string provinceName)
+        public async Task<ApiResponse<List<ProvinceResponse>>> GetProvinceAsync()
         {
-            var claim = Common.DecodeJwt(HttpContext.User);
             try
             {
-                var execute = await unitOfWork.Provinces.GetAsync(provinceName);
-                if (execute.Any())
-                {
-                    return ApiResponse<List<ProvinceModel>>.Builder()
-                        .WithMessage("Provinces fetched successfully")
-                        .WithStatusCode((int)HttpStatusCode.OK)
-                        .WithResult(execute)
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<List<ProvinceModel>>.Builder()
-                        .WithMessage("Provinces fetched unsuccessfully")
-                        .WithStatusCode((int)HttpStatusCode.BadRequest)
-                        .WithResult(new List<ProvinceModel>())
-                        .Build();
-                }
+                var execute = await unitOfWork.Provinces.GetAllProvinces();
+                return ApiResponseFactory.SuccessResponse(execute,execute.Count!=0?"provinces fetched successfully":"provinces fetched empty");
             }
             catch (Exception ex)
             {
-                return GlobalExceptionHandler.ExceptionError<List<ProvinceModel>>(ex.Message);
+                return GlobalExceptionHandler.ExceptionError<List<ProvinceResponse>>(ex.Message);
             }
         }
 
@@ -49,7 +30,7 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
             var claim = Common.DecodeJwt(HttpContext.User);
             try
             {
-                var affectedRow = await unitOfWork.Districts.DeleteAsync(provinceCode);
+                var affectedRow = await unitOfWork.Provinces.DeleteAsync(provinceCode);
                 if (affectedRow > 0)
                 {
                     return ApiResponse<int>.Builder()
@@ -72,14 +53,14 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
             }
         }
 
-        [HttpPatch]
+        [HttpPut]
         [Route("")]
-        public async Task<ApiResponse<int>> UpdateProvinceAsync([Required] ProvinceUpdateDto model)
+        public async Task<ApiResponse<int>> UpdateProvinceAsync([Required][FromBody] ProvinceUpdateRequest model)
         {
             var claim = Common.DecodeJwt(HttpContext.User);
             try
             {
-                var provinceModel = new ProvinceModel()
+                var provinceModel = new ProvinceModel
                 {
                     ProvinceId = model.ProvinceId,
                     Province = model.Province,
@@ -109,12 +90,12 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
 
         [HttpPost]
         [Route("")]
-        public async Task<ApiResponse<int>> AddDistrictAsync([Required] ProvinceDto model)
+        public async Task<ApiResponse<int>> AddDistrictAsync([Required][FromBody] ProvinceCreateRequest model)
         {
             var claim = Common.DecodeJwt(HttpContext.User);
             try
             {
-                var provinceModel = new ProvinceModel()
+                var provinceModel = new ProvinceModel
                 { 
                     Province = model.Province,
                 };

@@ -6,7 +6,7 @@ namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Inv
         public string? DbCode { get; set; }
         public string? InvoiceCode { get; set; }
         public double InvoiceAmount { get; set; }
-        public InvoiceTypes InvoiceTypes { get; set; }
+        public InvoiceStatus InvoiceType { get; set; }
         public DateTime CreatedDate { get; set; }
         public string? CustomField1 { get; set; }
         public bool IsDivided { get; set; }

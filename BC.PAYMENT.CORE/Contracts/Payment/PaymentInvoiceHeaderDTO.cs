@@ -1,4 +1,4 @@
-namespace BC.PAYMENT.CORE.DTO.Payment
+namespace BC.PAYMENT.CORE.Contracts.Payment
 {
     public class PaymentInvoiceHeaderDTO
     {

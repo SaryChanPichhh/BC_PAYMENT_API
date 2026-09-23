@@ -1,3 +1,8 @@
+using BC.PAYMENT.CORE.Contracts.Criteria;
+using BC.PAYMENT.CORE.Contracts.Invoice;
+using BC.PAYMENT.CORE.Contracts.Request.Invoice;
+using BC.PAYMENT.CORE.Contracts.Transaction.ProvincialPayment.StockCarPayment;
+
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.StockCarPayment
 {
     public  class SaleRepresentRepository : ISaleRepresentRepository
@@ -114,7 +119,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Sto
             return newResponds;
         }
 
-        public async Task<List<StockCarInvoicesModel>> GetAllInvoiceByInvoiceTypeAsync(string dbCode, InvoiceTypes invoiceTypes, int templateId)
+        public async Task<List<StockCarInvoiceModel>> GetAllInvoiceByInvoiceTypeAsync(string dbCode, InvoiceStatus invoiceStatus, int templateId)
         {
             const string sql = @"
                        SELECT N.ID InvoiceId,CUSTOMER_CODE CustomerCode,CUSTOMER_NAME CustomerName,CODE TransRef,VALUE InvoiceValue,
@@ -130,14 +135,14 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Sto
 	                        on Cust.CustomerCode = CUSTOMER_CODE
                          WHERE N.DB_CODE = @DB_CODE and T.DbCode = @DB_CODE and N.TYPE = @InvoiceType and T.Id = @TemplateId
                         ";
-            var invoiceType = Enum.GetName(typeof(InvoiceTypes), invoiceTypes)?.Substring(0, 1);
+            var invoiceType = Enum.GetName(typeof(InvoiceStatus),invoiceStatus )?.Substring(0, 1);
             var param = new
             {
                 DB_CODE = dbCode,
                 InvoiceType = invoiceType,
                 TemplateId = templateId
             };
-            var execute = await _sqlDataAccess.LoadData<StockCarInvoicesModel, dynamic>(sql, param);
+            var execute = await _sqlDataAccess.LoadData<StockCarInvoiceModel, dynamic>(sql, param);
             return execute.ToList();
         }
 
@@ -152,7 +157,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Sto
             return affectedRow;
         }
 
-        public async Task<int> UpdateInvoiceByIdAsync(StockCarInvoicesModel model)
+        public async Task<int> UpdateInvoiceByIdAsync(StockCarInvoiceModel model)
         {
             const string sql =
                 "UPDATE BCSTOCK_CAR SET CUSTOMER_CODE = @CustomerCode,CUSTOMER_NAME = @CustomerName,VALUE = @Value Where ID = @Id";
@@ -167,7 +172,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Sto
             return affectedRow;
         }
 
-        public async Task<List<OldInvoiceResponeDto>> GetOldInvoiceByRangeAsync(OldInvoiceRequestDto model)
+        public async Task<List<OldInvoiceResponeDto>> GetOldInvoiceByRangeAsync(OldInvoiceCriteria model)
         {
             var newResponds = new List<OldInvoiceResponeDto>();
             var storeProcedure = model.DbCode + "SI_SELECT_AGING";
@@ -208,7 +213,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Sto
             return newResponds;
         }
 
-        public async Task<List<OldInvoiceResponeDto>> GetOldInvoiceByAllAsync(OldInvoiceRequestDto model)
+        public async Task<List<OldInvoiceResponeDto>> GetOldInvoiceByAllAsync(OldInvoiceCriteria model)
         {
             var newResponds = new List<OldInvoiceResponeDto>();
             var storeProcedure = model.DbCode + "SI_SELECT_AGING";
@@ -262,7 +267,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.ProvincialPayment.Sto
                 CustomerName = model.CustomerName,
                 Code = model.InvoiceCode,
                 Value = model.InvoiceAmount,
-                Type = Enum.GetName(typeof(InvoiceTypes), model.InvoiceTypes)?.Substring(0, 1),
+                Type = Enum.GetName(typeof(InvoiceStatus), model.InvoiceType)?.Substring(0, 1),
                 Period = model.Period,
                 TransactionDate = model.TransactionDate,
                 Status = 1,

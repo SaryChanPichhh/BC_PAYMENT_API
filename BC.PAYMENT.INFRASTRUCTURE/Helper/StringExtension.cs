@@ -1,4 +1,4 @@
-﻿namespace BC.PAYMENT.API.Helper
+﻿namespace BC.PAYMENT.INFRASTRUCTURE.Helper
 {
     public static class StringExtension
     {
@@ -24,6 +24,21 @@
         {
             var tryParse = DateTime.TryParse(str, out _);
             return tryParse;
+        }
+
+
+
+        public static double ToDouble(this object value)
+        {
+            return Convert.ToDouble(value);
+        }
+        public static decimal ToDecimal(this object value)
+        {
+            return Convert.ToDecimal(value);
+        }
+        public static DateTime ToDateTime(this object value)
+        {
+            return Convert.ToDateTime(value);
         }
     }
 }

@@ -1,3 +1,7 @@
+using BC.PAYMENT.CORE.Contracts.Response;
+using BC.PAYMENT.CORE.Contracts.Response.Customer;
+using BC.PAYMENT.SQL.Queries;
+
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
     public class CustomerRepository:ICustomerRepository
@@ -57,6 +61,45 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
             };
             var execute = await _sqlDataAccess.LoadData<Customer, dynamic>(sql, param);
             return execute.ToList();
+        }
+
+        public async Task<List<CustomerResponse>> GetCustomerInfoByMarketIdAsync(string marketId)
+        {
+            var param = new { MARKET_ID = marketId };
+            var result = await _sqlDataAccess.LoadData<CustomerResponse, dynamic>(CustomerQueries.GetCustomerInfoByMarketIdAsync, param);
+            return result.ToList();
+        }
+
+        public async Task<List<CustomerResponse>> GetAllCustomerInfoAsync(string dbCode, int page, int pageSize)
+        {
+            var param = new 
+            { 
+                DB_CODE = dbCode,
+                OFFSET = (page - 1) * pageSize,
+                PAGESIZE = pageSize 
+            };
+            var allRecords = await _sqlDataAccess.LoadData<CustomerResponse, dynamic>(CustomerQueries.GetAllCustomerInfoAsync, param);
+            
+            return allRecords.ToList();
+        }
+
+        public async Task<int> GetAllCustomerInfoCountAsync(string dbCode)
+        {
+            var param = new { DB_CODE = dbCode };
+            return await _sqlDataAccess.LoadSingleData<int, dynamic>(CustomerQueries.GetAllCustomerInfoCountAsync, param);
+        }
+
+        public async Task<List<CustomerResponse>> GetCustomerWhoWrongAreaAndMarketAsync(string dbCode)
+        {
+            var param = new { DB_CODE = dbCode };
+            var result = await _sqlDataAccess.LoadData<CustomerResponse, dynamic>(CustomerQueries.GetCustomerWhoWrongAreaAndMarket, param);
+            return result.ToList();
+        }
+
+        public async Task<byte[]> GetCustomerImageAsync(string dbCode,string customerId)
+        {
+            var param = new { CUSTOMER_ID = customerId,DB_CODE = dbCode };
+            return await _sqlDataAccess.LoadSingleData<byte[], dynamic>(CustomerQueries.GetCustomerImage, param);
         }
     }
 }

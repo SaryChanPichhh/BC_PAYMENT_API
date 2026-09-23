@@ -1,3 +1,5 @@
+using BC.PAYMENT.CORE.Contracts.Transaction.DailyPayment.DeliveryPaid;
+
 namespace BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment
 {
     public class DailyPaymentDto

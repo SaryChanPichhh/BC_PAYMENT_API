@@ -7,7 +7,7 @@ public static class GlobalExceptionHandler
 {
     public static ApiResponse<T> ValidateSchemaError<T>(object validationResult,string errorMessage)
     {
-        return ApiResponse<T>.Builder()
+        return ApiResponse<T>.Builder() .WithErrors(ErrorCodes.ValidationError).WithSuccess(false)
             .WithErrors(validationResult).WithMessage(errorMessage)
             .WithStatusCode(StatusCodes.Status400BadRequest)
             .Build();
@@ -15,6 +15,8 @@ public static class GlobalExceptionHandler
     public static ApiResponse<T> ExceptionError<T>(string errorMessage)
     {
         return ApiResponse<T>.Builder()
+            .WithErrors(ErrorCodes.UnknownError)
+            .WithSuccess(false)
             .WithMessage(errorMessage)
             .WithStatusCode(StatusCodes.Status500InternalServerError)
             .Build();

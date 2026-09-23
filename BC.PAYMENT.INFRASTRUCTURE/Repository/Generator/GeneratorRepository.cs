@@ -1,17 +1,9 @@
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
 {
-    public class GeneratorRepository : IGeneratorRepository
+    public class GeneratorRepository(ISqlDataAccess sqlDataAccess, IDbConnection dbConnection, IConfiguration configuration) : IGeneratorRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-        private readonly IDbConnection _dbConnection;
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _configuration = configuration;
         private const int MaxInvoiceNumber = 9999;
-        public GeneratorRepository(ISqlDataAccess sqlDataAccess, IDbConnection dbConnection, IConfiguration configuration)
-        {
-            _sqlDataAccess = sqlDataAccess;
-            _dbConnection = dbConnection;
-            _configuration = configuration;
-        }
 
         public async Task<SaleAnalysisDto> GetSaleAnalysisByCustomerCodeAsync(string customerCode, string dbCode)
         { 
@@ -23,7 +15,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
                 CustomerCode = customerCode,
                 DbCode = dbCode
             };
-            var results = await _sqlDataAccess.LoadSingleData<SaleAnalysisDto,dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadSingleData<SaleAnalysisDto,dynamic>(sql, param);
             return results;
         }
 
@@ -38,7 +30,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
                 MOV_TYPE = movType,
                 REC_TYPE = recType
             };
-            var results = await _sqlDataAccess.LoadSingleData<string,dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadSingleData<string,dynamic>(sql, param);
             var year = DateTime.Now.Year.ToString().Substring(2, 2);
             var month = DateTime.Now.Month.ToString("D2");
             var suffix = year + month;
@@ -62,7 +54,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
             {
                 DB_CODE = dbCode
             };
-            var results = await _sqlDataAccess.LoadSingleData<string, dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadSingleData<string, dynamic>(sql, param);
             var year = DateTime.Now.Year.ToString().Substring(2, 2);
             var month = DateTime.Now.Month.ToString("D2");
             var suffix = year + month;
@@ -83,7 +75,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
             const string sql =
                 @"SELECT SI_DATA FROM SIDATA WHERE SI_TYPE = 'AUTON' AND CODE = @SaleType AND DB_CODE = @DB_CODE";
             var result =
-                await _sqlDataAccess.LoadSingleData<string,dynamic>(sql,
+                await sqlDataAccess.LoadSingleData<string,dynamic>(sql,
                     new { DB_CODE = dbCode, SaleType = saleType });
             if (string.IsNullOrEmpty(result)) return result;
             var prefix = result.Substring(32, 10).Trim();
@@ -114,7 +106,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
             const string sql =
                 @"SELECT SI_DATA FROM SIDATA WHERE SI_TYPE = 'AUTON' AND CODE = @SaleType AND DB_CODE = @DB_CODE";
             var result =
-                await _sqlDataAccess.LoadSingleData<string,dynamic>(sql,
+                await sqlDataAccess.LoadSingleData<string,dynamic>(sql,
                     new { DB_CODE = dbCode, SaleType = saleType });
             
             if (string.IsNullOrEmpty(result)) return result;
@@ -140,15 +132,15 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
         {
             const string sql = @"SELECT CODE FROM SIDATA WHERE SI_TYPE = 'AUTON' AND DB_CODE = @DB_CODE";
             var param = new { DB_CODE = dbCode };
-            var results = await _sqlDataAccess.LoadData<string,dynamic>(sql, param);
+            var results = await sqlDataAccess.LoadData<string,dynamic>(sql, param);
             return results.ToList();
         }
 
         private void GetId(string sqlStr)
         {
-            if (_dbConnection.State == ConnectionState.Closed) _dbConnection.Open();
+            if (dbConnection.State == ConnectionState.Closed) dbConnection.Open();
 
-            var result = _dbConnection.Query(sqlStr, new { });
+            var result = dbConnection.Query(sqlStr, new { });
 
 
         }
@@ -158,7 +150,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Generator
 
             if (interval.ToString() == "")
                 interval = 1;
-            var connection = new SqlConnection(_dbConnection.ConnectionString);
+            var connection = new SqlConnection(dbConnection.ConnectionString);
             if (connection.State == ConnectionState.Closed)
                 connection.Open();
             var command = new SqlCommand(sqlStr, connection)

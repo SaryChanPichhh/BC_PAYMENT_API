@@ -1,10 +1,9 @@
 ﻿
-
-namespace BC.PAYMENT.CORE.Entities.Prepare.Preset
+namespace BC.PAYMENT.CORE.Entities.Setting.Preset
 {
     public class ProvinceModel
     {
-        public string? ProvinceId { get; set; }
+        public int ProvinceId { get; set; }
         public string? Province { get; set; }
     }
 }

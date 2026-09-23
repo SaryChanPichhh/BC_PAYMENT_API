@@ -1,5 +1,7 @@
 ﻿using BC.PAYMENT.APPLICATION.Interfaces.General;
+using BC.PAYMENT.CORE;
 using BC.PAYMENT.CORE.DTO.General;
+using BC.PAYMENT.CORE.Entities.Login;
 using BC.PAYMENT.LOGGING;
 
 namespace BC.PAYMENT.API.Helper
@@ -16,15 +18,30 @@ namespace BC.PAYMENT.API.Helper
                 {
                     // Extract claims from HttpContext.User
                     var claims = Common.DecodeJwt(user);
-
-                    // Fetch additional user data from the database
-                    var userData = await unitOfWork.Users.GetUserByIdAsync(new ContextDTO
+                    // Checking Is Admin 
+                    User userData;
+                    if (Singleton.Instance.AppCode.Equals(claims.AppCode)&&Singleton.Instance.Username.Equals(claims.Username))
                     {
-                        UserId = claims.UserId,
-                        DbCode = claims.DbCode,
-                        AppCode = claims.AppCode
-                    });
-
+                        userData = new User
+                        {
+                            UserId = 0,
+                            Username =  claims.Username,
+                            DbCode =   claims.DbCode,
+                            Role = claims.Role,
+                            Name = claims.Username,
+                            CurrentDate =  DateTime.Today,
+                        };
+                    }
+                    else
+                    {
+                        userData = await unitOfWork.Users.GetUserByIdAsync(new ContextDTO
+                        {
+                            UserId = claims.UserId,
+                            DbCode = claims.DbCode,
+                            AppCode = claims.AppCode
+                        });
+                    }
+                    // Fetch additional user data from the database
                     if (userData != null)
                     {
                         // Attach user object to HttpContext.Items for downstream access
@@ -39,7 +56,7 @@ namespace BC.PAYMENT.API.Helper
             }
 
             // Continue with the pipeline
-            await next(context);
+                await next(context);
         }
 
        

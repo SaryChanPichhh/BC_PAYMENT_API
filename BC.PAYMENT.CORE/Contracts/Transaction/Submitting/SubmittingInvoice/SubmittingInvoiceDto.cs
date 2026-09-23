@@ -1,4 +1,4 @@
-namespace BC.PAYMENT.CORE.DTO.Transaction.Submitting.SubmittingInvoice
+namespace BC.PAYMENT.CORE.Contracts.Transaction.Submitting.SubmittingInvoice
 {
     public class SubmittingInvoiceDto
     {

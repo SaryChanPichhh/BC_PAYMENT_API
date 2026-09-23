@@ -1,4 +1,4 @@
-﻿namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice
+namespace BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DividingInvoices.Invoice
 {
     public class DividedInvoiceModel
     {

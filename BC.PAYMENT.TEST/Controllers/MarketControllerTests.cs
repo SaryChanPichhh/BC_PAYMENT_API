@@ -60,9 +60,9 @@ namespace BC.PAYMENT.TEST.Controllers
         public async Task GetMarket_ReturnsOk_WhenMarketsExist()
         {
             // Arrange
-            var mockMarkets = new List<Market>
+            var mockMarkets = new List<MarketResponse>
             {
-                new Market { MarketID = "M01", MarketName = "Test Market", ImagePath = "" }
+                new MarketResponse { MarketId = "1", MarketName = "Test Market", Image = "" }
             };
             _mockMarketRepo.Setup(r => r.GetMarket("DB01")).ReturnsAsync(mockMarkets);
 
@@ -79,7 +79,7 @@ namespace BC.PAYMENT.TEST.Controllers
         public async Task GetMarket_ReturnsBadRequest_WhenNoMarkets()
         {
             // Arrange
-            _mockMarketRepo.Setup(r => r.GetMarket("DB01")).ReturnsAsync(new List<Market>());
+            _mockMarketRepo.Setup(r => r.GetMarket("DB01")).ReturnsAsync(new List<MarketResponse>());
 
             // Act
             var response = await _controller.GetMarket();
@@ -158,6 +158,22 @@ namespace BC.PAYMENT.TEST.Controllers
         }
 
         [Fact]
+        public async Task GetMarketByMarketIdAsync_ReturnsOk()
+        {
+            // Arrange
+            var mockMarket = new MarketResponse { MarketId = "M01" };
+            _mockMarketRepo.Setup(r => r.GetMarketByMarketIdAsync("DB01", "M01")).ReturnsAsync(mockMarket);
+
+            // Act
+            var response = await _controller.GetMarketByMarketIdAsync("M01");
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("M01", response?.Result?.MarketId);
+        }
+
+        [Fact]
         public async Task AddNewMarket_ReturnsCreated_OnSuccess()
         {
             // Arrange
@@ -177,7 +193,7 @@ namespace BC.PAYMENT.TEST.Controllers
         public async Task UpdateMarket_ReturnsOk_OnSuccess()
         {
             // Arrange
-            var model = new MarketModel { MarketId = "M01" };
+            var model = new MarketUpdateRequest() { MarketId = "M01" };
             _mockMarketRepo.Setup(r => r.UpdateMarketAsync(It.IsAny<MarketModel>())).ReturnsAsync(1);
 
             // Act
@@ -202,6 +218,37 @@ namespace BC.PAYMENT.TEST.Controllers
             Assert.NotNull(response);
             Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
             Assert.Equal(1, response.Result);
+        }
+
+        [Fact]
+        public async Task GenerateMarketIdAsync_ReturnsOk_OnSuccess()
+        {
+            // Arrange
+            _mockMarketRepo.Setup(r => r.GenerateMarketIdAsync()).ReturnsAsync("MK-001");
+
+            // Act
+            var response = await _controller.GenerateMarketIdAsync();
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("MK-001", response.Result);
+        }
+
+        [Fact]
+        public async Task AddNewMarket_ReturnsExceptionError_OnException()
+        {
+            // Arrange
+            var request = new MarketCreateRequest { MarketId = "M01" };
+            _mockMarketRepo.Setup(r => r.AddNewMarketAsync(It.IsAny<MarketModel>())).ThrowsAsync(new Exception("Database error"));
+            // Act
+            var response = await _controller.AddNewMarket(request);
+
+            // Assert
+            Assert.NotNull(response);
+            Assert.False(response.Success);
+            // Since GlobalExceptionHandler creates an error response, we assume it has Success = false and the message contains the exception.
+            Assert.Equal("Database error", response.Message);
         }
     }
 }

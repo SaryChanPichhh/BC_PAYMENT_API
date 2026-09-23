@@ -6,7 +6,7 @@ public class MarketModel : BasedEntity
     public string MarketId { get; set; }
     public string MarketName { get; set; }
     public string MarketNameKhmer { get; set; }
-    public int AreaId { get; set; }
+    public string AreaId { get; set; }
     public string AreaName { get; set; }
     public int DistrictId { get; set; }
     public string DistrictName { get; set; }
@@ -15,7 +15,5 @@ public class MarketModel : BasedEntity
     public bool Status { get; set; }
     public byte[] Image { get; set; }
     public string Other { get; set; }   
-    public string Map { get; set; }
-    public string AnadCode { get; set; }
     
 }

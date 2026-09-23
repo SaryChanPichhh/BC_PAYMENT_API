@@ -1,16 +1,11 @@
-using System.Net;
-using BC.PAYMENT.API.Helper;
+
 using BC.PAYMENT.API.MapperHelper.ViewStock;
-using BC.PAYMENT.API.MapperHelper.ViewStock;
-using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.ViewStock;
 using BC.PAYMENT.CORE.DTO.ViewStock;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
 namespace BC.PAYMENT.API.Controllers.ViewStock;
 
-[Authorize]
+[Helper.Authorize]
 [ApiController]
 public sealed class ViewStockController(IViewStockupRepository repository, ILogger<ViewStockController> logger) : BaseApiController
 {

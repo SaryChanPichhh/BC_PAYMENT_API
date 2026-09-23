@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using BC.PAYMENT.API.Helper;
+using BC.PAYMENT.CORE.Contracts.General;
 using BC.PAYMENT.CORE.DTO.Preset.ExchangeItemAnalysis;
 using BC.PAYMENT.CORE.Entities.General;
 using BC.PAYMENT.CORE.Entities.Preset.AnnualPurchase;

@@ -2,14 +2,10 @@ using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.ClosingInventoryAndInvoice;
-using BC.PAYMENT.CORE.DTO.Inventory;
 using BC.PAYMENT.CORE.Entities.ClosingInventoryAndInvoice.ClosingInventory;
-using BC.PAYMENT.CORE.Entities.Inventory;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 
-namespace BC.PAYMENT.API.Controllers.ClosingInventoryAndInvoice.ClosingInvoice
+namespace BC.PAYMENT.API.Controllers.ClosingInventoryAndInvoice.ClosingInventory
 {
     public class OpeningBalanceController : BaseApiController
     {

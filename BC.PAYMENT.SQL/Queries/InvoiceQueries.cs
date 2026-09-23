@@ -1,0 +1,268 @@
+namespace BC.PAYMENT.SQL.Queries
+{
+    public static class InvoiceQueries
+    {
+        public static string GetInvoicesByAreaAndTransCode(string condition) => $@"SELECT T.AREA_ID AreaId,
+       T.Id InvoiceId,
+       T.CustomerCode,
+       T.CustomerName,
+       T.[Transaction] InvoiceCode ,
+       T.Market,
+       T.Store,
+       T.Area,
+       T.Amount InvoiceAmount,
+       T.Type  InvoiceType FROM(
+                SELECT A.AREA_ID,N.ID Id,S.ADD_CODE CustomerCode,S.ADD_LINE_1KH CustomerName,N.TRANSACTION_REF [Transaction],M.MARKET_KHMER_NAME Market,S.STORE Store
+                ,A.AREA_NAME_KHMER Area,N.HEADER_TRANSACTION_VALUES [Amount],CASE WHEN N.STATUS = 'N' THEN N'NewInvoice' WHEN N.STATUS = 'C' THEN N'ChangeInvoice' ELSE N'OldInvoice' END as 'Type' FROM NEW_INVOICE N LEFT JOIN SIADD S ON S.ADD_CODE  = N.CUSTOMER_CODE 
+                INNER JOIN TB_BCMARKET M ON M.MARKET_ID = S.MARKET_ID INNER JOIN TB_AREAS A ON A.AREA_ID = S.AREA_ID
+                WHERE N.DB_CODE = @DB_CODE AND N.CREATED_DATE = CONVERT(DATE, GETDATE()) AND N.IS_DIVIDED = 'TRUE'
+                UNION 
+                SELECT R.AREA_ID,N.ID, N.CUSTOMER_CODE, N.ACC_NAME_KH, N.TRANSACTION_REF AS 'Code',M.MARKET_KHMER_NAME,Customer.STORE,R.AREA_NAME_KHMER, convert(money, N.HEADER_TRANSACTION_VALUES) as 'Money',
+                CASE WHEN N.STATUS = 'N'THEN N'NewInvoice' WHEN N.STATUS = 'C' THEN N'ChangeInvoice' ELSE N'OldInvoice' END as 'Type'
+                FROM BCMC AS C  INNER JOIN TB_BCMARKET AS M
+                ON M.MARKET_ID = C.MARKET_ID INNER JOIN TB_AREAS AS R
+                ON R.AREA_ID = M.AREA_ID 
+                INNER JOIN NEW_INVOICE AS N ON N.CUSTOMER_CODE = C.ADD_CODE
+                INNER JOIN (SELECT ADD_CODE, ADD_LINE_1, STORE
+                FROM SIADD WHERE DB_CODE = @DB_CODE) Customer on Customer.ADD_CODE = N.CUSTOMER_CODE
+                WHERE 
+                N.CREATED_DATE = CONVERT(DATE, GETDATE())
+                AND N.IS_DIVIDED = 'TRUE'
+                AND N.DB_CODE = @DB_CODE AND R.DB_CODE = @DB_CODE AND M.DB_CODE = @DB_CODE)
+                T
+                WHERE AREA_ID = @AREA_ID {condition}
+                ORDER BY [Transaction];";
+        public static string InsertSiSoHdrRecordTypeO(string dbCode) => $@"INSERT INTO {dbCode}SISOHDR
+            SELECT 'I', @NEW_TRANS_REF, HEADER_ID, CUST_CODE, DELIV_ADD, TRANS_DATE, '85',
+                TRANS_CD, TRANS_CODE, ORDER_NO, ORDER_DATE, PRN_DATE, DEL_DATE, @INV_DATE, @INV_PRD,
+                CUST_REF, DEL_REF, COMMENTS, TRANS_VAL, PAY_DATE, ANAL_M0, ANAL_M1, ANAL_M2, ANAL_M3,
+                ANAL_M4, ANAL_M5, ANAL_M6, ANAL_M7, ANAL_M8, ANAL_M9, QUOTE_CONVERT, QUOTE_PRINT,
+                QUOTE_EXPIRY, QUOTED_PRD, QUOTATION_REF, DATE_QUOTED, VOID_STATUS, USER_CODE
+            FROM {dbCode}SISOHDR
+            WHERE REC_TYPE='O' AND TRANS_REF=@TRANS_REF AND VOID_STATUS='N'";
+
+        public static string ExecuteSiSoPrintInvoice(string dbCode) => $"{dbCode}_SISOPRINT_INVOICE";
+
+        public static string UpdateSiSoHdrStatus(string dbCode) => $@"UPDATE {dbCode}SISOHDR SET STATUS='80' WHERE REC_TYPE='O' AND TRANS_REF=@TRANS_REF AND VOID_STATUS='N'";
+
+        public static string UpdateSiSoDetStatus(string dbCode) => $@"UPDATE {dbCode}SISODET SET STATUS='80',DEL_DATE=(CASE WHEN DEL_DATE='' THEN @INV_DATE ELSE DEL_DATE END),
+                     INV_DATE=@INV_DATE,INV_PRD=@INV_PRD,INV_NO=@NEW_TRANS_REF,USER_INVOICED=@USER_INVOICED WHERE TRANS_REF=@TRANS_REF AND REC_TYPE='D'";
+
+        public const string UpdateChangeInvoiceExchangeStatus = "UPDATE TB_BC_CHANGEINVOICE_EXCHANGE_INVOICE SET STATUS = 1 WHERE TRANSACTION_CODE = @TRANSACTION_CODE";
+
+        public const string UpdateChangeInvoiceRepairStatus = "UPDATE TB_BC_CHANGEINVOICE_REPAIR_INVOICE SET STATUS = 1 WHERE INVOICE_NUMBER = @TRANSACTION_CODE";
+
+        public static string GetItemExpiredDates(string dbCode) => $@"SELECT TOP 1 ISNULL(ITEM_CODE,ITEMCODE) ItemCodeCopy,PHYSICAL Physical, ISNULL(HOLD_SALE, 0) OnHold, PHYSICAL-ISNULL(HOLD_SALE, 0) Fees, TAB1.EXPIRE_DATE LineRef 
+                  FROM (SELECT ITEM_CODE ITEMCODE, ISNULL(SUM(QUANTITY),0) PHYSICAL, LINE_REF EXPIRE_DATE FROM {dbCode}SIINVMOV TAB1 
+                  WHERE IR_STAT='I' AND STATUS='80' AND LOCATION = @WAREHOUSE AND TAB1.ITEM_CODE=@ITEM_CODE AND ALLOC_REF='' 
+                  GROUP BY LOCATION,TAB1.ITEM_CODE, LINE_REF) TAB1 LEFT JOIN (SELECT ITEM_CODE,SUM(CASE WHEN STK_QTY_VALUE=1 THEN VALUE_1   
+                  WHEN STK_QTY_VALUE=2 THEN VALUE_2 WHEN STK_QTY_VALUE=3 THEN VALUE_3 WHEN STK_QTY_VALUE=4 THEN VALUE_4 
+                  WHEN STK_QTY_VALUE=5 THEN VALUE_5 WHEN STK_QTY_VALUE=6 THEN VALUE_6 WHEN STK_QTY_VALUE=7 THEN VALUE_7 
+                  WHEN STK_QTY_VALUE=8 THEN VALUE_8 WHEN STK_QTY_VALUE=9 THEN VALUE_9 WHEN STK_QTY_VALUE=10 THEN VALUE_10 
+                  WHEN STK_QTY_VALUE=11 THEN VALUE_11 WHEN STK_QTY_VALUE=12 THEN VALUE_12 WHEN STK_QTY_VALUE=13 THEN VALUE_13 
+                  WHEN STK_QTY_VALUE=14 THEN VALUE_14 WHEN STK_QTY_VALUE=15 THEN VALUE_15 WHEN STK_QTY_VALUE=16 THEN VALUE_16 
+                  WHEN STK_QTY_VALUE=17 THEN VALUE_17 WHEN STK_QTY_VALUE=18 THEN VALUE_18 WHEN STK_QTY_VALUE=19 THEN VALUE_19 
+                  WHEN STK_QTY_VALUE=20 THEN VALUE_20 ELSE 0 END) HOLD_SALE, LINE_REF EXPIRE_DATE FROM {dbCode}SISODET 
+                  WHERE REC_TYPE='D' AND STATUS<'80' AND CREDIT_STATUS='' AND LOCATION = @WAREHOUSE AND ITEM_CODE=@ITEM_CODE 
+                  GROUP BY ITEM_CODE,LINE_REF) TAB2 ON TAB1.ITEMCODE=TAB2.ITEM_CODE AND TAB1.EXPIRE_DATE=TAB2.EXPIRE_DATE 
+                  WHERE PHYSICAL-ISNULL(HOLD_SALE, 0)>0 AND TAB1.EXPIRE_DATE NOT IN @EXPIREDDATE ORDER BY CAST(TAB1.EXPIRE_DATE AS DATE);";
+
+        public static string InsertSiSoHdr(string dbCode) => $@"INSERT INTO {dbCode}SISOHDR(REC_TYPE,TRANS_REF,HEADER_ID,CUST_CODE,DELIV_ADD,TRANS_DATE,STATUS,TRANS_CD,TRANS_CODE,ORDER_NO,ORDER_DATE,PRN_DATE,DEL_DATE,INV_DATE,INV_PRD,CUST_REF,DEL_REF,COMMENTS,TRANS_VAL,PAY_DATE,ANAL_M0,ANAL_M1,ANAL_M2,ANAL_M3,ANAL_M4,ANAL_M5,ANAL_M6,ANAL_M7,ANAL_M8,ANAL_M9,QUOTE_CONVERT,QUOTE_PRINT,QUOTE_EXPIRY,QUOTED_PRD,QUOTATION_REF,DATE_QUOTED,VOID_STATUS,USER_CODE)
+            VALUES(@REC_TYPE,@TRANS_REF,@HEADER_ID,@CUST_CODE,@DELIV_ADD,@TRANS_DATE,@STATUS,@TRANS_CD,@TRANS_CODE,@ORDER_NO,@ORDER_DATE,@PRN_DATE,@DEL_DATE,@INV_DATE,
+            @INV_PRD,@CUST_REF,@DEL_REF,@COMMENTS,@TRANS_VAL,@PAY_DATE,@ANAL_M0,@ANAL_M1,@ANAL_M2,@ANAL_M3,@ANAL_M4,@ANAL_M5,@ANAL_M6,@ANAL_M7,@ANAL_M8,@ANAL_M9,@QUOTE_CONVERT,@QUOTE_PRINT,@QUOTE_EXPIRY,@QUOTED_PRD,@QUOTATION_REF,@DATE_QUOTED,@VOID_STATUS,@USER_CODE)";
+
+        public static string InsertSiSoDet(string dbCode) => $@"INSERT INTO {dbCode}SISODET
+                (
+                REC_TYPE,
+                DETAIL_ID,
+                TRANS_TYPE,
+                TRANS_REF,
+                TRANS_LINE,
+                TRANS_CD,
+                LOCATION,
+                ITEM_CODE,
+                DESCRIPTN,
+                DUE_DATE,
+                STATUS,
+                VALUE_1,
+                VALUE_2,
+                VALUE_3,
+                VALUE_4,
+                VALUE_5,
+                VALUE_6,
+                VALUE_7,
+                VALUE_8,
+                VALUE_9,
+                VALUE_10,
+                VALUE_11,
+                VALUE_12,
+                VALUE_13,
+                VALUE_14,
+                VALUE_15,
+                VALUE_16,
+                VALUE_17,
+                VALUE_18,
+                VALUE_19,
+                VALUE_20,
+                UNIT_SALE,
+                ORD_PRD,
+                DEL_DATE,
+                INV_DATE,
+                INV_NO,
+                INV_PRD,
+                ACCNT_CODE,
+                ANAL_M0,
+                ANAL_M1,
+                ANAL_M2,
+                ANAL_M3,
+                ANAL_M4,
+                ANAL_M5,
+                ANAL_M6,
+                ANAL_M7,
+                ANAL_M8,
+                ANAL_M9,
+                ASSEMBLY_IND,
+                SPLIT_VAL,
+                CREDIT_STATUS,
+                PRICE_BOOK,
+                SALE_QTY_VALUE,
+                STK_QTY_VALUE,
+                TOT_VALUE,
+                DISP_VAL_1,
+                DISP_VAL_2,
+                FIXED_VAL,
+                LINE_REF,
+                USER_CODE,
+                USER_INVOICED,
+                ALLOC_REF,
+                UPDATE_STOCK,
+                FIXED_VAL_2,
+                FIXED_VAL_3
+                )
+                VALUES
+                (
+                @REC_TYPE,
+                @DETAIL_ID,
+                @TRANS_TYPE,
+                @TRANS_REF,
+                @TRANS_LINE,
+                @TRANS_CD,
+                @LOCATION,
+                @ITEM_CODE,
+                @DESCRIPTN,
+                @DUE_DATE,
+                @STATUS,
+                @VALUE_1,
+                @VALUE_2,
+                @VALUE_3,
+                @VALUE_4,
+                @VALUE_5,
+                @VALUE_6,
+                @VALUE_7,
+                @VALUE_8,
+                @VALUE_9,
+                @VALUE_10,
+                @VALUE_11,
+                @VALUE_12,
+                @VALUE_13,
+                @VALUE_14,
+                @VALUE_15,
+                @VALUE_16,
+                @VALUE_17,
+                @VALUE_18,
+                @VALUE_19,
+                @VALUE_20,
+                @UNIT_SALE,
+                @ORD_PRD,
+                @DEL_DATE,
+                @INV_DATE,
+                @INV_NO,
+                @INV_PRD,
+                @ACCNT_CODE,
+                @ANAL_M0,
+                @ANAL_M1,
+                @ANAL_M2,
+                @ANAL_M3,
+                @ANAL_M4,
+                @ANAL_M5,
+                @ANAL_M6,
+                @ANAL_M7,
+                @ANAL_M8,
+                @ANAL_M9,
+                @ASSEMBLY_IND,
+                @SPLIT_VAL,
+                @CREDIT_STATUS,
+                @PRICE_BOOK,
+                @SALE_QTY_VALUE,
+                @STK_QTY_VALUE,
+                @TOT_VALUE,
+                @DISP_VAL_1,
+                @DISP_VAL_2,
+                @FIXED_VAL,
+                @LINE_REF,
+                @USER_CODE,
+                @USER_INVOICED,
+                @ALLOC_REF,
+                @UPDATE_STOCK,
+                @FIXED_VAL_2,   
+                @FIXED_VAL_3)";
+
+        public const string InsertRecordInvoice = @"INSERT INTO NEW_INVOICE(DB_CODE,TRANSACTION_REF,CUSTOMER_CODE,ACC_NAME_KH,HEADER_TRANSACTION_VALUES,[STATUS],CREATED_DATE,CREATED_BY,IS_DIVIDED,ENTRIES_CODE) VALUES
+                (@DB_CODE,@TRANSACTION_CODE,@CUSTOMER_CODE,@CUSTOMER_NAME,@VALUE,@STATUS,@CREATED_DATE,@CREATED_BY,@IS_DIVIDED,@ENTRIES_CODE)";
+
+        public const string InsertRepairInvoice = @"INSERT INTO TB_BC_CHANGEINVOICE_REPAIR_INVOICE (DB_CODE,DB_CODE_1,INVOICE_NUMBER,INVOICE_DATE,INVOICE_DUE,CUSTOMER_CODE,DISCOUNT,TAXES,TOTAL_AMOUNT,CREATED_DATE,CREATED_BY,STATUS,DESCRIPTION)
+                VALUES (@DB_CODE,@DB_CODE_1,@INVOICE_REFERENCE,@INVOICE_DATE,@INVOICE_DUE,@CUSTOMER_CODE,@DISCOUNT,@TAXES,@TOTAL_AMOUNT,@CREATED_DATE,@CREATED_BY,0,@DESCRIPTION)";
+
+        public const string InsertRepairInvoiceDetails = @"INSERT INTO TB_BC_CHANGEINVOICE_REPAIR_INVOICE_DETAILS(INVOICE_ID,TRANS_REF,REPAIR_COMPLETED_ID,QUANTITY,UNIT_PRICE,TOTAL,REQUEST_REPAIR_ID)
+                OUTPUT Inserted.REQUEST_REPAIR_ID
+                VALUES (@INVOICE_ID,@TRANS_REF,@REPAIR_COMPLETED_ID,@QUANTITY,@UNIT_PRICE,@TOTAL,@REQUEST_REPAIR_ID)";
+
+        public const string UpdateChangeInvoiceDetail = "UPDATE TB_BC_CHANGEINVOICE_DETAIL SET IS_RECEIVED = 'Completed' WHERE ID = (SELECT ID FROM TB_BC_CHANGEINVOICE_DETAIL WHERE CHANGE_INVOICE_ID = @RequestDetailId)";
+
+        public const string UpdateRepairCompleted = "UPDATE TB_BC_CHANGEINVOICE_REPAIR_COMPLETED SET STATUS = 'Completed' WHERE ID = @RepairCompletedId";
+
+        public const string UpdateRepairMaster = @"UPDATE TB_BC_CHANGEINVOICE SET IS_RECEIVED = 'Completed',COMPLETED = @COMPLETED_DATE FROM TB_BC_CHANGEINVOICE HEADER INNER JOIN TB_BC_CHANGEINVOICE_DETAIL DETAIL ON DETAIL.CHANGE_INVOICE_ID = HEADER.ID
+                        INNER JOIN TB_BC_CHANGEINVOICE_RECEIVED RECEIVED ON RECEIVED.CHANGE_INVOICE_DETAIL_ID = DETAIL.ID
+                        INNER JOIN TB_BC_CHANGEINVOICE_REPAIR REPAIR ON REPAIR.RECEIVED_ID = RECEIVED.ID
+                        WHERE REPAIR.TRAN_REF = @TRANSACTION";
+
+        public const string GetInvoiceByCustomerCodeQuery = @"SELECT MARKET_KHMER_NAME Market,CusInfo.ADD_LINE_1 CustomerName,CusInfo.ADD_TEL Phone,CUSTOMER_CODE CustomerCode,S.LAST_NAME + ' ' + S.FIRST_NAME SalesRepresentative 
+                FROM TB_BC_CHANGEINVOICE TBC INNER JOIN dbo.BCUSERS S 
+                ON S.USER_ID = TBC.USER_CODE
+				LEFT JOIN (SELECT ADD_CODE,ADD_LINE_1,ADD_TEL FROM SIADD) CusInfo ON CusInfo.ADD_CODE = CUST_CODE
+                INNER JOIN (
+                SELECT CUS.ADD_CODE CUSTOMER_CODE,ADD_LINE_1 CUSTOMER_NAME,M.MARKET_KHMER_NAME FROM SIADD CUS INNER JOIN TB_BCMARKET M ON M.MARKET_ID = CUS.MARKET_ID
+                WHERE CUS.DB_CODE = @DbCode AND M.DB_CODE = @DbCode) CUS ON CUS.CUSTOMER_CODE = TBC.CUST_CODE
+                AND CUST_CODE LIKE @CustomerCode";
+
+        public static string CheckStockQuantity(string dbCode) => $@"SELECT CAST(CASE WHEN COUNT(QUANTITY) > 0 THEN 1 ELSE 0 END AS BIT) FROM 
+	   (SELECT PHYSICAL-TAB5.ON_ORDER AS QUANTITY 
+			FROM (SELECT TAB3.LOCATION,TAB3.ITEM_CODE,TAB3.ITEM_DESC,TAB3.UNIT_STOCK,TAB3.PHYSICAL,ISNULL(TAB4.HOLD_SALE,0) ON_ORDER 
+			  FROM (SELECT TAB1.LOCATION,TAB1.ITEM_CODE,TAB2.ITEM_DESC,TAB2.UNIT_STOCK,PHYSICAL 
+				FROM (SELECT LOCATION,ITEM_CODE,ISNULL(SUM(QUANTITY),0) PHYSICAL FROM {dbCode}SIINVMOV WHERE IR_STAT='I' AND STATUS='80'AND ALLOC_REF=''  GROUP BY LOCATION,ITEM_CODE) AS TAB1 
+				  LEFT JOIN (SELECT ITEM_CODE,ITEM_DESC,UNIT_STOCK FROM SIITEMS WHERE DB_CODE=@DB_CODE) AS TAB2 ON TAB1.ITEM_CODE=TAB2.ITEM_CODE) AS TAB3 
+					LEFT JOIN (SELECT LOCATION,ITEM_CODE,SUM(CASE WHEN STK_QTY_VALUE=1 THEN VALUE_1 WHEN STK_QTY_VALUE=2 THEN VALUE_2 WHEN STK_QTY_VALUE=3 THEN VALUE_3 WHEN STK_QTY_VALUE=4
+							   THEN VALUE_4 WHEN STK_QTY_VALUE=5 THEN VALUE_5 WHEN STK_QTY_VALUE=6 THEN VALUE_6 WHEN STK_QTY_VALUE=7 THEN VALUE_7 WHEN STK_QTY_VALUE=8 THEN VALUE_8 WHEN STK_QTY_VALUE=9 THEN VALUE_9 WHEN
+							   STK_QTY_VALUE=10 THEN VALUE_10 WHEN STK_QTY_VALUE=11 THEN VALUE_11 WHEN STK_QTY_VALUE=12 THEN VALUE_12 WHEN STK_QTY_VALUE=13 THEN VALUE_13 WHEN STK_QTY_VALUE=14 THEN VALUE_14 WHEN
+							   STK_QTY_VALUE=15 THEN VALUE_15 WHEN STK_QTY_VALUE=16 THEN VALUE_16 WHEN STK_QTY_VALUE=17 THEN VALUE_17 WHEN STK_QTY_VALUE=18 THEN VALUE_18 WHEN STK_QTY_VALUE=19 THEN VALUE_19 WHEN
+							   STK_QTY_VALUE=20 THEN VALUE_20 ELSE 0 END) HOLD_SALE 
+							   FROM {dbCode}SISODET WHERE REC_TYPE='D' AND STATUS<'80' AND CREDIT_STATUS='' GROUP BY LOCATION,ITEM_CODE) AS TAB4 ON TAB3.LOCATION=TAB4.LOCATION AND TAB3.ITEM_CODE=TAB4.ITEM_CODE) AS TAB5 
+					   LEFT JOIN (SELECT LOCATION,ITEM_CODE,SUM(QUANTITY) PICK_QTY 
+								FROM {dbCode}SIINVMOVH WHERE  IR_STAT<>'I' AND STATUS='10' GROUP BY LOCATION,ITEM_CODE) 
+						        AS TAB6 ON TAB5.LOCATION=TAB6.LOCATION AND TAB5.ITEM_CODE=TAB6.ITEM_CODE WHERE TAB5.LOCATION=@LOCATION AND TAB5.ITEM_CODE= @ITEM_CODE) AS TAB7 WHERE QUANTITY >= @QUANTITYREQUEST";
+
+        public const string UpdateStatusExchangeReceivedToCredit = "UPDATE TB_BC_CHANGEINVOICE_RECEIVED SET STATUS = @STATUS WHERE ID = @ID";
+
+        public const string UpdateStatusRequestExchangeDetails = "UPDATE TB_BC_CHANGEINVOICE_DETAIL SET IS_RECEIVED = @STATUS WHERE ID = @ID";
+
+        public const string SaveRecordItemExchanged = @"INSERT INTO TB_BC_CHANGEINVOICE_ITEM_EXCHANGED([TRANSACTION],ITEM_CODE,QUANTITY,CREATED_DATE,CREATED_BY,UNIT_PRICE,DB_CODE)
+                VALUES (@TRANSACTION,@ITEM_CODE,@QUANTITY,@CREATED_DATE,@CREATED_BY,@UNIT_PRICE,@DB_CODE)";
+
+        public const string IsAllItemRequestCompletedByRequestId = @"SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) 
+                FROM TB_BC_CHANGEINVOICE_DETAIL WHERE CHANGE_INVOICE_ID = @REQUEST_ID AND (IS_RECEIVED <> 'Completed' OR (TYPE = 'EXCHANGE' AND IS_RECEIVED <> 'Completed'))
+                ";
+
+        public const string UpdateReceivedToCompletedById = @"UPDATE TB_BC_CHANGEINVOICE SET IS_RECEIVED = 'Completed' WHERE ID = @REQUEST_ID AND DB_CODE = @DB_CODE";
+        public static string IsAlreadyPost(string dbCode) => $@"SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT ) IsPosted FROM {dbCode}SISOHDR WHERE TRANS_REF = @TRANS_REF AND REC_TYPE = 'I';";
+    }
+}

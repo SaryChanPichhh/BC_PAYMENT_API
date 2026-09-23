@@ -6,6 +6,7 @@ using BC.PAYMENT.LOGGING;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
+using BC.PAYMENT.CORE.Contracts.General;
 using BC.PAYMENT.CORE.Contracts.Login;
 
 namespace BC.PAYMENT.API.Controllers

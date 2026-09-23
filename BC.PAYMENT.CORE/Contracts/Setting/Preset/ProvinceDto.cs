@@ -1,4 +1,4 @@
-namespace BC.PAYMENT.CORE.DTO.Prepare.Preset
+namespace BC.PAYMENT.CORE.Contracts.Setting.Preset
 {
     public  class ProvinceDto
     {

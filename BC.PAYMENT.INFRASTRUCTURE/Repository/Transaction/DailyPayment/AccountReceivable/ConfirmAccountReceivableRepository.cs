@@ -77,90 +77,12 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.AccountR
 
         public async Task<int> UpdateConfirmBalanceAccountReceivableDetails(string dbCode, ConfirmAccountReceivableModel.ConfirmBalanceDetails balanceDetails)
         {
-            const string sql = @"UPDATE DT_CONFIRM_ACCOUNT_RECEIVABLEDET SET 
-            BALANCE = @BALANCE,
-            DESCRIPTION = @DESCRIPTION,
-            IS_AGREE = @IS_AGREE,
-            CUSTOMER_STATUS = @IS_MET,
-            STATUS = 'Completed',
-            UPDATED_DATE = @UPDATED_DATE,
-            UPDATED_BY = @UPDATED_BY
-            WHERE INVOICE_CODE = @INVOICE_CODE
-            AND HEADER_ID = @HEADER_ID";
-            var param = new
-            {
-                BALANCE = balanceDetails.Balance,
-                DESCRIPTION = balanceDetails.Description,
-                IS_AGREE = balanceDetails.IsCustomerAgreed,
-                IS_MET = balanceDetails.IsMet,
-                UPDATED_DATE = DateTime.Now,
-                UPDATED_BY = balanceDetails.UpdatedBy,
-                INVOICE_CODE = balanceDetails.InvoicedCode,
-                HEADER_ID = balanceDetails.ConfirmBalanceId
-            };
-            var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param);
-            return rowAffected ;
+            throw new NotImplementedException();
         }
 
         public async Task<int> AddConfirmAccountReceivableDetails(int confirmAccountReceivableId, List<ConfirmAccountReceivableModel.ConfirmBalanceDetails> confirmBalanceDetails)
         {
-            if(_dbConnection.State == ConnectionState.Closed)
-            { 
-                _dbConnection.Open();
-            }
-            var transaction= _dbConnection.BeginTransaction();
-            try
-            {
-                const string sql = @"INSERT INTO DT_CONFIRM_ACCOUNT_RECEIVABLEDET
-               (HEADER_ID,DB_CODE,INVOICE_CODE,CUSTOMER_NAME,CUSTOMER_CODE,INVOICE_AMOUNT ,CREATED_DATE,CREATED_BY,STATUS)        
-                VALUES (@HEADER_ID,@DB_CODE,@INVOICE_CODE,@CUSTOMER_NAME,@CUSTOMER_CODE,@INVOICE_AMOUNT,@CREATED_DATE,@CREATED_BY,@STATUS)";
-                    const string sqlCheckExistInvoice = @"SELECT CAST(COUNT(*) AS BIT) FROM DT_CONFIRM_ACCOUNT_RECEIVABLEDET
-                WHERE DB_CODE = @DB_CODE AND HEADER_ID = @HEADER_ID AND INVOICE_CODE = @INVOICE_CODE";
-                var rowAffected = 0;
-                foreach (var item in confirmBalanceDetails)
-                {
-                    var paramCheckExistInvoice = new
-                    {
-                        DB_CODE = item.DbCode,
-                        HEADER_ID = confirmAccountReceivableId,
-                        INVOICE_CODE = item.InvoicedCode
-                    };
-                    var exist = await _dbConnection.ExecuteScalarAsync<bool>(sqlCheckExistInvoice, paramCheckExistInvoice, transaction);
-                    if (exist) continue;
-                    var param = new
-                    {
-                        HEADER_ID = confirmAccountReceivableId,
-                        DB_CODE = item.DbCode,
-                        INVOICE_CODE = item.InvoicedCode,
-                        CUSTOMER_NAME = item.CustomerName,
-                        CUSTOMER_CODE = item.CustomerCode,
-                        INVOICE_AMOUNT = item.InvoicedAmount,
-                        CREATED_DATE = DateTime.Now,
-                        CREATED_BY = item.CreatedBy,
-                        STATUS = "Pending"
-                    };
-                    rowAffected += await _dbConnection.ExecuteAsync(sql, param, transaction);
-                }
-                if (rowAffected == confirmBalanceDetails.Count)
-                {
-                    transaction.Commit();
-                    return rowAffected;
-                }
-                else
-                {
-                    transaction.Commit();
-                    return rowAffected;
-                }
-            }
-            catch (Exception ex)
-            {
-                transaction.Rollback();
-                throw;
-            }
-            finally
-            {
-                _dbConnection.Close();
-            }
+            throw new NotImplementedException();
         }
     }
 }

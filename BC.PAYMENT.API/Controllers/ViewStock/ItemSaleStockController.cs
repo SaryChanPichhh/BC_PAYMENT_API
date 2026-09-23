@@ -1,18 +1,8 @@
-using System.Globalization;
-using System.Net;
-using BC.PAYMENT.API.Helper;
-using BC.PAYMENT.API.Models;
-using BC.PAYMENT.APPLICATION.Interfaces.General;
 using BC.PAYMENT.CORE.DTO.ViewStock;
 using BC.PAYMENT.CORE.Mappers;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
-using Microsoft.Extensions.Options;
-
 namespace BC.PAYMENT.API.Controllers.ViewStock;
 
-[Authorize]
-[ApiController]
+[Helper.Authorize]
 public sealed class ItemSaleStockController : BaseApiController
 {
     private const int ClientClosedRequestStatusCode = 499;

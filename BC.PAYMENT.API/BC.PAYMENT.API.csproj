@@ -1,11 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Dapper" Version="2.1.35" />
@@ -21,35 +19,36 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
     <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
-      <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-  	<None Update="appsettings.BC.PAYMENT.API.json">
-  		<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-  	</None>
-  	<None Update="appsettings.BC.PAYMENT.API.Development.json">
-  		<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-  	</None>
+    <None Update="appsettings.BC.PAYMENT.API.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="appsettings.BC.PAYMENT.API.Development.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
   </ItemGroup>
-	<ItemGroup>
-		<None Remove="appsettings.Development.json" />
-	</ItemGroup>
-
-	<ItemGroup>
+  <ItemGroup>
+    <None Remove="appsettings.Development.json" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\BC.PAYMENT.APPLICATION\BC.PAYMENT.APPLICATION.csproj" />
     <ProjectReference Include="..\BC.PAYMENT.INFRASTRUCTURE\BC.PAYMENT.INFRASTRUCTURE.csproj" />
     <ProjectReference Include="..\BC.PAYMENT.LOGGING\BC.PAYMENT.LOGGING.csproj" />
   </ItemGroup>
-
-	<ItemGroup>
-	  <Reference Include="DevExpress.CodeParser.v24.2">
-	    
-	  </Reference>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Controllers\CommodityExchange\ExchangeInvoiceAndRepairInvoiceReport\" />
-	  <Folder Include="Controllers\Setting\Customer\" />
-	</ItemGroup>
-
+  <ItemGroup>
+    <Reference Include="DevExpress.CodeParser.v24.2">
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\CommodityExchange\ExchangeInvoiceAndRepairInvoiceReport\" />
+    <Folder Include="Controllers\Setting\Customer\" />
+    <Folder Include="Controllers\Transaction\DailyPayment\DividingInvoices\Invoice\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="secrets.json">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
 </Project>

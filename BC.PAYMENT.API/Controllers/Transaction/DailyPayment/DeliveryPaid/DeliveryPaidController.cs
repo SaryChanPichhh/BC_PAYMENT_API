@@ -4,7 +4,7 @@ using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DeliveryPaid;
+using BC.PAYMENT.CORE.Contracts.Transaction.DailyPayment.DeliveryPaid;
 using BC.PAYMENT.CORE.Entities.Expense;
 using BC.PAYMENT.CORE.Entities.Transaction.DailyPayment.DeliveryPaid;
 using Microsoft.AspNetCore.Http;

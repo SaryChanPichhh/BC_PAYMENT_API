@@ -29,3 +29,5 @@ package-lock.json
 **/wwwroot/js/viewer.part.bundle.js
 **/wwwroot/js/reporting.thirdparty.bundle.js
 **/wwwroot/js/site.thirdparty.bundle.js
+# Ignore secrets file
+secrets.json

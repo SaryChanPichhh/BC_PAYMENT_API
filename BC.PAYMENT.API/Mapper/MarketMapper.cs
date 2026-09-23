@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+using System.Drawing;
 using BC.PAYMENT.CORE.Contracts.Request.Market;
 using BC.PAYMENT.CORE.Contracts.Response.Market;
 using BC.PAYMENT.CORE.Entities.Setting.Preset;
@@ -23,8 +23,6 @@ public static class MarketMapper
                     ProvinceId = request.ProvinceId,
                     Image      = request.Image,
                     Other      = request.Other,
-                    Map        = request.Map,
-                    AnadCode   = request.AnadCode,
                     DbCode     = dbCode,
                     UpdatedBy  = username,
                     UpdatedAt  = DateTime.Now,
@@ -39,7 +37,7 @@ public static class MarketMapper
                 if (model == null) return null!;
                 return new MarketResponse
                 {
-                    MarketId        = int.TryParse(model.MarketId, out var id) ? id : 0,
+                    MarketId        = model.MarketId,
                     MarketName      = model.MarketName,
                     MarketNameKhmer = model.MarketNameKhmer,
                     AreaId          = model.AreaId,

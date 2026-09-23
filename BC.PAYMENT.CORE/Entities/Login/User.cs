@@ -6,7 +6,6 @@ namespace BC.PAYMENT.CORE.Entities.Login
         public string? Username { get; set; }
         public string? DbCode { get; set; }
         public List<BranchDTO> Branches { get; set; }
-
         [JsonIgnore]
         public string? UserPass { get; set; }
         //public bool? UserStatus { get; set; }
@@ -18,6 +17,6 @@ namespace BC.PAYMENT.CORE.Entities.Login
         public DateTime CurrentDate { get; set; }
         public int RowNumber { get; set; }
         public string InvoiceEntryCode { get; set; }
-
+        public string Role { get; set; }
     }
 }

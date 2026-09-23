@@ -1,31 +1,24 @@
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Preset
 {
-    public class DistrictRepository : IDistrictRepository
+    public class DistrictRepository(ISqlDataAccess sqlDataAccess) : IDistrictRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public DistrictRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
         public async Task<int> AddNewAsync(DistrictModel model)
         {
-            var sql = $@"INSERT INTO DISTRICT VALUES (@D_ID,@D_NAME,@P_ID);";
+            var sql = DistrictQueries.AddNew;
 
             var param = new
             {
-                D_ID = model.DistrictId,
                 D_NAME = model.District,
                 P_ID = model.ProvinceId
             };
-            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
+            
+            var affectedRow = await sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;
         }
 
         public async Task<int> UpdateAsync(DistrictModel model)
         {
-            var sql = $@"UPDATE DISTRICT SET D_NAME = @D_NAME,P_ID = @P_ID WHERE D_ID = @D_ID";
+            var sql = DistrictQueries.Update;
 
             var param = new
             {
@@ -33,51 +26,51 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Prepare.Preset
                 D_NAME = model.District,
                 P_ID = model.ProvinceId
             };
-            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
+            var affectedRow = await sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;
         }
 
-        public async Task<List<DistrictModel>> GetAsync(string dbCode)
+        public async Task<List<DistrictResponseDTO>> GetAsync(string dbCode)
         {
-            var sql = $@"SELECT D_ID DistrictId,D_NAME District,P.PROID ProvinceId,P.PRO_NAME Province FROM DISTRICT INNER JOIN PROVINCE P ON P.PROID = DISTRICT.P_ID ";
+            var sql = DistrictQueries.Get;
             var param = new
             {
             };
-            var execute = await _sqlDataAccess.LoadData<DistrictModel, dynamic>(sql,param);
+            var execute = await sqlDataAccess.LoadData<DistrictResponseDTO, dynamic>(sql,param);
             return execute.ToList();
         }
 
         public async Task<int> DeleteAsync(string code)
         {
-            var sql = $@"DELETE FROM DISTRICT WHERE D_ID = @D_ID";
+            var sql = DistrictQueries.Delete;
 
             var param = new
             {
                 D_ID = code,
             };
-            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
+            var affectedRow = await sqlDataAccess.ExecuteAsync(sql, param);
             return affectedRow;
         }
 
-        public async Task<List<DistrictModel>> GetDistrictsByProvinceAsync(string province)
+        public async Task<List<DistrictResponseDTO>> GetDistrictsByProvinceAsync(string province)
         {
-            var sql = $@"SELECT D_ID DistrictId,D_NAME District,P.PROID ProvinceId,P.PRO_NAME Province FROM DISTRICT INNER JOIN PROVINCE P ON P.PROID = DISTRICT.P_ID WHERE P.PRO_NAME LIKE '%@PROVINCE%'";
+            var sql = DistrictQueries.GetDistrictsByProvince;
             var param = new
             {
-                PROVINCE = province,
+                PRO_ID = province,
             };
-            var execute = await _sqlDataAccess.LoadData<DistrictModel, dynamic>(sql, param);
+            var execute = await sqlDataAccess.LoadData<DistrictResponseDTO, dynamic>(sql, param);
             return execute.ToList();
         }
 
-        public async Task<List<DistrictModel>> GetDistrictsByDistrictAsync(string district)
+        public async Task<List<DistrictResponseDTO>> GetDistrictsByDistrictAsync(string district)
         {
-            var sql = $@"SELECT D_ID DistrictId,D_NAME District,P.PROID ProvinceId,P.PRO_NAME Province FROM DISTRICT INNER JOIN PROVINCE P ON P.PROID = DISTRICT.P_ID WHERE P.PRO_NAME LIKE '%@DISTRICT%'";
+            var sql = DistrictQueries.GetDistrictsByDistrict;
             var param = new
             {
                 DISTRICT = district,
             };
-            var execute = await _sqlDataAccess.LoadData<DistrictModel, dynamic>(sql, param);
+            var execute = await sqlDataAccess.LoadData<DistrictResponseDTO, dynamic>(sql, param);
             return execute.ToList();
         }
     }

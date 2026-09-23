@@ -1,5 +1,5 @@
 ﻿
-namespace BC.PAYMENT.CORE.DTO.Items
+namespace BC.PAYMENT.CORE.Contracts.Items
 {
     public class ItemDto
     {

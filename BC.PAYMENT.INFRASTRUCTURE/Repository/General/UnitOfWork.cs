@@ -1,4 +1,7 @@
-using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Transaction.DailyPayment.DividingInvoices.Invoice.IDividedInvoiceRepository;
+using BC.PAYMENT.APPLICATION.Interfaces.ConfirmBalance;
+using BC.PAYMENT.APPLICATION.Interfaces.StockCar;
+using BC.PAYMENT.APPLICATION.Interfaces.Submit;
+using IDividedInvoiceRepository = BC.PAYMENT.APPLICATION.Interfaces.Invoice.IDividedInvoiceRepository;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
@@ -6,7 +9,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
     {
         private IItemRepairReportRepository _itemRepairReport;
 
-        public UnitOfWork(IUserRepository users, IBranchRepository branches, ICustomerRepository customers, IInvoiceRepository invoices, IAnalysisAccountRepository analysisAccounts, APPLICATION.Interfaces.Payment.IDividedInvoiceRepository dividedInvoices, IDeliveryRepository deliveries, IMarketRepository markets, IDistrictRepository districts, IProvinceRepository provinces, IAccountReceivablePresetRepository accountReceivablePresets, IPublicHolidayRepository publicHoliday, INewInvoiceRepository newInvoice, IChangeInvoiceRepository changeInvoice, IReturnInvoiceRepository returnInvoice, IIssuanceInvoiceRepository issuanceInvoice, IDividedInvoiceRepository dividedInvoice, IInvoiceReportRepository invoiceReport, ICheckReturnInvoiceRepository checkReturnInvoice, IDeliveryPaidRepository deliveryPaid, IDailyPaymentRepository dailyPayment, IConfirmAccountReceivableRepository confirmAccountReceivable, ISubmittingInvoiceRepository submittingInvoice, IGeneratorRepository generators, IAccountReceivableRepository accountReceivable, ISubmittingPerDeliveryRepository submittingPerDelivery, ISubmittedInvoiceRepository submittedInvoice, ISubmittedPerDeliveryRepository submittedPerDelivery, ISubmittedRejectedInvoiceRepository submittedRejectedInvoice, ISubmittedRejectedInvoicePerDeliveryRepository rejectedInvoicePerDelivery, IMonthlyInvoiceRepository invoiceVerify, ISubmissionHistoryRepository historyApproval, IDailySubmissionRepository approve, IStockInventoryCountingRepository stockInventoryCounting, IVerifyInvoiceRepository verifyInvoice, ISaleRepresentRepository saleRepresent, IReviewReportRepository reviewReport, IVerificationStockRepository verificationStock, ICheckingStockCarPaymentRepository checkingStockCarPayment, IVerificationRFIDRepository verificationRfid, IWarehouseRepository warehouses, IItemRepository items, ICashFlowDataRepository cashFlowData, ICashFlowDataReportRepository cashFlowDataReport, ICashFlowSubmittedRepository cashFlowSubmitted, ICashFlowAuditSubmittedRepository cashFlowAuditSubmitted, ICashFlowAuditReportRepository cashFlowAuditReport, IDailyRefundItemRepository dailyRefundItem, IRepairGoodsRepository repairGoods, IRepairerRepository repairer, ICompletedRepairRepository completedRepair, ICheckingInvoiceRepository checkingInvoice, IExchangeItemRepository exchangeItem, IItemTransactionAnalysisRepository itemTransactionAnalysis, IExchangeItemAnalysisRepository exchangeItemAnalysis, IAnnualPurchaseRepository annualPurchase, IOwedInvoiceRepository owedInvoice, IInventoryValueRepository inventoryValue, IDailyAnalysisRepository dailyAnalysis, ICreditInvoiceRepository creditInvoice, IPaidInvoiceRepository paidInvoice, ISummaryInvoiceRepository summaryInvoice, IAmountCollectedRepository amountCollected, IExpenseInvoiceReportRepository expenseInvoice, ITotalMonthlyPaymentRepository totalMonthlyPayment, IBillsOwedRepository billsOwed, ICustomerReportRepository customerReport, IEmployeeRepository employee, ICarPaymentReportRepository carPaymentReport, ICarPaymentRepository carPayment, IReportDividedInvoiceRepository reportDividedInvoice, IItemRepairReportRepository itemRepairReport, ICreditNoteReportRepository creditNoteReport, IItemExchangeReportRepository itemExchangeReport, IInventoryRepository inventory, IProductRepository products, IInventoryReportRepository inventoryReport, IInventoryExpiredRepository inventoryExpired, IInventoryTrackingRepository inventoryTracking, IWarehousePresetRepository warehousePreset, IOpeningBalanceRepository openingBalance)
+        public UnitOfWork(IUserRepository users, IBranchRepository branches, ICustomerRepository customers, IInvoiceRepository invoices, IAnalysisAccountRepository analysisAccounts, APPLICATION.Interfaces.Payment.IDividedInvoiceRepository dividedInvoices, IDeliveryRepository deliveries, IMarketRepository markets, IDistrictRepository districts, IProvinceRepository provinces, IAccountReceivablePresetRepository accountReceivablePresets, IPublicHolidayRepository publicHoliday, INewInvoiceRepository newInvoice, IChangeInvoiceRepository changeInvoice, IReturnInvoiceRepository returnInvoice, IDividedInvoiceRepository dividedInvoice, ICheckReturnInvoiceRepository checkReturnInvoice, IDeliveryPaidRepository deliveryPaid, IConfirmBalanceRepository confirmBalance, IConfirmAccountReceivableRepository confirmAccountReceivable, ISubmittingInvoiceRepository submittingInvoice, IGeneratorRepository generators, IAccountReceivableRepository accountReceivable, ISubmittingPerDeliveryRepository submittingPerDelivery, ISubmittedInvoiceRepository submittedInvoice, ISubmittedPerDeliveryRepository submittedPerDelivery, ISubmittedRejectedInvoiceRepository submittedRejectedInvoice, ISubmittedRejectedInvoicePerDeliveryRepository rejectedInvoicePerDelivery, IMonthlyInvoiceRepository invoiceVerify, ISubmissionHistoryRepository historyApproval, IDailySubmissionRepository approve, IStockInventoryCountingRepository stockInventoryCounting, IVerifyInvoiceRepository verifyInvoice, ISaleRepresentRepository saleRepresent, IReviewReportRepository reviewReport, IVerificationStockRepository verificationStock, ICheckingStockCarPaymentRepository checkingStockCarPayment, IVerificationRFIDRepository verificationRfid, IWarehouseRepository warehouses, IItemRepository items, ICashFlowDataRepository cashFlowData, ICashFlowDataReportRepository cashFlowDataReport, ICashFlowSubmittedRepository cashFlowSubmitted, ICashFlowAuditSubmittedRepository cashFlowAuditSubmitted, ICashFlowAuditReportRepository cashFlowAuditReport, IDailyRefundItemRepository dailyRefundItem, IRepairGoodsRepository repairGoods, IRepairerRepository repairer, ICompletedRepairRepository completedRepair, ICheckingInvoiceRepository checkingInvoice, IExchangeItemRepository exchangeItem, IItemTransactionAnalysisRepository itemTransactionAnalysis, IExchangeItemAnalysisRepository exchangeItemAnalysis, IAnnualPurchaseRepository annualPurchase, IOwedInvoiceRepository owedInvoice, IInventoryValueRepository inventoryValue, IDailyAnalysisRepository dailyAnalysis, ICreditInvoiceRepository creditInvoice, IPaidInvoiceRepository paidInvoice, ISummaryInvoiceRepository summaryInvoice, IAmountCollectedRepository amountCollected, IExpenseInvoiceReportRepository expenseInvoice, ITotalMonthlyPaymentRepository totalMonthlyPayment, IBillsOwedRepository billsOwed, ICustomerReportRepository customerReport, IEmployeeRepository employee, ICarPaymentReportRepository carPaymentReport, ICarPaymentRepository carPayment, IReportDividedInvoiceRepository reportDividedInvoice, IItemRepairReportRepository itemRepairReport, ICreditNoteReportRepository creditNoteReport, IItemExchangeReportRepository itemExchangeReport, IInventoryRepository inventory, IProductRepository products, IInventoryReportRepository inventoryReport, IInventoryExpiredRepository inventoryExpired, IInventoryTrackingRepository inventoryTracking, IWarehousePresetRepository warehousePreset, IOpeningBalanceRepository openingBalance, IStockCountingRepository stockCounting, IInvoiceClosingEntryRepository invoiceClosingEntry, IAreaRepository areas, IExpenseTypeRepository expenseTypes, IGeneralRepository generalRepository, IOldInvoiceRepository oldInvoice, IPaymentInvoiceRepository paymentInvoice, IExpenseRepository expense, IStockCarInvoiceRepository stockCarInvoice, ITemplateRepository template, ISubmitExpenseRepository? submitExpense = null, ITransferMoneyRepository? transferMoney = null, IStockCarExpenseRepository? stockCarExpense = null, IStockCarPaymentInvoiceRepository? stockCarPaymentInvoice = null)
         {
             Users = users;
             Branches = branches;
@@ -23,12 +26,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
             NewInvoice = newInvoice;
             ChangeInvoice = changeInvoice;
             ReturnInvoice = returnInvoice;
-            IssuanceInvoice = issuanceInvoice;
             DividedInvoice = dividedInvoice;
-            InvoiceReport = invoiceReport;
             CheckReturnInvoice = checkReturnInvoice;
             DeliveryPaid = deliveryPaid;
-            DailyPayment = dailyPayment;
+            ConfirmBalance = confirmBalance;
             ConfirmAccountReceivable = confirmAccountReceivable;
             SubmittingInvoice = submittingInvoice;
             Generators = generators;
@@ -89,10 +90,25 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
             InventoryTracking = inventoryTracking;
             WarehousePreset = warehousePreset;
             OpeningBalance = openingBalance;
+            StockCounting = stockCounting;
+            InvoiceClosingEntry = invoiceClosingEntry;
+            Areas = areas;
+            ExpenseTypes = expenseTypes;
+            GeneralRepository = generalRepository;
+            OldInvoice = oldInvoice;
+            PaymentInvoice = paymentInvoice;
+            Expense = expense;
+            StockCarInvoice = stockCarInvoice;
+            Template = template;
+            TransferMoney = transferMoney!;
+            StockCarExpense = stockCarExpense!;
+            StockCarPaymentInvoice = stockCarPaymentInvoice!;
+            SubmitExpense = submitExpense!;
         }
 
 
         public IGeneratorRepository Generators { get; }
+        public IGeneralRepository GeneralRepository { get; }
         public IUserRepository Users { get; set; }
         public IBranchRepository Branches { get; set; }
         public ICustomerRepository Customers { get; set; }
@@ -101,9 +117,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
         public APPLICATION.Interfaces.Payment.IDividedInvoiceRepository DividedInvoices { get; }
         public IDeliveryRepository Deliveries { get; }
         public IMarketRepository Markets { get; }
+        public IAreaRepository Areas { get; }
         public IWarehouseRepository Warehouses { get; }
         public IItemRepository Items { get; }
         public IEmployeeRepository Employee { get; }
+        public IInvoiceClosingEntryRepository InvoiceClosingEntry { get; }
         public IDistrictRepository Districts { get; set; }
         public IProvinceRepository Provinces { get; }
         public IAccountReceivablePresetRepository AccountReceivablePresets { get; }
@@ -111,12 +129,10 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
         public INewInvoiceRepository NewInvoice { get; }
         public IChangeInvoiceRepository ChangeInvoice { get; }
         public IReturnInvoiceRepository ReturnInvoice { get; }
-        public IIssuanceInvoiceRepository IssuanceInvoice { get; }
         public IDividedInvoiceRepository DividedInvoice { get; }
-        public IInvoiceReportRepository InvoiceReport { get; }
         public ICheckReturnInvoiceRepository CheckReturnInvoice { get; }
         public IDeliveryPaidRepository DeliveryPaid { get; }
-        public IDailyPaymentRepository DailyPayment { get; }
+        public IConfirmBalanceRepository ConfirmBalance { get; }
         public IConfirmAccountReceivableRepository ConfirmAccountReceivable { get; }
         public ISubmittingInvoiceRepository SubmittingInvoice { get; }
         public IAccountReceivableRepository AccountReceivable { get; }
@@ -128,8 +144,14 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
         public IMonthlyInvoiceRepository InvoiceVerify { get; }
         public ISubmissionHistoryRepository HistoryApproval { get; }
         public IDailySubmissionRepository Approve { get; set; }
+        public ISubmitExpenseRepository SubmitExpense { get; }
         public IStockInventoryCountingRepository StockInventoryCounting { get; }
         public IVerifyInvoiceRepository VerifyInvoice { get; }
+        public IStockCarInvoiceRepository StockCarInvoice { get; }
+        public ITemplateRepository Template { get; }
+        public ITransferMoneyRepository TransferMoney { get; }
+        public IStockCarExpenseRepository StockCarExpense { get; }
+        public IStockCarPaymentInvoiceRepository StockCarPaymentInvoice { get; }
         public ISaleRepresentRepository SaleRepresent { get; }
         public IReviewReportRepository ReviewReport { get; }
         public ICheckingStockCarPaymentRepository CheckingStockCarPayment { get; }
@@ -173,5 +195,12 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
         public IInventoryTrackingRepository InventoryTracking { get; }
         public IWarehousePresetRepository WarehousePreset { get; }
         public IOpeningBalanceRepository OpeningBalance { get; }
+        public IStockCountingRepository StockCounting { get; }
+        public IOldInvoiceRepository OldInvoice { get; }
+        public IPaymentInvoiceRepository PaymentInvoice { get; }
+        public IExpenseTypeRepository ExpenseTypes { get; }
+        public IExpenseRepository Expense { get; }
+        public IExpenseRepository Expenses => Expense;
+        public IExpenseRepository ExpenseRepository => Expense;
     }
 }

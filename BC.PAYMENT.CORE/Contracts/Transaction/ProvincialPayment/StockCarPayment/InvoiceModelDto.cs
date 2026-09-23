@@ -1,6 +1,4 @@
-﻿
-
-namespace BC.PAYMENT.CORE.DTO.Transaction.ProvincialPayment.StockCarPayment
+﻿namespace BC.PAYMENT.CORE.Contracts.Transaction.ProvincialPayment.StockCarPayment
 {
     public class InvoiceModelDto
     {

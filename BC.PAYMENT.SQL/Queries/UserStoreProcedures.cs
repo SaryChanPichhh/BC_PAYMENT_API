@@ -58,17 +58,18 @@
                     AND U.USER_STATUS = 1;";
 
         public static string IsExistsUser =>
-            $@"SELECT M.DB_CODE DbCode, S.DB_NAME DbName
-                FROM 
-                    dbo.BCUSERS U
-                INNER JOIN 
-                    dbo.BCMSAPP M 
-                    ON M.USER_ID = U.USER_ID
-              INNER JOIN SIDBINFO S ON S.DB_CODE = M.DB_CODE
-                WHERE 
-                    U.USER_NAME = @USER_NAME
-                    AND M.APP_CODE = @APP_CODE
-                    AND U.USER_STATUS = 1;";
+            $@"
+    SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) IsExists
+                  FROM 
+                      dbo.BCUSERS U
+                  INNER JOIN 
+                      dbo.BCMSAPP M 
+                      ON M.USER_ID = U.USER_ID
+                  WHERE 
+                      U.USER_NAME = @USER_NAME
+                      AND M.APP_CODE = @APP_CODE
+                      AND U.USER_STATUS = 1;
+";
         public static string GetUserId => "";
         public static string GetAppCode => "";
     }

@@ -1,4 +1,6 @@
-namespace BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DeliveryPaid
+using BC.PAYMENT.CORE.Contracts.Expense;
+
+namespace BC.PAYMENT.CORE.Contracts.Transaction.DailyPayment.DeliveryPaid
 {
     public  class InvoicePaymentDto
     {

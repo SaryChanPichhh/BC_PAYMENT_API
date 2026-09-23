@@ -3,8 +3,8 @@ using System.Net;
 using BC.PAYMENT.API.Helper;
 using BC.PAYMENT.API.Models;
 using BC.PAYMENT.APPLICATION.Interfaces.General;
-using BC.PAYMENT.CORE.DTO.Prepare.Preset;
-using BC.PAYMENT.CORE.Entities.Prepare.Preset;
+using BC.PAYMENT.CORE.Contracts.Setting.Preset;
+using BC.PAYMENT.CORE.Entities.Setting.Preset;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BC.PAYMENT.API.Controllers.Setting.Preset
@@ -13,7 +13,7 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
     {
         [HttpGet]
         [Route("")]
-        public async Task<ApiResponse<List<DistrictModel>>> GetDistrict()
+        public async Task<ApiResponse<List<DistrictResponseDTO>>> GetDistrict()
         {
             var claim = Common.DecodeJwt(HttpContext.User);
             try
@@ -21,7 +21,7 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
                 var execute = await unitOfWork.Districts.GetAsync(claim.DbCode!);
                 if (execute.Any())
                 {
-                    return ApiResponse<List<DistrictModel>>.Builder()
+                    return ApiResponse<List<DistrictResponseDTO>>.Builder()
                         .WithMessage("District fetched successfully")
                         .WithStatusCode((int)HttpStatusCode.OK)
                         .WithResult(execute)
@@ -29,22 +29,22 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
                 }
                 else
                 {
-                    return ApiResponse<List<DistrictModel>>.Builder()
+                    return ApiResponse<List<DistrictResponseDTO>>.Builder()
                         .WithMessage("District fetched unsuccessfully")
                         .WithStatusCode((int)HttpStatusCode.BadRequest)
-                        .WithResult(new List<DistrictModel>())
+                        .WithResult(new List<DistrictResponseDTO>())
                         .Build();
                 }
             }
             catch (Exception ex)
             {
-                return GlobalExceptionHandler.ExceptionError<List<DistrictModel>>(ex.Message);
+                return GlobalExceptionHandler.ExceptionError<List<DistrictResponseDTO>>(ex.Message);
             }
         }
 
         [HttpGet]
-        [Route("GetDistrictByDistrict/{districtName}")]
-        public async Task<ApiResponse<List<DistrictModel>>> GetDistrictByDistrictAsync([Required]string districtName)
+        [Route("by-name/{districtName}")]
+        public async Task<ApiResponse<List<DistrictResponseDTO>>> GetDistrictByDistrictAsync([Required]string districtName)
         {
             var claim = Common.DecodeJwt(HttpContext.User);
             try
@@ -52,7 +52,7 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
                 var execute = await unitOfWork.Districts.GetDistrictsByDistrictAsync(districtName);
                 if (execute.Any())
                 {
-                    return ApiResponse<List<DistrictModel>>.Builder()
+                    return ApiResponse<List<DistrictResponseDTO>>.Builder()
                         .WithMessage("District fetched successfully")
                         .WithStatusCode((int)HttpStatusCode.OK)
                         .WithResult(execute)
@@ -60,30 +60,29 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
                 }
                 else
                 {
-                    return ApiResponse<List<DistrictModel>>.Builder()
+                    return ApiResponse<List<DistrictResponseDTO>>.Builder()
                         .WithMessage("District fetched unsuccessfully")
                         .WithStatusCode((int)HttpStatusCode.BadRequest)
-                        .WithResult(new List<DistrictModel>())
+                        .WithResult(new List<DistrictResponseDTO>())
                         .Build();
                 }
             }
             catch (Exception ex)
             {
-                return GlobalExceptionHandler.ExceptionError<List<DistrictModel>>(ex.Message);
+                return GlobalExceptionHandler.ExceptionError<List<DistrictResponseDTO>>(ex.Message);
             }
         }
         
         [HttpGet]
-        [Route("GetDistrictByProvince/{provinceName}")]
-        public async Task<ApiResponse<List<DistrictModel>>> GetDistrictByProvinceAsync([Required]string provinceName)
+        [Route("by-province-id/{provinceId}")]
+        public async Task<ApiResponse<List<DistrictResponseDTO>>> GetDistrictByProvinceAsync([Required]string provinceId)
         {
-            var claim = Common.DecodeJwt(HttpContext.User);
             try
             {
-                var execute = await unitOfWork.Districts.GetDistrictsByProvinceAsync(provinceName);
+                var execute = await unitOfWork.Districts.GetDistrictsByProvinceAsync(provinceId);
                 if (execute.Any())
                 {
-                    return ApiResponse<List<DistrictModel>>.Builder()
+                    return ApiResponse<List<DistrictResponseDTO>>.Builder()
                         .WithMessage("District fetched successfully")
                         .WithStatusCode((int)HttpStatusCode.OK)
                         .WithResult(execute)
@@ -91,16 +90,16 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
                 }
                 else
                 {
-                    return ApiResponse<List<DistrictModel>>.Builder()
+                    return ApiResponse<List<DistrictResponseDTO>>.Builder()
                         .WithMessage("District fetched unsuccessfully")
                         .WithStatusCode((int)HttpStatusCode.BadRequest)
-                        .WithResult(new List<DistrictModel>())
+                        .WithResult(new List<DistrictResponseDTO>())
                         .Build();
                 }
             }
             catch (Exception ex)
             {
-                return GlobalExceptionHandler.ExceptionError<List<DistrictModel>>(ex.Message);
+                return GlobalExceptionHandler.ExceptionError<List<DistrictResponseDTO>>(ex.Message);
             }
         }
         
@@ -134,14 +133,14 @@ namespace BC.PAYMENT.API.Controllers.Setting.Preset
             }
         }
         
-        [HttpPatch]
+        [HttpPut]
         [Route("")]
         public async Task<ApiResponse<int>> UpdateDistrictAsync([Required] DistrictUpdateDto model)
         {
             var claim = Common.DecodeJwt(HttpContext.User);
             try
             {
-                var districtModel = new DistrictModel()
+                var districtModel = new DistrictModel
                 {
                     District = model.District,
                     DistrictId = model.DistrictId,

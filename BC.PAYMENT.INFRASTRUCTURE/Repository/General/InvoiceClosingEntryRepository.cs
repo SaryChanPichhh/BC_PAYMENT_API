@@ -1,48 +1,36 @@
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
 {
-    public class InvoiceClosingEntryRepository : IInvoiceClosingEntryRepository
+    public class InvoiceClosingEntryRepository(ISqlDataAccess sqlDataAccess) : IInvoiceClosingEntryRepository
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-
-        public InvoiceClosingEntryRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
         public async Task<bool> CheckIsEntriesIsAlreadyOpenAsync(string dbCode)
         {
-            const string sql = @"SELECT COUNT(*) FROM PAYMENT_CLOSING_ENTRY_INVOICE WHERE IS_ACTIVE=1 AND DB_CODE=@DB_CODE";
             var param = new
             {
                 DB_CODE = dbCode
             };
-            return await _sqlDataAccess.ExecuteScalarAsync<bool, dynamic>(sql, param);
+            return await sqlDataAccess.ExecuteScalarAsync<bool, dynamic>(InvoiceClosingEntryQueries.CheckIsEntriesIsAlreadyOpen, param);
         }
-        public async Task<int> CreateClosingEntryAsync(InvoiceClosingEntriesModel closingEntry, string dbCode)
+        public async Task<int> CreateClosingEntryAsync(InvoiceClosingEntriesModel closingEntry)
         {
-            const string sql =
-                @"INSERT INTO PAYMENT_CLOSING_ENTRY_INVOICE(CODE,DB_CODE,DESCRIPTION,CREATED_BY,CREATED_DATE,IS_ACTIVE)
-                VALUES(@CODE,@DB_CODE,@DESCRIPTION,@CREATED_BY,@CREATED_DATE,@IS_ACTIVE)";
+            var code = await  GenerateOpeningEntryCodeAsync(closingEntry.DbCode);
             var param = new
             {
-                CODE = closingEntry.Code,
-                DB_CODE = dbCode,
+                CODE = code,
+                DB_CODE = closingEntry.DbCode,
                 DESCRIPTION = closingEntry.Description,
                 CREATED_BY = closingEntry.CreatedBy,
                 CREATED_DATE = DateTime.Now,
                 IS_ACTIVE = true
             };
-            return await _sqlDataAccess.ExecuteAsync(sql, param);
+            return await sqlDataAccess.ExecuteAsync(InvoiceClosingEntryQueries.AddNew, param);
         }
         public async Task<string> GenerateOpeningEntryCodeAsync(string dbCode)
         {
-            const string sql = @"SELECT ISNULL(MAX(SUBSTRING(CODE,8,10)),0) FROM PAYMENT_CLOSING_ENTRY_INVOICE
-         WHERE SUBSTRING(CODE,4,2) = MONTH(GETDATE()) AND DB_CODE = @DB_CODE";
             var param = new
             {
                 DB_CODE = dbCode
             };
-            var results = await _sqlDataAccess.ExecuteScalarAsync<int, dynamic>(sql, param);
+            var results = await sqlDataAccess.ExecuteScalarAsync<int, dynamic>(InvoiceClosingEntryQueries.GenerateEntriesCode, param);
             results++;
             var generateCode = $@"{dbCode}{DateTime.Now.Month:D2}{DateTime.Now.Year.ToString().Substring(2, 2)}{results:D3}";
             return generateCode;
@@ -54,7 +42,7 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.General
             {
                 DB_CODE = dbCode
             };
-            var results = await _sqlDataAccess.ExecuteScalarAsync<string, dynamic>(sql, param);
+            var results = await sqlDataAccess.ExecuteScalarAsync<string, dynamic>(sql, param);
             return results;
         }
     }
