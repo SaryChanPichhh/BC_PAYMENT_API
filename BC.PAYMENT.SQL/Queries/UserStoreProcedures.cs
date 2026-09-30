@@ -1,4 +1,4 @@
-﻿namespace BC.PAYMENT.SQL.Queries
+namespace BC.PAYMENT.SQL.Queries
 {
     public static class UserStoreProcedures
     {
@@ -16,9 +16,7 @@
                     dbo.BCMSAPP M 
                     ON M.USER_ID = U.USER_ID
                 WHERE 
-                    M.DB_CODE = @DB_CODE 
-                    AND M.APP_CODE = @APP_CODE
-                    AND U.USER_STATUS = 1";
+                    U.USER_STATUS = 1";
         public static string UserById 
             => @"SELECT 
                     U.USER_ID UserId, 

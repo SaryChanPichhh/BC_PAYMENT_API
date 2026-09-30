@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "dgSpecHash": "yjQoHT5oH/U=",
-  "success": false,
+  "dgSpecHash": "rmyiSmuHR1s=",
+  "success": true,
   "projectFilePath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.REPORTS\\BC.PAYMENT.REPORTS.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\USER\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
@@ -120,17 +120,6 @@
       "warningLevel": 1,
       "filePath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.REPORTS\\BC.PAYMENT.REPORTS.csproj",
       "libraryId": "DevExpress.AspNetCore.Reporting",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    },
-    {
-      "code": "NU1104",
-      "level": "Error",
-      "message": "Unable to find project 'D:\\Project BC\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.API\\BC.PAYMENT.API.csproj'. Check that the project reference is valid and that the project file exists.",
-      "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.REPORTS\\BC.PAYMENT.REPORTS.csproj",
-      "filePath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.REPORTS\\BC.PAYMENT.REPORTS.csproj",
-      "libraryId": "D:\\Project BC\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.API\\BC.PAYMENT.API.csproj",
       "targetGraphs": [
         "net8.0"
       ]

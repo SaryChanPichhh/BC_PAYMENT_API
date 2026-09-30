@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using BC.PAYMENT.CORE.Contracts.Request.StockCar;
 using BC.PAYMENT.CORE.Contracts.Response.StockCar;
+using BC.PAYMENT.CORE.Contracts.Response.User;
 using BC.PAYMENT.CORE.Entities;
 
 namespace BC.PAYMENT.API.Controllers.StockCar;
@@ -31,6 +32,32 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
         catch (Exception ex)
         {
             return GlobalExceptionHandler.ExceptionError<List<TemplateResponse>>(ex.Message);
+        }
+    }
+    [HttpGet]
+    [Route("has-completed")]
+    public async Task<ApiResponse<List<UserResponse>>> GetAllUsersWhoCompletedPayment()
+    {
+        var credential = Common.DecodeJwt(User);
+        try
+        {
+            var data = await unitOfWork.Template.GetAllUsersWhoCompletedPayment(credential?.DbCode);
+            if (data.Count > 0)
+            {
+                return ApiResponse<List<UserResponse>>.Builder()
+                    .WithMessage("data fetched successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(data)
+                    .Build();
+            }
+            return ApiResponse<List<UserResponse>>.Builder()
+                .WithMessage("data fetched empty.")
+                .WithStatusCode((int)HttpStatusCode.BadRequest)
+                .Build();
+        }
+        catch (Exception ex)
+        {
+            return GlobalExceptionHandler.ExceptionError<List<UserResponse>>(ex.Message);
         }
     }
 

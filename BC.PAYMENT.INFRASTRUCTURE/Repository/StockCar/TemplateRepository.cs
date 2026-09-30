@@ -1,5 +1,6 @@
 using BC.PAYMENT.APPLICATION.Interfaces.StockCar;
 using BC.PAYMENT.CORE.Contracts.Response.StockCar;
+using BC.PAYMENT.CORE.Contracts.Response.User;
 using BC.PAYMENT.CORE.Entities;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.StockCar;
@@ -62,5 +63,17 @@ public class TemplateRepository(ISqlDataAccess sqlDataAccess) : ITemplateReposit
         };
         var affectedRow = await sqlDataAccess.ExecuteAsync(sql, parameter);
         return affectedRow;
+    }
+
+    public async Task<List<UserResponse>> GetAllUsersWhoCompletedPayment(string dbCode)
+    {
+        var sql = @"
+                SELECT DISTINCT U.USER_ID EmployeeId,UPPER(LEFT(USER_NAME,1))+LOWER(SUBSTRING(USER_NAME,2,LEN(USER_NAME))) EmployeeName
+                FROM BCUSERS U INNER JOIN BCMSAPP MS ON MS.USER_ID = U.USER_ID
+                INNER JOIN TEMPLATE T ON T.Employee = U.USER_ID AND T.DbCode = @DB_CODE
+                WHERE U.USER_TYPE = 'S' 
+                AND T.IsEnable = 0";
+        var execute = await sqlDataAccess.LoadData<UserResponse, dynamic>(sql, new{DB_CODE = dbCode});
+        return execute.ToList();
     }
 }

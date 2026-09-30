@@ -55,35 +55,6 @@ namespace BC.PAYMENT.API.Controllers.Report.ProvincialPayment
 
         }
 
-        [HttpGet]
-        [Route("gettemplatebyemployeeid")]
-        public async Task<ApiResponse<List<TemplateModel>>> GetAllTemplateByEmployeId([Required] int employeeId)
-        {
-            try
-            {
-                var execute = await _unitOfWork.Employee.GetAllTemplateByEmployeId(employeeId);
-                if (execute.Any())
-                {
-                    return ApiResponse<List<TemplateModel>>.Builder()
-                        .WithResult(execute)
-                        .WithStatusCode(StatusCodes.Status200OK)
-                        .WithMessage("Template fetched successfully")
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<List<TemplateModel>>.Builder()
-                        .WithStatusCode(StatusCodes.Status400BadRequest)
-                        .WithMessage("Template fetched unsuccessfully")
-                        .Build();
-                }
-            }
-            catch (Exception ex)
-            {
-                return GlobalExceptionHandler.ExceptionError<List<TemplateModel>>(ex.Message);
-            }
-        }
-
         #endregion
 
         #region Car Payment Credit Invoice

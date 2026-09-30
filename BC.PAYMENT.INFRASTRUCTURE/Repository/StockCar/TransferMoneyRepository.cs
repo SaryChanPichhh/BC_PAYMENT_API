@@ -13,10 +13,10 @@ public class TransferMoneyRepository(ISqlDataAccess sqlDataAccess) : ITransferMo
             @"SELECT S.ID Id, S.TRANSACTION_DATE TransactionDate, S.AMOUNT Amount, S.DESCRIPTION Description,
                      S.DEPOSIT_DOLLAR DepositDollar, S.DEPOSIT_RIEL DepositRiel, S.DEPOSIT_EXCHANGE DepositExchange,
                      S.DOLLAR DollarFromEmployee, S.RIEL RielFromEmployee, S.EXCHANGE ExchangeRateEmployee,
-                     UPPER(Emp.username) Employee, Emp.userid EmployeeId
+              UPPER(Emp.USER_NAME) Employee, Emp.USER_ID EmployeeId
               FROM BCSTOCK_CAR_SENT_MONEY_DETAILS S
               INNER JOIN TEMPLATE T ON T.Id = S.TEMPLATE_ID
-              INNER JOIN (SELECT userid, username FROM USERS WHERE dbcode = @DbCode) Emp ON CONVERT(VARCHAR, Emp.userid) = T.Employee
+              INNER JOIN BCUSERS Emp ON CONVERT(VARCHAR, Emp.USER_ID) = T.Employee
               WHERE S.DB_CODE = @DbCode AND S.TEMPLATE_ID = @TemplateId";
         var parameter = new
         {

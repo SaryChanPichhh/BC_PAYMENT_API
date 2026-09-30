@@ -71,6 +71,21 @@ public class StockCarInvoiceRepository(ISqlDataAccess sqlDataAccess) : IStockCar
         return await sqlDataAccess.ExecuteAsync(sql, new { ID = id });
     }
 
+    public async Task<int> UpdateInvoiceByIdAsync(BcStockCar model)
+    {
+        const string sql =
+            "UPDATE BCSTOCK_CAR SET CUSTOMER_CODE = @CustomerCode,CUSTOMER_NAME = @CustomerName,VALUE = @Value Where ID = @Id";
+        var parameter = new
+        {
+            CustomerCode = model.CustomerCode,
+            CustomerName = model.CustomerName,
+            Value = model.Value,
+            Id = model.Id
+        };
+        var affectedRow = await sqlDataAccess.ExecuteAsync(sql, parameter);
+        return affectedRow;
+    }
+
     public async Task<int> AddNewStockCarInvoiceAsync(BcStockCar model)
     {
         const string sql =

@@ -134,4 +134,39 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
         }
     }
+
+    [HttpPut]
+    [Route("")]
+    public async Task<ApiResponse<int>> UpdateInvoiceByIdAsync([FromBody] UpdateStockCarInvoiceRequest request)
+    {
+        var credential = Common.DecodeJwt(User);
+        try
+        {
+            var model = new BcStockCar
+            {
+                Id = request.Id,
+                CustomerCode = request.CustomerCode,
+                CustomerName = request.CustomerName,
+                Value = request.Value
+            };
+            var affectedRow = await unitOfWork.StockCarInvoice
+                .UpdateInvoiceByIdAsync(model);
+            if (affectedRow > 0)
+            {
+                return ApiResponse<int>.Builder()
+                    .WithMessage("data updated successfully.")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(affectedRow)
+                    .Build();
+            }
+            return ApiResponse<int>.Builder()
+                .WithMessage("data updated unsuccessfully.")
+                .WithStatusCode((int)HttpStatusCode.BadRequest)
+                .Build();
+        }
+        catch (Exception ex)
+        {
+            return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
+        }
+    }
 }

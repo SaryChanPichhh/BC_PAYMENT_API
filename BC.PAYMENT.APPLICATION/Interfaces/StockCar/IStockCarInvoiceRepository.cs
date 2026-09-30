@@ -8,5 +8,7 @@ public interface IStockCarInvoiceRepository
     Task<List<StockCarInvoiceResponse>> GetStockCarInvoicesByInvoiceTypeAsync(string dbCode,int templateId,InvoiceStatus invoiceStatus);
     Task<List<PaymentInvoiceResponse>> GetPaymentInvoicesByTemplateIdAsync(string dbCode, int templateId);
     Task<int> DeleteStockCarInvoiceByIdAsync(int id);
+    Task<int> UpdateInvoiceByIdAsync(BcStockCar model);
     Task<int> AddNewStockCarInvoiceAsync(BcStockCar model);
+
 }
