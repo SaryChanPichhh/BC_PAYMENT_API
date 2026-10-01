@@ -1,4 +1,3 @@
-
 using BC.PAYMENT.API.MapperHelper.ViewStock;
 using BC.PAYMENT.APPLICATION.Interfaces.ViewStock;
 using BC.PAYMENT.CORE.DTO.ViewStock;
@@ -7,10 +6,14 @@ namespace BC.PAYMENT.API.Controllers.ViewStock;
 
 [Helper.Authorize]
 [ApiController]
-public sealed class ViewStockController(IViewStockupRepository repository, ILogger<ViewStockController> logger) : BaseApiController
+public sealed class ViewStockController(IViewStockupRepository repository, ILogger<ViewStockController> logger)
+    : BaseApiController
 {
     private const int ClientClosedRequestStatusCode = 499;
-    private readonly IViewStockupRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+
+    private readonly IViewStockupRepository _repository =
+        repository ?? throw new ArgumentNullException(nameof(repository));
+
     private readonly ILogger<ViewStockController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpPost("sales-types")]
@@ -122,7 +125,8 @@ public sealed class ViewStockController(IViewStockupRepository repository, ILogg
         {
             _logger.LogError(ex, "Unexpected error while fetching view-stock lookup data.");
 
-            return CreateResponse<TDto>(false, HttpStatusCode.InternalServerError, "An unexpected error occurred while fetching lookup data.");
+            return CreateResponse<TDto>(false, HttpStatusCode.InternalServerError,
+                "An unexpected error occurred while fetching lookup data.");
         }
     }
 

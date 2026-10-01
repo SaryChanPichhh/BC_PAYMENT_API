@@ -9,46 +9,41 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-namespace BC.PAYMENT.API.Controllers.Preset.StockPrice
+namespace BC.PAYMENT.API.Controllers.Preset.StockPrice;
+
+public class InventoryValueController : BaseApiController
 {
+    private readonly IUnitOfWork _unitOfWork;
 
-    public class InventoryValueController : BaseApiController
+    public InventoryValueController(IUnitOfWork unitOfWork)
     {
-        private readonly IUnitOfWork _unitOfWork;
+        _unitOfWork = unitOfWork;
+    }
 
-        public InventoryValueController(IUnitOfWork unitOfWork)
+    [HttpPost]
+    [Route("getinvetoryvalue")]
+    public async Task<ApiResponse<List<InventoryValueModel>>> GetInventoryValueAsync([FromBody] InventoryValueDto model)
+    {
+        var credential = Common.DecodeJwt(User);
+        try
         {
-            _unitOfWork = unitOfWork;
+            var execute = await _unitOfWork.InventoryValue.GetInventoryValueAsync(
+                model.BranchDtos.ToDictionary(x => x.DbCode, x => x.DbName), model.Page, model.PageSize);
+            if (execute.Any())
+                return ApiResponse<List<InventoryValueModel>>.Builder()
+                    .WithResult(execute)
+                    .WithStatusCode(StatusCodes.Status200OK)
+                    .WithMessage("Account receivable fetched successfully")
+                    .Build();
+            else
+                return ApiResponse<List<InventoryValueModel>>.Builder()
+                    .WithStatusCode(StatusCodes.Status400BadRequest)
+                    .WithMessage("Account receivable fetched unsuccessfully")
+                    .Build();
         }
-
-        [HttpPost]
-        [Route("getinvetoryvalue")]
-        public async Task<ApiResponse<List<InventoryValueModel>>> GetInventoryValueAsync([FromBody] InventoryValueDto model)
+        catch (Exception ex)
         {
-            var credential = Common.DecodeJwt(User);
-            try
-            {
-                var execute = await _unitOfWork.InventoryValue.GetInventoryValueAsync(model.BranchDtos.ToDictionary(x => x.DbCode, x => x.DbName), model.Page, model.PageSize);
-                if (execute.Any())
-                {
-                    return ApiResponse<List<InventoryValueModel>>.Builder()
-                        .WithResult(execute)
-                        .WithStatusCode(StatusCodes.Status200OK)
-                        .WithMessage("Account receivable fetched successfully")
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<List<InventoryValueModel>>.Builder()
-                        .WithStatusCode(StatusCodes.Status400BadRequest)
-                        .WithMessage("Account receivable fetched unsuccessfully")
-                        .Build();
-                }
-            }
-            catch (Exception ex)
-            {
-                return GlobalExceptionHandler.ExceptionError<List<InventoryValueModel>>(ex.Message);
-            }
+            return GlobalExceptionHandler.ExceptionError<List<InventoryValueModel>>(ex.Message);
         }
     }
 }

@@ -1,19 +1,19 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice;
+
+public class ClosingInventoryRepository : IClosingInventoryRepository
 {
-    public class ClosingInventoryRepository : IClosingInventoryRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+    private readonly IConfiguration _setting;
+
+    public ClosingInventoryRepository(ISqlDataAccess sqlDataAccess, IConfiguration setting)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
-        private readonly IConfiguration _setting;
+        _sqlDataAccess = sqlDataAccess;
+        _setting = setting;
+    }
 
-        public ClosingInventoryRepository(ISqlDataAccess sqlDataAccess, IConfiguration setting)
-        {
-            _sqlDataAccess = sqlDataAccess;
-            _setting = setting;
-        }
-
-        public async Task<List<ClosingStockEntryModel>> GetClosingEntryDay(string dbCode, string date)
-        {
-            var sql = $@"SELECT DISTINCT
+    public async Task<List<ClosingStockEntryModel>> GetClosingEntryDay(string dbCode, string date)
+    {
+        var sql = $@"SELECT DISTINCT
             T.OpeningItemCode ItemCode,
             T.OpeningLocation Location,
             T.CLOSING_BALANCE OpeningBalance,
@@ -41,19 +41,19 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice
             WHERE C.STATUS = 0 AND C.DB_CODE = @DB_CODE AND S.WAR_STAT = 'A' AND S.DB_CODE = @DB_CODE AND CLOSING_TYPE <> 'Monthly' AND CLOSING_TYPE <> 'Yearly'
             ) T  ORDER BY ItemCode
             ";
-            var param = new
-            {
-                DATE = date,
-                DB_CODE = dbCode
-            };
-            var results = await _sqlDataAccess.LoadData<ClosingStockEntryModel, dynamic>(sql, param);
-            return results.ToList();
-        }
-
-        public async Task<bool> CheckStockQuantityAsync(string dbCode, string location, string itemCode)
+        var param = new
         {
-            var sql =
-                @$"SELECT CAST(CASE WHEN COUNT(QUANTITY) > 0 THEN 1 ELSE 0 END AS BIT) FROM 
+            DATE = date,
+            DB_CODE = dbCode
+        };
+        var results = await _sqlDataAccess.LoadData<ClosingStockEntryModel, dynamic>(sql, param);
+        return results.ToList();
+    }
+
+    public async Task<bool> CheckStockQuantityAsync(string dbCode, string location, string itemCode)
+    {
+        var sql =
+            @$"SELECT CAST(CASE WHEN COUNT(QUANTITY) > 0 THEN 1 ELSE 0 END AS BIT) FROM 
             (SELECT PHYSICAL AS QUANTITY 
 	          -- (SELECT PHYSICAL-TAB5.ON_ORDER AS QUANTITY 
 			        FROM (SELECT TAB3.LOCATION,TAB3.ITEM_CODE,TAB3.ITEM_DESC,TAB3.UNIT_STOCK,TAB3.PHYSICAL,ISNULL(TAB4.HOLD_SALE,0) ON_ORDER 
@@ -69,64 +69,64 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice
 					           LEFT JOIN (SELECT LOCATION,ITEM_CODE,SUM(QUANTITY) PICK_QTY 
 								        FROM {dbCode}SIINVMOVH WHERE  IR_STAT<>'I' AND STATUS='10' GROUP BY LOCATION,ITEM_CODE) 
 						                AS TAB6 ON TAB5.LOCATION=TAB6.LOCATION AND TAB5.ITEM_CODE=TAB6.ITEM_CODE WHERE TAB5.LOCATION=@LOCATION AND TAB5.ITEM_CODE= @ITEM_CODE) AS TAB7 WHERE QUANTITY <> 0";
-            var param = new { DB_CODE = dbCode, LOCATION = location, ITEM_CODE = itemCode, };
-            var results = await _sqlDataAccess.LoadSingleData<bool, dynamic>(sql, param);
-            return results;
-        }
+        var param = new { DB_CODE = dbCode, LOCATION = location, ITEM_CODE = itemCode };
+        var results = await _sqlDataAccess.LoadSingleData<bool, dynamic>(sql, param);
+        return results;
+    }
 
-        public async Task<int> InsertNewItem(NewItemModel model)
-        {
-            const string sql =
-                @"INSERT INTO TB_BC_CLOSING_ENTRY(DB_CODE, LOCATION, ITEM_CODE, OPENING_QTY, CREATED_DATE, CREATED_BY,
+    public async Task<int> InsertNewItem(NewItemModel model)
+    {
+        const string sql =
+            @"INSERT INTO TB_BC_CLOSING_ENTRY(DB_CODE, LOCATION, ITEM_CODE, OPENING_QTY, CREATED_DATE, CREATED_BY,
                    STATUS,CLOSING_TYPE ) VALUES (@DB_CODE, @LOCATION, @ITEM_CODE, @OPENING_QTY, @CREATED_DATE, @CREATED_BY,
                    @STATUS,@CLOSING_TYPE)";
 
-            var param = new
-            {
-                DB_CODE = model.DbCode,
-                LOCATION = model.Location,
-                ITEM_CODE = model.ItemCode,
-                OPENING_QTY = 0,
-                CREATED_DATE = DateTime.Today,
-                CREATED_BY = model.CreatedBy,
-                STATUS = "0",
-                CLOSING_TYPE = "Daily" // = "Opening"
-            };
-            var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param);
-            return rowAffected;
-        }
-
-        public async Task<bool> ExistItem(NewItemModel model)
+        var param = new
         {
-            const string sql =
-                @"SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) FROM TB_BC_CLOSING_ENTRY 
+            DB_CODE = model.DbCode,
+            LOCATION = model.Location,
+            ITEM_CODE = model.ItemCode,
+            OPENING_QTY = 0,
+            CREATED_DATE = DateTime.Today,
+            CREATED_BY = model.CreatedBy,
+            STATUS = "0",
+            CLOSING_TYPE = "Daily" // = "Opening"
+        };
+        var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param);
+        return rowAffected;
+    }
+
+    public async Task<bool> ExistItem(NewItemModel model)
+    {
+        const string sql =
+            @"SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) FROM TB_BC_CLOSING_ENTRY 
                 WHERE DB_CODE = @DB_CODE and LOCATION = @LOCATION AND ITEM_CODE = @ITEM_CODE";
-            var param = new { DB_CODE = model.DbCode, LOCATION = model.Location, ITEM_CODE = model.ItemCode, };
-            var rowAffected = await _sqlDataAccess.ExecuteScalarAsync<bool, dynamic>(sql, param);
+        var param = new { DB_CODE = model.DbCode, LOCATION = model.Location, ITEM_CODE = model.ItemCode };
+        var rowAffected = await _sqlDataAccess.ExecuteScalarAsync<bool, dynamic>(sql, param);
 
-            return rowAffected;
-        }
+        return rowAffected;
+    }
 
-        public async Task<bool> CheckDateIsAlreadyClosingEntry(string dbCode, DateTime date)
+    public async Task<bool> CheckDateIsAlreadyClosingEntry(string dbCode, DateTime date)
+    {
+        const string sql =
+            @"SELECT CAST(COUNT(*) AS BIT) FROM TB_BC_CLOSING_ENTRY WHERE CLOSING_DATE = @DATE AND DB_CODE = @DB_CODE";
+        var param = new
         {
-            const string sql =
-                @"SELECT CAST(COUNT(*) AS BIT) FROM TB_BC_CLOSING_ENTRY WHERE CLOSING_DATE = @DATE AND DB_CODE = @DB_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                DATE = date
-            };
-            var results = await _sqlDataAccess.LoadSingleData<bool, dynamic>(sql, param);
-            return results;
-        }
+            DB_CODE = dbCode,
+            DATE = date
+        };
+        var results = await _sqlDataAccess.LoadSingleData<bool, dynamic>(sql, param);
+        return results;
+    }
 
-        public async Task<int> InsertDailyClosingEntryAsync(List<ClosingStockEntryModel> closingEntryModel, bool status)
-        {
-            var connection = new SqlConnection(_setting.GetConnectionString("DBConnection"));
-            if (connection.State == System.Data.ConnectionState.Closed)
-                await connection.OpenAsync();
-            var sql =
-                @"IF NOT EXISTS (SELECT * FROM TB_BC_CLOSING_ENTRY 
+    public async Task<int> InsertDailyClosingEntryAsync(List<ClosingStockEntryModel> closingEntryModel, bool status)
+    {
+        var connection = new SqlConnection(_setting.GetConnectionString("DBConnection"));
+        if (connection.State == ConnectionState.Closed)
+            await connection.OpenAsync();
+        var sql =
+            @"IF NOT EXISTS (SELECT * FROM TB_BC_CLOSING_ENTRY 
                     WHERE DB_CODE = @DB_CODE 
                     AND LOCATION = @LOCATION
                     AND CLOSING_DATE =@CLOSING_DATE
@@ -141,182 +141,184 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice
                     AND CLOSING_DATE =@CLOSING_DATE
                     AND ITEM_CODE = @ITEM_CODE 
                     AND STATUS = 0 AND CLOSING_TYPE = @CLOSING_TYPE";
-            var sqlUpdate =
-                @"UPDATE TB_BC_CLOSING_ENTRY SET STATUS = 1,UPDATED_BY = @UPDATED_BY,UPDATED_DATE = @UPDATED_DATE WHERE STATUS = 0 AND DB_CODE = @DB_CODE AND ITEM_CODE = @ITEM_CODE AND LOCATION = @LOCATION ";
-            var affectedRows = 0;
-            if (status)
+        var sqlUpdate =
+            @"UPDATE TB_BC_CLOSING_ENTRY SET STATUS = 1,UPDATED_BY = @UPDATED_BY,UPDATED_DATE = @UPDATED_DATE WHERE STATUS = 0 AND DB_CODE = @DB_CODE AND ITEM_CODE = @ITEM_CODE AND LOCATION = @LOCATION ";
+        var affectedRows = 0;
+        if (status)
+        {
+            var transaction = await connection.BeginTransactionAsync();
+
+            foreach (var item in closingEntryModel)
             {
-                var transaction = await connection.BeginTransactionAsync();
-
-                foreach (var item in closingEntryModel)
+                var param = new
                 {
-                    var param = new
+                    CLOSING_DATE = item.ClosingDate,
+                    DB_CODE = item.DbCode,
+                    LOCATION = item.Location,
+                    ITEM_CODE = item.ItemCode,
+                    OPENING_QTY = item.OpeningBalance,
+                    PURCHASE_QTY = item.PurchaseOrder,
+                    ORDER_QTY = item.Order,
+                    SALE_QTY = item.Sale,
+                    TRANSFER_QTY = item.Transfer,
+                    CREDIT_NOTE_QTY = item.CreditNote,
+                    CHANGE_QTY = item.InventoryAdjustment,
+                    PRINT_QTY = item.Print,
+                    CLOSING_BALANCE = item.ClosingBalance,
+                    CREATED_DATE = item.CreatedDate,
+                    CREATED_BY = item.CreatedBy,
+                    CLOSING_TYPE = item.ClosingEntryType.ToString(),
+                    STATUS = "0"
+                };
+                await connection.ExecuteAsync(sqlUpdate,
+                    new
                     {
-                        CLOSING_DATE = item.ClosingDate,
                         DB_CODE = item.DbCode,
-                        LOCATION = item.Location,
                         ITEM_CODE = item.ItemCode,
-                        OPENING_QTY = item.OpeningBalance,
-                        PURCHASE_QTY = item.PurchaseOrder,
-                        ORDER_QTY = item.Order,
-                        SALE_QTY = item.Sale,
-                        TRANSFER_QTY = item.Transfer,
-                        CREDIT_NOTE_QTY = item.CreditNote,
-                        CHANGE_QTY = item.InventoryAdjustment,
-                        PRINT_QTY = item.Print,
-                        CLOSING_BALANCE = item.ClosingBalance,
-                        CREATED_DATE = item.CreatedDate,
-                        CREATED_BY = item.CreatedBy,
-                        CLOSING_TYPE = item.ClosingEntryType.ToString(),
-                        STATUS = "0"
-                    };
-                    await connection.ExecuteAsync(sqlUpdate,
-                        new
-                        {
-                            DB_CODE = item.DbCode,
-                            ITEM_CODE = item.ItemCode,
-                            LOCATION = item.Location,
-                            UPDATED_BY = item.CreatedBy,
-                            UPDATED_DATE = DateTime.Today
-                        }, transaction);
-                    affectedRows += await connection.ExecuteAsync(sql, param, transaction);
-                }
+                        LOCATION = item.Location,
+                        UPDATED_BY = item.CreatedBy,
+                        UPDATED_DATE = DateTime.Today
+                    }, transaction);
+                affectedRows += await connection.ExecuteAsync(sql, param, transaction);
+            }
 
-                if (affectedRows == closingEntryModel.Count)
-                {
-                    await transaction.CommitAsync();
-                    return affectedRows;
-                }
-                else
-                {
-                    await transaction.RollbackAsync();
-                    return affectedRows;
-                }
+            if (affectedRows == closingEntryModel.Count)
+            {
+                await transaction.CommitAsync();
+                return affectedRows;
             }
             else
             {
-                var transaction = connection.BeginTransaction();
-                foreach (var closingStock in closingEntryModel)
-                {
-                    var param = new
-                    {
-                        CLOSING_DATE = closingStock.ClosingDate,
-                        DB_CODE = closingStock.DbCode,
-                        LOCATION = closingStock.Location,
-                        ITEM_CODE = closingStock.ItemCode,
-                        OPENING_QTY = closingStock.OpeningBalance,
-                        PURCHASE_QTY = closingStock.PurchaseOrder,
-                        ORDER_QTY = closingStock.Order,
-                        SALE_QTY = closingStock.Sale,
-                        TRANSFER_QTY = closingStock.Transfer,
-                        CREDIT_NOTE_QTY = closingStock.CreditNote,
-                        CHANGE_QTY = closingStock.InventoryAdjustment,
-                        PRINT_QTY = closingStock.Print,
-                        CLOSING_BALANCE = closingStock.ClosingBalance,
-                        CREATED_DATE = closingStock.CreatedDate,
-                        CREATED_BY = closingStock.CreatedBy,
-                        CLOSING_TYPE = closingStock.ClosingEntryType.ToString(),
-                        STATUS = "0"
-                    };
-                    await connection.ExecuteAsync(sql, param, transaction);
-                }
-
-                if (affectedRows == closingEntryModel.Count)
-                {
-                    await transaction.CommitAsync();
-                    return affectedRows;
-                }
-                else
-                {
-                    await transaction.RollbackAsync();
-                    return affectedRows;
-                }
+                await transaction.RollbackAsync();
+                return affectedRows;
             }
         }
-
-        public async Task<List<ClosingStockEntryModel>> GetAllStockBalanceByBranchCode(string dbCode,
-            string closingDate)
+        else
         {
-            var sql =
-                $@"SELECT DB_CODE DbCode,CLOSING_DATE ClosingDate,LOCATION Location,ITEM_CODE ItemCode,OPENING_QTY OpeningBalance,PURCHASE_QTY PurchaseOrder,ORDER_QTY [Order], PRINT_QTY [Print],
+            var transaction = connection.BeginTransaction();
+            foreach (var closingStock in closingEntryModel)
+            {
+                var param = new
+                {
+                    CLOSING_DATE = closingStock.ClosingDate,
+                    DB_CODE = closingStock.DbCode,
+                    LOCATION = closingStock.Location,
+                    ITEM_CODE = closingStock.ItemCode,
+                    OPENING_QTY = closingStock.OpeningBalance,
+                    PURCHASE_QTY = closingStock.PurchaseOrder,
+                    ORDER_QTY = closingStock.Order,
+                    SALE_QTY = closingStock.Sale,
+                    TRANSFER_QTY = closingStock.Transfer,
+                    CREDIT_NOTE_QTY = closingStock.CreditNote,
+                    CHANGE_QTY = closingStock.InventoryAdjustment,
+                    PRINT_QTY = closingStock.Print,
+                    CLOSING_BALANCE = closingStock.ClosingBalance,
+                    CREATED_DATE = closingStock.CreatedDate,
+                    CREATED_BY = closingStock.CreatedBy,
+                    CLOSING_TYPE = closingStock.ClosingEntryType.ToString(),
+                    STATUS = "0"
+                };
+                await connection.ExecuteAsync(sql, param, transaction);
+            }
+
+            if (affectedRows == closingEntryModel.Count)
+            {
+                await transaction.CommitAsync();
+                return affectedRows;
+            }
+            else
+            {
+                await transaction.RollbackAsync();
+                return affectedRows;
+            }
+        }
+    }
+
+    public async Task<List<ClosingStockEntryModel>> GetAllStockBalanceByBranchCode(string dbCode,
+        string closingDate)
+    {
+        var sql =
+            $@"SELECT DB_CODE DbCode,CLOSING_DATE ClosingDate,LOCATION Location,ITEM_CODE ItemCode,OPENING_QTY OpeningBalance,PURCHASE_QTY PurchaseOrder,ORDER_QTY [Order], PRINT_QTY [Print],
                     SALE_QTY Sale,TRANSFER_QTY Transfer, CREDIT_NOTE_QTY CreditNote,CHANGE_QTY InventoryAdjustment , CREATED_BY CreatedBy, CREATED_DATE CreatedDate  
                     FROM
                     TB_BC_CLOSING_ENTRY WHERE CLOSING_TYPE <> 'Opening' AND ​CLOSING_TYPE <> 'Monthly' AND MONTH(CLOSING_DATE) = @MONTH AND YEAR(CLOSING_DATE) = @YEAR
                     AND DB_CODE = @DB_CODE 
                     ORDER BY ITEM_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                MONTH = Convert.ToDateTime(closingDate).Month,
-                YEAR = Convert.ToDateTime(closingDate).Year,
-                CLOSING_DATE = closingDate
-            };
-            var execute = await _sqlDataAccess.LoadData<ClosingStockEntryModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<int> InsertClosingMonthlyAndYearlyAsync(List<ClosingStockEntryModel> closingEntryModel,
-            ClosingEntryType closeType)
+        var param = new
         {
-            var sql =
-                $@"INSERT INTO TB_BC_CLOSING_ENTRY(DB_CODE, CLOSING_DATE, LOCATION, ITEM_CODE, OPENING_QTY, PURCHASE_QTY, ORDER_QTY, SALE_QTY, TRANSFER_QTY, CREDIT_NOTE_QTY, CHANGE_QTY, PRINT_QTY, CLOSING_BALANCE, CREATED_DATE, CREATED_BY, CLOSING_TYPE, STATUS)
+            DB_CODE = dbCode,
+            MONTH = Convert.ToDateTime(closingDate).Month,
+            YEAR = Convert.ToDateTime(closingDate).Year,
+            CLOSING_DATE = closingDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ClosingStockEntryModel, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<int> InsertClosingMonthlyAndYearlyAsync(List<ClosingStockEntryModel> closingEntryModel,
+        ClosingEntryType closeType)
+    {
+        var sql =
+            $@"INSERT INTO TB_BC_CLOSING_ENTRY(DB_CODE, CLOSING_DATE, LOCATION, ITEM_CODE, OPENING_QTY, PURCHASE_QTY, ORDER_QTY, SALE_QTY, TRANSFER_QTY, CREDIT_NOTE_QTY, CHANGE_QTY, PRINT_QTY, CLOSING_BALANCE, CREATED_DATE, CREATED_BY, CLOSING_TYPE, STATUS)
                     VALUES (@DB_CODE, @CLOSING_DATE, @LOCATION, @ITEM_CODE, @OPENING_QTY, @PURCHASE_QTY, @ORDER_QTY, @SALE_QTY, @TRANSFER_QTY, @CREDIT_NOTE_QTY, @CHANGE_QTY, @PRINT_QTY, @CLOSING_BALANCE, @CREATED_DATE, @CREATED_BY, @CLOSING_TYPE,'0')";
-            var connection = new SqlConnection(_setting.GetConnectionString("DBConnection"));
-            if (connection.State == System.Data.ConnectionState.Closed)
-                await connection.OpenAsync();
-            var transaction = await connection.BeginTransactionAsync();
-            try
+        var connection = new SqlConnection(_setting.GetConnectionString("DBConnection"));
+        if (connection.State == ConnectionState.Closed)
+            await connection.OpenAsync();
+        var transaction = await connection.BeginTransactionAsync();
+        try
+        {
+            foreach (var item in closingEntryModel)
             {
-                foreach (var item in closingEntryModel)
+                var param = new
                 {
-                    var param = new
-                    {
-                        DB_CODE = item.DbCode,
-                        CLOSING_DATE = item.ClosingDate,
-                        LOCATION = item.Location,
-                        ITEM_CODE = item.ItemCode,
-                        OPENING_QTY = item.OpeningBalance,
-                        PURCHASE_QTY = item.PurchaseOrder,
-                        ORDER_QTY = item.Order,
-                        SALE_QTY = item.Sale,
-                        TRANSFER_QTY = item.Transfer,
-                        CREDIT_NOTE_QTY = item.CreditNote,
-                        CHANGE_QTY = item.InventoryAdjustment,
-                        PRINT_QTY = item.Print,
-                        CLOSING_BALANCE = item.ClosingBalance,
-                        CREATED_DATE = DateTime.Today,
-                        CREATED_BY = item.CreatedBy,
-                        CLOSING_TYPE = closeType.ToString()
-                    };
-                    await _sqlDataAccess.ExecuteAsync(sql, param);
-                }
-                await transaction.CommitAsync();
+                    DB_CODE = item.DbCode,
+                    CLOSING_DATE = item.ClosingDate,
+                    LOCATION = item.Location,
+                    ITEM_CODE = item.ItemCode,
+                    OPENING_QTY = item.OpeningBalance,
+                    PURCHASE_QTY = item.PurchaseOrder,
+                    ORDER_QTY = item.Order,
+                    SALE_QTY = item.Sale,
+                    TRANSFER_QTY = item.Transfer,
+                    CREDIT_NOTE_QTY = item.CreditNote,
+                    CHANGE_QTY = item.InventoryAdjustment,
+                    PRINT_QTY = item.Print,
+                    CLOSING_BALANCE = item.ClosingBalance,
+                    CREATED_DATE = DateTime.Today,
+                    CREATED_BY = item.CreatedBy,
+                    CLOSING_TYPE = closeType.ToString()
+                };
+                await _sqlDataAccess.ExecuteAsync(sql, param);
             }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                Debug.WriteLine(ex.Message);
-            }
-            return closingEntryModel.Count;
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            Debug.WriteLine(ex.Message);
         }
 
-        public async Task<List<ClosingStockEntryModel>> GetAllStockBalanceMonthlyByBranchCode(string dbCode,
-            string closingDate)
-        {
-            var sql = $@"SELECT DB_CODE DbCode,CLOSING_DATE ClosingDate,LOCATION Location,ITEM_CODE ItemCode,OPENING_QTY OpeningBalance,PURCHASE_QTY PurchaseOrder,ORDER_QTY [Order], PRINT_QTY [Print],
+        return closingEntryModel.Count;
+    }
+
+    public async Task<List<ClosingStockEntryModel>> GetAllStockBalanceMonthlyByBranchCode(string dbCode,
+        string closingDate)
+    {
+        var sql =
+            $@"SELECT DB_CODE DbCode,CLOSING_DATE ClosingDate,LOCATION Location,ITEM_CODE ItemCode,OPENING_QTY OpeningBalance,PURCHASE_QTY PurchaseOrder,ORDER_QTY [Order], PRINT_QTY [Print],
                     SALE_QTY Sale,TRANSFER_QTY Transfer, CREDIT_NOTE_QTY CreditNote,CHANGE_QTY InventoryAdjustment , CREATED_BY CreatedBy, CREATED_DATE CreatedDate  
                     FROM
                     TB_BC_CLOSING_ENTRY WHERE CLOSING_TYPE <> 'Opening' AND YEAR(CLOSING_DATE) = @YEAR
                     AND DB_CODE = @DB_CODE AND CLOSING_TYPE = 'Monthly'
                     ORDER BY ITEM_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                YEAR = Convert.ToDateTime(closingDate).Year,
-                CLOSING_DATE = closingDate
-            };
-            var execute = await _sqlDataAccess.LoadData<ClosingStockEntryModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            YEAR = Convert.ToDateTime(closingDate).Year,
+            CLOSING_DATE = closingDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ClosingStockEntryModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice
+namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Audit.VerifyInvoice;
+
+public interface IVerifyInvoiceRepository
 {
-    public interface IVerifyInvoiceRepository
-    {
-        Task<List<VerifyInvoiceModel>> GetVerifyInvoicesAsync(string dbCode);
-        Task<int> InsertVerifyInvoicesAsync(List<OldInvoiceModel> model);
-    }
+    Task<List<VerifyInvoiceModel>> GetVerifyInvoicesAsync(string dbCode);
+    Task<int> InsertVerifyInvoicesAsync(List<OldInvoiceModel> model);
 }

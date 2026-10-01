@@ -1,10 +1,9 @@
-namespace BC.PAYMENT.CORE.Enums
+namespace BC.PAYMENT.CORE.Enums;
+
+public enum ClosingEntryType
 {
-    public enum ClosingEntryType
-    {
-        Daily,
-        Weekly,
-        Monthly,
-        Yearly
-    }
+    Daily,
+    Weekly,
+    Monthly,
+    Yearly
 }

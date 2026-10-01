@@ -1,19 +1,21 @@
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ItemRepairReport
-{
-    public class ItemExchangeReportRepository : IItemExchangeReportRepository
-    {
-        private readonly ISqlDataAccess _sqlDataAccess;
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ItemRepairReport;
 
-        public ItemExchangeReportRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-        public async Task<List<ExchangeItemReportDto>> GetExchangeItemInvoiceAsync(string dbCode,DateTime fromDate,DateTime toDate)
-        {
-            string sql =
-                @"SELECT S.LAST_NAME +' '+ S.FIRST_NAME [Seller],DB.DB_NAME DbName,CREATED_DATE SubmittedDate,INVOICE.INVOICE_DATE CompletedDate,ITEM_CODE ItemCode,DESCRIPION [Description],QUANTITY Quantity,
+public class ItemExchangeReportRepository : IItemExchangeReportRepository
+{
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public ItemExchangeReportRepository(ISqlDataAccess sqlDataAccess)
+    {
+        _sqlDataAccess = sqlDataAccess;
+    }
+
+    public async Task<List<ExchangeItemReportDto>> GetExchangeItemInvoiceAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
+    {
+        var sql =
+            @"SELECT S.LAST_NAME +' '+ S.FIRST_NAME [Seller],DB.DB_NAME DbName,CREATED_DATE SubmittedDate,INVOICE.INVOICE_DATE CompletedDate,ITEM_CODE ItemCode,DESCRIPION [Description],QUANTITY Quantity,
                 D.IS_RECEIVED [Status],CUS.*,INVOICE.TRANSACTION_CODE [Transaction],INVOICE.SUB_TOTAL Total FROM TB_BC_CHANGEINVOICE C INNER JOIN TB_BC_CHANGEINVOICE_DETAIL D 
                 ON D.CHANGE_INVOICE_ID = C.ID 
                 LEFT JOIN (SELECT ADD_CODE CustomerCode,ADD_LINE_1KH CustomerName,M.MARKET_KHMER_NAME Market,R.AREA_NAME_KHMER Area,STORE Store 
@@ -24,19 +26,20 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ItemRepairRepo
                 INNER JOIN dbo.BCUSERS S ON S.USER_ID = C.USER_CODE
                 LEFT JOIN TB_BC_CHANGEINVOICE_EXCHANGE_INVOICE INVOICE ON INVOICE.REQUEST_EXCHANGE_ID = C.ID
                 WHERE TYPE = 'EXCHANGE' AND C.DB_CODE = @DB_CODE AND CONVERT(DATE,INVOICE.INVOICE_DATE) BETWEEN @FROM_DATE AND @TO_DATE";
-            var param = new
-            {
-                DB_CODE =  dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate
-            };
-            var execute = await _sqlDataAccess.LoadData<ExchangeItemReportDto,dynamic>(sql,param);
-            return execute.ToList();
-        }
-
-        public async Task<List<ItemReceivedDto>> GetReceivedExchangeItemInvoiceAsync(string dbCode, DateTime fromDate, DateTime toDate)
+        var param = new
         {
-            var sql = @"
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ExchangeItemReportDto, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<ItemReceivedDto>> GetReceivedExchangeItemInvoiceAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
+    {
+        var sql = @"
                SELECT DetailId,MasterId,ReceivedDate,TransactionCode,Area,Market,ITEM_CODE ItemCode,Customer CustomerCode,CustomerName,QUANTITY Quantity,
                 Received Received,[Status] FROM (
                         SELECT TBCD.ID DetailId,TBC.ID MasterId,
@@ -62,34 +65,37 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ItemRepairRepo
 						WHERE CONVERT(DATE,REC.CREATED_DATE) BETWEEN @FROM_DATE AND @TO_DATE AND TBCD.[TYPE] = 'EXCHANGE'
 						AND TBC.DB_CODE = @DB_CODE
 						) TAB";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate,
-            };
-            var execute = await _sqlDataAccess.LoadData<ItemReceivedDto, dynamic>(sql,param);
-            return execute.ToList();
-        }
-
-        public async Task<List<ReportExchangePendingItemDto>> GetPendingExchangeItemInvoiceAsync(string dbCode)
+        var param = new
         {
-            var sql = $@"SELECT CUS.*,DETAIL.ITEM_CODE ItemCode,DETAIL.DESCRIPION [Description],QUANTITY Quantity,S.FIRST_NAME + S.LAST_NAME [Seller],HEADER.CREATED_DATE CreatedDate,DETAIL.IS_RECEIVED [Status] FROM TB_BC_CHANGEINVOICE_DETAIL 
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ItemReceivedDto, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<ReportExchangePendingItemDto>> GetPendingExchangeItemInvoiceAsync(string dbCode)
+    {
+        var sql =
+            $@"SELECT CUS.*,DETAIL.ITEM_CODE ItemCode,DETAIL.DESCRIPION [Description],QUANTITY Quantity,S.FIRST_NAME + S.LAST_NAME [Seller],HEADER.CREATED_DATE CreatedDate,DETAIL.IS_RECEIVED [Status] FROM TB_BC_CHANGEINVOICE_DETAIL 
                 DETAIL INNER JOIN TB_BC_CHANGEINVOICE HEADER ON HEADER.ID = DETAIL.CHANGE_INVOICE_ID
                 INNER JOIN GET_CUSTOMERS_BY_DB_CODE() CUS ON CUS.CustomerCode = HEADER.CUST_CODE
                 INNER JOIN BCUSERS S ON S.USER_ID = HEADER.USER_CODE
                 WHERE DETAIL.IS_RECEIVED IN ('Yes','CreditNote') AND TYPE = 'EXCHANGE' AND HEADER.DB_CODE = @DB_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode
-            };
-            var execute = await _sqlDataAccess.LoadData<ReportExchangePendingItemDto, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<List<ReportExchangeDto>> GetExchangeInvoiceNotYetSendToCustomerReportAsync(string dbCode, DateTime fromDate, DateTime toDate)
+        var param = new
         {
-            var sql = @"SELECT EXCHANGE.INVOICE_DATE [InvoiceDate],CUS.*,EXCHANGE.TRANSACTION_CODE [InvoiceNumber],ITEM.ITEM_CODE ItemCode,QUANTITY Quantity,UNIT_PRICE UnitPrice,TOTAL Total FROM TB_BC_CHANGEINVOICE_EXCHANGE_INVOICE EXCHANGE 
+            DB_CODE = dbCode
+        };
+        var execute = await _sqlDataAccess.LoadData<ReportExchangePendingItemDto, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<ReportExchangeDto>> GetExchangeInvoiceNotYetSendToCustomerReportAsync(string dbCode,
+        DateTime fromDate, DateTime toDate)
+    {
+        var sql =
+            @"SELECT EXCHANGE.INVOICE_DATE [InvoiceDate],CUS.*,EXCHANGE.TRANSACTION_CODE [InvoiceNumber],ITEM.ITEM_CODE ItemCode,QUANTITY Quantity,UNIT_PRICE UnitPrice,TOTAL Total FROM TB_BC_CHANGEINVOICE_EXCHANGE_INVOICE EXCHANGE 
 				INNER JOIN TB_BC_CHANGEINVOICE_EXCHANGE_ITEM ITEM ON ITEM.INVOICE_ID = EXCHANGE.ID
 				LEFT JOIN GET_CUSTOMERS_BY_DB_CODE() CUS ON CUS.CustomerCode = EXCHANGE.CUSTOMER_CODE
 				WHERE EXCHANGE.DB_CODE = @DB_CODE AND CAST(EXCHANGE.INVOICE_DATE AS DATE) BETWEEN @FROM_DATE AND @TO_DATE
@@ -104,19 +110,21 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ItemRepairRepo
                 WHERE  D.DB_CODE = @DB_CODE AND N.DB_CODE = @DB_CODE) T ORDER BY ROW_NUMBER() OVER (PARTITION BY TRANSACTION_REF ORDER BY CREATE_DATE DESC)) T
                 ) TAB WHERE TAB.Status = 'Completed')
 				ORDER BY TRANSACTION_CODE DESC";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate
-            };
-            var execute = await _sqlDataAccess.LoadData<ReportExchangeDto, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<List<ReportExchangeDto>> GetExchangeInvoiceAlreadySendToCustomerReportAsync(string dbCode, DateTime fromDate, DateTime toDate)
+        var param = new
         {
-            var sql = @"SELECT COMPLETED.CREATE_DATE [AllocationDate],EXCHANGE.INVOICE_DATE [InvoiceDate],CUS.*,EXCHANGE.TRANSACTION_CODE [InvoiceNumber],ITEM.ITEM_CODE ItemCode,QUANTITY Quantity,UNIT_PRICE UnitPrice,TOTAL Total FROM TB_BC_CHANGEINVOICE_EXCHANGE_INVOICE EXCHANGE INNER JOIN(SELECT TRANSACTION_REF,CREATE_DATE,Status FROM(
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ReportExchangeDto, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<ReportExchangeDto>> GetExchangeInvoiceAlreadySendToCustomerReportAsync(string dbCode,
+        DateTime fromDate, DateTime toDate)
+    {
+        var sql =
+            @"SELECT COMPLETED.CREATE_DATE [AllocationDate],EXCHANGE.INVOICE_DATE [InvoiceDate],CUS.*,EXCHANGE.TRANSACTION_CODE [InvoiceNumber],ITEM.ITEM_CODE ItemCode,QUANTITY Quantity,UNIT_PRICE UnitPrice,TOTAL Total FROM TB_BC_CHANGEINVOICE_EXCHANGE_INVOICE EXCHANGE INNER JOIN(SELECT TRANSACTION_REF,CREATE_DATE,Status FROM(
                 SELECT CREATE_DATE,TRANSACTION_REF,Status Id,StatusText,CASE WHEN InvoiceAmount = Paid THEN 'Completed' ELSE '' END [Status] FROM(
                 SELECT TOP 1 WITH TIES CREATE_DATE,TRANSACTION_REF,Status,StatusText,InvoiceAmount,Paid FROM (
                 SELECT D.CREATE_DATE,N.TRANSACTION_REF,CASE WHEN R.RETURN_ID IS NOT NULL THEN R.RETURN_ID ELSE P.PAYMENT_ID END [Status]
@@ -129,14 +137,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.ItemRepairRepo
 				INNER JOIN TB_BC_CHANGEINVOICE_EXCHANGE_ITEM ITEM ON ITEM.INVOICE_ID = EXCHANGE.ID
 				LEFT JOIN GET_CUSTOMERS_BY_DB_CODE() CUS ON CUS.CustomerCode = EXCHANGE.CUSTOMER_CODE
 				WHERE EXCHANGE.DB_CODE = @DB_CODE ORDER BY TRANSACTION_CODE";
-            var parameters = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate
-            };
-            var execute = await _sqlDataAccess.LoadData<ReportExchangeDto, dynamic>(sql, parameters);
-            return execute.ToList();
-        }
+        var parameters = new
+        {
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ReportExchangeDto, dynamic>(sql, parameters);
+        return execute.ToList();
     }
 }

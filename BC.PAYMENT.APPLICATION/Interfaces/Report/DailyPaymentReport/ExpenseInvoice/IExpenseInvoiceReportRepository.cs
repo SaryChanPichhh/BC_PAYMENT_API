@@ -1,7 +1,7 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Report.DailyPaymentReport.ExpenseInvoice
+namespace BC.PAYMENT.APPLICATION.Interfaces.Report.DailyPaymentReport.ExpenseInvoice;
+
+public interface IExpenseInvoiceReportRepository
 {
-    public interface IExpenseInvoiceReportRepository
-    {
-        Task<List<ExpenseInvoiceReportModel>> GetExpenseInvoiceReportsByDateAsync(string dbCode, DateTime fromDate, DateTime toDate);
-    }
+    Task<List<ExpenseInvoiceReportModel>> GetExpenseInvoiceReportsByDateAsync(string dbCode, DateTime fromDate,
+        DateTime toDate);
 }

@@ -1,8 +1,9 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData
+namespace BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
+
+public interface ICashFlowDataReportRepository
 {
-    public interface ICashFlowDataReportRepository
-    {
-        Task<List<PaymentCashFlowModel>> GetPaymentCashFlowReportAsync(string dbCode);
-        Task<List<PaymentCashFlowModel>> GetPaymentCashFlowReportByDateAsync(string dbCode,DateTime fromDate,DateTime toDate);
-    }
+    Task<List<PaymentCashFlowModel>> GetPaymentCashFlowReportAsync(string dbCode);
+
+    Task<List<PaymentCashFlowModel>> GetPaymentCashFlowReportByDateAsync(string dbCode, DateTime fromDate,
+        DateTime toDate);
 }

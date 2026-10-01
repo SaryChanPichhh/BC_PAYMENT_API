@@ -4,13 +4,12 @@ using System.Collections;
 using System.ComponentModel;
 using System.Drawing;
 
-namespace BC.PAYMENT.REPORTS.Reports
+namespace BC.PAYMENT.REPORTS.Reports;
+
+public partial class MainReport : XtraReport
 {
-    public partial class MainReport : DevExpress.XtraReports.UI.XtraReport
+    public MainReport()
     {
-        public MainReport()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

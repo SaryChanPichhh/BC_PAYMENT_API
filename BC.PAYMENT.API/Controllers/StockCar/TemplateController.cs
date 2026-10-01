@@ -5,7 +5,7 @@ using BC.PAYMENT.CORE.Entities;
 
 namespace BC.PAYMENT.API.Controllers.StockCar;
 
-public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
+public class TemplateController(IUnitOfWork unitOfWork) : BaseApiController
 {
     [HttpGet]
     [Route("")]
@@ -16,13 +16,11 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
         {
             var data = await unitOfWork.Template.GetTemplatesAsync(credential?.DbCode);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<TemplateResponse>>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<TemplateResponse>>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -55,7 +53,7 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
 
     [HttpPost]
     [Route("")]
-    public async Task<ApiResponse<int>> AddNewTemplateAsync( [FromBody] CreateTemplateRequest req)
+    public async Task<ApiResponse<int>> AddNewTemplateAsync([FromBody] CreateTemplateRequest req)
     {
         var credential = Common.DecodeJwt(User);
         try
@@ -66,17 +64,15 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
                 CreatedBy = credential.Username,
                 CreatedDate = credential.CurrectDate,
                 Employee = req.EmployeeId,
-                Description = req.Description,
+                Description = req.Description
             };
             var data = await unitOfWork.Template.AddNewTemplateAsync(model);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data added successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data added unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -99,17 +95,15 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
             {
                 Id = req.Id,
                 Employee = req.EmployeeId,
-                Description = req.Description,
+                Description = req.Description
             };
             var data = await unitOfWork.Template.UpdateTemplateAsync(model);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data updated successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data updated unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -130,13 +124,11 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
         {
             var data = await unitOfWork.Template.DeleteTemplateAsync(id);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data deleted successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data deleted unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -157,13 +149,11 @@ public class TemplateController(IUnitOfWork unitOfWork) :BaseApiController
         {
             var data = await unitOfWork.SaleRepresent.DisableTemplateById(credential?.Username, id);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("template disabled successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("template disabled unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)

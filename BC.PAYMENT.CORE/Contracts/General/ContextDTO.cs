@@ -1,9 +1,8 @@
-﻿namespace BC.PAYMENT.CORE.DTO.General
+﻿namespace BC.PAYMENT.CORE.DTO.General;
+
+public record ContextDTO
 {
-    public record ContextDTO
-    {
-        public int UserId { get; set; }
-        public string? DbCode { get; set; }
-        public string? AppCode { get; set; }
-    }
+    public int UserId { get; set; }
+    public string? DbCode { get; set; }
+    public string? AppCode { get; set; }
 }

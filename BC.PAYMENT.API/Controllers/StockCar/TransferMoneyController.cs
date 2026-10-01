@@ -16,13 +16,11 @@ public class TransferMoneyController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var data = await unitOfWork.TransferMoney.GetTransferMoneyAsync(credential?.DbCode, templateId);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<TransferMoneyResponse>>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<TransferMoneyResponse>>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -36,20 +34,19 @@ public class TransferMoneyController(IUnitOfWork unitOfWork) : BaseApiController
 
     [HttpGet]
     [Route("by-template/{templateId:int}/{id:int}")]
-    public async Task<ApiResponse<TransferMoneyResponse>> GetTransferMoneyByIdAsync([Required] int templateId, [Required] int id)
+    public async Task<ApiResponse<TransferMoneyResponse>> GetTransferMoneyByIdAsync([Required] int templateId,
+        [Required] int id)
     {
         var credential = Common.DecodeJwt(User);
         try
         {
             var data = await unitOfWork.TransferMoney.GetTransferMoneyByIdAsync(credential?.DbCode, templateId, id);
             if (data != null)
-            {
                 return ApiResponse<TransferMoneyResponse>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<TransferMoneyResponse>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -63,20 +60,20 @@ public class TransferMoneyController(IUnitOfWork unitOfWork) : BaseApiController
 
     [HttpGet]
     [Route("total/by-template/{templateId:int}")]
-    public async Task<ApiResponse<TotalTransferMoneyResponse>> GetTotalTransferMoneyByTemplateIdAsync([Required] int templateId)
+    public async Task<ApiResponse<TotalTransferMoneyResponse>> GetTotalTransferMoneyByTemplateIdAsync(
+        [Required] int templateId)
     {
         var credential = Common.DecodeJwt(User);
         try
         {
-            var data = await unitOfWork.TransferMoney.GetTotalTransferMoneyByTemplateIdAsync(credential?.DbCode, templateId);
+            var data = await unitOfWork.TransferMoney.GetTotalTransferMoneyByTemplateIdAsync(credential?.DbCode,
+                templateId);
             if (data != null)
-            {
                 return ApiResponse<TotalTransferMoneyResponse>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<TotalTransferMoneyResponse>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -114,13 +111,11 @@ public class TransferMoneyController(IUnitOfWork unitOfWork) : BaseApiController
             };
             var data = await unitOfWork.TransferMoney.AddNewTransferMoneyAsync(model);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data added successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data added unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -154,13 +149,11 @@ public class TransferMoneyController(IUnitOfWork unitOfWork) : BaseApiController
             };
             var data = await unitOfWork.TransferMoney.UpdateTransferMoneyAsync(model);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data updated successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data updated unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -181,13 +174,11 @@ public class TransferMoneyController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var data = await unitOfWork.TransferMoney.DeleteTransferMoneyAsync(transferId);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data deleted successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data deleted unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)

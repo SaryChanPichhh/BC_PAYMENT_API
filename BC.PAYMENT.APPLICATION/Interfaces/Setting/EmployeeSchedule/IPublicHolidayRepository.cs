@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule
+namespace BC.PAYMENT.APPLICATION.Interfaces.Prepare.EmployeeSchedule;
+
+public interface IPublicHolidayRepository : IBaseRepository<PublicHolidayModel>
 {
-    public interface IPublicHolidayRepository : IBaseRepository<PublicHolidayModel>
-    {
-        Task<string> GetMaxCodePublicHolidayAsync();
-        Task<List<PublicHolidayModel>> GetListHoliday();
-    }
+    Task<string> GetMaxCodePublicHolidayAsync();
+    Task<List<PublicHolidayModel>> GetListHoliday();
 }

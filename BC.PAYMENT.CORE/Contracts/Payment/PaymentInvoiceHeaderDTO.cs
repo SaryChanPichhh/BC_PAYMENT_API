@@ -1,32 +1,22 @@
-namespace BC.PAYMENT.CORE.Contracts.Payment
+namespace BC.PAYMENT.CORE.Contracts.Payment;
+
+public class PaymentInvoiceHeaderDTO
 {
-    public class PaymentInvoiceHeaderDTO
-    {
-        [JsonIgnore]
-        public int Id { get; set; }
+    [JsonIgnore] public int Id { get; set; }
 
-        [Required]
-        public string DbCode { get; set; }
+    [Required] public string DbCode { get; set; }
 
-        [Required]
-        public string DeliveryId { get; set; }
+    [Required] public string DeliveryId { get; set; }
 
-        [Required]
-        public int Period { get; set; }
+    [Required] public int Period { get; set; }
 
-        [Required]
-        public DateTime InvoiceDividendDate { get; set; }
+    [Required] public DateTime InvoiceDividendDate { get; set; }
 
-        [Required]
-        public string EntriesCode { get; set; }
+    [Required] public string EntriesCode { get; set; }
 
-        [Required]
-        public string CreatedBy { get; set; }
+    [Required] public string CreatedBy { get; set; }
 
-        [Required]
-        public string CreatedDate { get; set; }
+    [Required] public string CreatedDate { get; set; }
 
-        [JsonIgnore]
-        public string Status => "1";
-    }
+    [JsonIgnore] public string Status => "1";
 }

@@ -1,7 +1,5 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces
-{
-    public interface IExchangeInvoiceAndRepairInvoiceReportRepository
-    {
+namespace BC.PAYMENT.APPLICATION.Interfaces;
 
-    }
+public interface IExchangeInvoiceAndRepairInvoiceReportRepository
+{
 }

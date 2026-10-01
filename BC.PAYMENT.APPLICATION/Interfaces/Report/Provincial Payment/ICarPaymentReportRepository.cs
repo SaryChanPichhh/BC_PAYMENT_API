@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Report.Provincial_Payment
+namespace BC.PAYMENT.APPLICATION.Interfaces.Report.Provincial_Payment;
+
+public interface ICarPaymentReportRepository
 {
-    public interface ICarPaymentReportRepository
-    {
-        Task<List<CarPaymentReportModel>> GetCarPaymentReportByDateAsync(DateTime fromDate,DateTime toDate);
-        Task<List<CarPaymentReportModel>> GetCarPaymentReportByPeriodAsync(int period);
-    }
+    Task<List<CarPaymentReportModel>> GetCarPaymentReportByDateAsync(DateTime fromDate, DateTime toDate);
+    Task<List<CarPaymentReportModel>> GetCarPaymentReportByPeriodAsync(int period);
 }

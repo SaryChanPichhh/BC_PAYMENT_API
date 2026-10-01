@@ -1,59 +1,44 @@
 using System.Data;
-using BC.PAYMENT.API.Helper;
 using log4net.Config;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Scalar.AspNetCore;
-using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json.Serialization;
 using BC.PAYMENT.INFRASTRUCTURE;
-using Microsoft.Data.SqlClient;
 using Serilog;
-using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using BC.PAYMENT.CORE;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Serilog
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()  // Set default log level
-    .Enrich.FromLogContext()  // Include contextual info like request ID
-    .WriteTo.Console()  // Log to console
-    .WriteTo.Seq("http://localhost:5341") // Optional: log to Seq
+    .MinimumLevel.Debug()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.Seq("http://localhost:5341")
     .CreateLogger();
 
 builder.Host.UseSerilog();
-//Configure Log4net.
 XmlConfigurator.Configure(new FileInfo("log4net.config"));
-// Inject Connection 
-builder.Services.AddTransient<IDbConnection>(x=>new SqlConnection(builder.Configuration.GetConnectionString("DBConnection")));
-
-//Injecting services.
+builder.Services.AddTransient<IDbConnection>(x =>
+    new SqlConnection(builder.Configuration.GetConnectionString("DBConnection")));
 builder.Services.RegisterServices();
-
-// configure strongly typed settings object
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("Jwt"));
-
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    // Configure enums globally to serialize as strings
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-// Configure Rate Limiting
 builder.Services.AddRateLimiter(options =>
 {
     options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-    
-    // IP-based rate limiting (100 requests per minute per IP)
+
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
         RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
-            factory: partition => new FixedWindowRateLimiterOptions
+            httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            partition => new FixedWindowRateLimiterOptions
             {
                 AutoReplenishment = true,
                 PermitLimit = 100,
@@ -64,28 +49,22 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("SharedConfig/appsettings.json", optional: true, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{builder.Environment.ApplicationName}.json", optional: true, reloadOnChange: true)  // Keep API-specific settings
-    .AddJsonFile("secrets.json", optional: true, reloadOnChange: true)
+    .AddJsonFile("SharedConfig/appsettings.json", true, true)
+    .AddJsonFile($"appsettings.{builder.Environment.ApplicationName}.json", true, true) // Keep API-specific settings
+    .AddJsonFile("secrets.json", true, true)
     .AddEnvironmentVariables();
 
-// Enforce lowercase URLs for all generated routes.
-builder.Services.Configure<RouteOptions>(options =>
-{
-    options.LowercaseUrls = true;
-});
+builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; });
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
-// Add JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(options =>
 {
-    options.RequireHttpsMetadata = false; // Set to true in production
+    options.RequireHttpsMetadata = false;
     options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
@@ -100,12 +79,9 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-//});
-
-// Add Swagger Auth Scheme.
 builder.Services.AddSwaggerGen(options =>
 {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
         In = ParameterLocation.Header,
@@ -116,7 +92,6 @@ builder.Services.AddSwaggerGen(options =>
     {
         if (!type.IsGenericType)
             return type.FullName!.Replace("+", ".");
-
         var genericBase = type.GetGenericTypeDefinition().FullName!
             .Split('`')[0]
             .Replace("+", ".");
@@ -124,7 +99,7 @@ builder.Services.AddSwaggerGen(options =>
             t.IsGenericType
                 ? t.GetGenericTypeDefinition().FullName!.Split('`')[0].Split('.').Last() + "_" +
                   string.Join("_", t.GetGenericArguments().Select(a => a.FullName ?? a.Name))
-                : (t.FullName ?? t.Name)));
+                : t.FullName ?? t.Name));
         return $"{genericBase}[{genericArgs}]";
     });
     options.UseInlineDefinitionsForEnums();
@@ -142,7 +117,6 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-
 });
 
 
@@ -153,47 +127,24 @@ Singleton.Instance.UserPassword = builder.Configuration["AdminPassword"];
 Singleton.Instance.AppCode = builder.Configuration["AppCode"];
 var enableApiDocs = builder.Configuration.GetValue<bool>("EnableApiDocs");
 
-// Configure the HTTP request pipeline.
-// ✅ .NET 8 Fix: MapOpenApi() requires .NET 9. Use UseSwagger (Swashbuckle) as the OpenAPI source,
-//    and configure Scalar to read from that Swashbuckle endpoint.
-// ✅ Scalar is accessible via "EnableApiDocs": true in appsettings (works after deploy too)
 if (app.Environment.IsDevelopment() || enableApiDocs)
 {
-    // Swashbuckle generates the OpenAPI JSON
-    app.UseSwagger();
-
-    // Scalar reads from Swashbuckle's default endpoint: /swagger/v1/swagger.json
+    app.UseSwagger(options => options.RouteTemplate = "openapi/{documentName}.json");
     app.MapScalarApiReference(options =>
     {
         options
             .WithTitle("TD PAYMENT API")
             .WithSidebar(true)
-            .WithOpenApiRoutePattern("/swagger/v1/swagger.json"); // Point Scalar at Swashbuckle
-        options.Title = "TD PAYMENT API";
+            .WithOpenApiRoutePattern("/openapi/{documentName}.json");
     });
-
-    // Optional: Keep SwaggerUI as fallback at /swagger
-    app.UseSwaggerUI();
 }
 
-// ✅ Fix 3: Correct middleware order
-app.UseHttpsRedirection();  // Must be first
-
+app.UseHttpsRedirection();
 app.UseRouting();
 app.UseRateLimiter();
-
-// global cors policy — must come after UseRouting
-app.UseCors(x => x
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-    .AllowAnyHeader());
-
+app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.UseAuthentication();
 app.UseAuthorization();
-// custom jwt auth middleware
 app.UseMiddleware<JwtMiddlewares>();
-
 app.MapControllers();
-
-
 app.Run();

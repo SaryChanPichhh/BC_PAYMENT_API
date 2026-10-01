@@ -2,8 +2,11 @@
 
 public static class InventoryQueries
 {
-    public static string GetInventory(string dbCode,string addOnField="",string addReference="",string criteria="",string groupBy="",
-        string sortBy="") => $@"
+    public static string GetInventory(string dbCode, string addOnField = "", string addReference = "",
+        string criteria = "", string groupBy = "",
+        string sortBy = "")
+    {
+        return $@"
 SELECT DISTINCT ITEM_CODE ItemCode, ITEM_DESC ItemDesc,C.ITEM_CUS10_KH AS ItemDescKh
                 FROM(SELECT TAB5.LOCATION,
                         TAB5.ITEM_CODE,
@@ -94,4 +97,5 @@ SELECT DISTINCT ITEM_CODE ItemCode, ITEM_DESC ItemDesc,C.ITEM_CUS10_KH AS ItemDe
                               TAB5.ON_ORDER,
 							  TAB5.ITEM_CUS10_KH) C ORDER BY ITEM_CODE
 ";
+    }
 }

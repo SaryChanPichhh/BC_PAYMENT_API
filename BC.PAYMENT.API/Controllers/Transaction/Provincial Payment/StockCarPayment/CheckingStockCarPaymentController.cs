@@ -2,22 +2,18 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPayment
+namespace BC.PAYMENT.API.Controllers.Transaction.Provincial_Payment.StockCarPayment;
+
+public class CheckingStockCarPaymentController : BaseApiController
 {
-    public class CheckingStockCarPaymentController : BaseApiController
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CheckingStockCarPaymentController(IUnitOfWork unitOfWork)
     {
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CheckingStockCarPaymentController(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
-
-        #region Submitting
-
-
-            
-
-        #endregion
+        _unitOfWork = unitOfWork;
     }
+
+    #region Submitting
+
+    #endregion
 }

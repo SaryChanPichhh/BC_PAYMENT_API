@@ -1,7 +1,6 @@
-﻿namespace BC.PAYMENT.REPORTS.Models
+﻿namespace BC.PAYMENT.REPORTS.Models;
+
+public class ReportSettings
 {
-    public class ReportSettings
-    {
-        public string Directory { get; set; }
-    }
+    public string Directory { get; set; }
 }

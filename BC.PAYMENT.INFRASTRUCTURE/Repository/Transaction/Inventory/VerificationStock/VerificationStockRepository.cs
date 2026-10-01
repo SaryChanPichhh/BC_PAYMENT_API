@@ -1,21 +1,23 @@
 using static System.Runtime.InteropServices.JavaScript.JSType;
-using String = System.String;
+using String = string;
 
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationStock
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationStock;
+
+public class VerificationStockRepository : IVerificationStockRepository
 {
-    public class VerificationStockRepository : IVerificationStockRepository
-    {
-        private readonly ISqlDataAccess _sqlDataAccess;
-        private readonly IDbConnection _dbConnection;
-        public VerificationStockRepository(ISqlDataAccess sqlDataAccess, IDbConnection dbConnection)
-        {
-            this._sqlDataAccess = sqlDataAccess;
-            _dbConnection = dbConnection;
-        }
+    private readonly ISqlDataAccess _sqlDataAccess;
+    private readonly IDbConnection _dbConnection;
 
-        public async Task<List<VerificationStockModel>> GetAllStockItemByLocationAndCountingDateAsync(string dbCode, string location, DateTime fromDate, DateTime toDate, int page, int pageSize)
-        {
-            var sql = $@"SELECT CASE WHEN C.STOCK_NAME IS NULL THEN S.LOCATION ELSE C.STOCK_NAME END Location,C.COUNT_DATE, 
+    public VerificationStockRepository(ISqlDataAccess sqlDataAccess, IDbConnection dbConnection)
+    {
+        _sqlDataAccess = sqlDataAccess;
+        _dbConnection = dbConnection;
+    }
+
+    public async Task<List<VerificationStockModel>> GetAllStockItemByLocationAndCountingDateAsync(string dbCode,
+        string location, DateTime fromDate, DateTime toDate, int page, int pageSize)
+    {
+        var sql = $@"SELECT CASE WHEN C.STOCK_NAME IS NULL THEN S.LOCATION ELSE C.STOCK_NAME END Location,C.COUNT_DATE, 
                         CASE WHEN C.ITEM_CODE IS NULL THEN S.ITEM_CODE ELSE C.ITEM_CODE END ItemCode,  
                         CASE WHEN C.ITEM_DESC IS NULL THEN S.ITEM_DESC ELSE C.ITEM_DESC END ItemDescription,  
                         ISNULL(S.UNIT_STOCK,0) UnitStock,ISNULL(S.PHYSICAL,0) Physical,ISNULL(S.ON_ORDER,0) OnOrder,  
@@ -43,22 +45,23 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
                         BETWEEN @FROM_DATE AND @FROM_DATE AND M.DB_CODE = @DB_CODE AND D.DB_CODE = @DB_CODE 
                         AND D.STATUS = '1' GROUP BY ITEM_CODE,ITEM_DESC,M.STOCK_NAME,M.COUNT_DATE) C ON C.ITEM_CODE = S.ITEM_CODE ORDER BY C.COUNT_DATE OFFSET @OFFSET ROWS FETCH NEXT @PAGE_SIZE ROWS ONLY
                             ";
-            var param = new
-            {
-                DB_CODE =  dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate,
-                LOCATION = location,
-                OFFSET = (page - 1) * pageSize,
-                PAGE_SIZE = pageSize
-            };
-            var execute = await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<List<VerificationStockModel>> GetAllStockItemByLocationAndCountingPeriodAsync(string dbCode, string location,int month,int year,int page,int pageSize)
+        var param = new
         {
-            var sql = $@"SELECT CASE WHEN C.STOCK_NAME IS NULL THEN S.LOCATION ELSE C.STOCK_NAME END Location,C.COUNT_DATE, 
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate,
+            LOCATION = location,
+            OFFSET = (page - 1) * pageSize,
+            PAGE_SIZE = pageSize
+        };
+        var execute = await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<VerificationStockModel>> GetAllStockItemByLocationAndCountingPeriodAsync(string dbCode,
+        string location, int month, int year, int page, int pageSize)
+    {
+        var sql = $@"SELECT CASE WHEN C.STOCK_NAME IS NULL THEN S.LOCATION ELSE C.STOCK_NAME END Location,C.COUNT_DATE, 
                         CASE WHEN C.ITEM_CODE IS NULL THEN S.ITEM_CODE ELSE C.ITEM_CODE END ItemCode,  
                         CASE WHEN C.ITEM_DESC IS NULL THEN S.ITEM_DESC ELSE C.ITEM_DESC END ItemDescription,  
                         ISNULL(S.UNIT_STOCK,0) UnitStock,ISNULL(S.PHYSICAL,0) Physical,ISNULL(S.ON_ORDER,0) OnOrder,  
@@ -84,29 +87,29 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
                         WHERE TAB5.LOCATION = @LOCATION) S FULL OUTER JOIN (SELECT M.STOCK_NAME,M.COUNT_DATE,D.ITEM_CODE, SUM(D.QUANTITY) QUANTITY,ITEM_DESC
                         FROM SC_STOCK M INNER JOIN SC_COUNT_ITEM D ON D.STOCK_ID = M.STOCK_ID WHERE M.STOCK_NAME = @LOCATION AND YEAR(M.COUNT_DATE) = @YEAR AND MONTH(M.COUNT_DATE) = @MONTH  AND M.DB_CODE = @DB_CODE AND D.DB_CODE = @DB_CODE 
                         AND D.STATUS = '1' GROUP BY ITEM_CODE,ITEM_DESC,M.STOCK_NAME,M.COUNT_DATE) C ON C.ITEM_CODE = S.ITEM_CODE ORDER BY C.COUNT_DATE OFFSET @OFFSET ROWS FETCH NEXT @PAGE_SIZE ROWS ONLY";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                YEAR = year,
-                MONTH = month,
-                LOCATION = location,
-                OFFSET = (page - 1) * pageSize,
-                PAGE_SIZE = pageSize
-            };
-            var execute = await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<int> SaveRecordStockItemAfterVerify(List<VerificationStockModel> model)
+        var param = new
         {
-            if(_dbConnection.State == ConnectionState.Closed)
-                _dbConnection.Open();
+            DB_CODE = dbCode,
+            YEAR = year,
+            MONTH = month,
+            LOCATION = location,
+            OFFSET = (page - 1) * pageSize,
+            PAGE_SIZE = pageSize
+        };
+        var execute = await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param);
+        return execute.ToList();
+    }
 
-            var transaction = _dbConnection.BeginTransaction();
-            try
-            {
-                const string sql =
-                    @"IF EXISTS (SELECT * FROM BCSTOCK_INVENTORY_VERIFY WHERE ITEM_CODE = @ItemCode AND LOCATION = @Location AND DB_CODE = @DbCode AND CREATED_DATE = CONVERT(DATE,GETDATE()))
+    public async Task<int> SaveRecordStockItemAfterVerify(List<VerificationStockModel> model)
+    {
+        if (_dbConnection.State == ConnectionState.Closed)
+            _dbConnection.Open();
+
+        var transaction = _dbConnection.BeginTransaction();
+        try
+        {
+            const string sql =
+                @"IF EXISTS (SELECT * FROM BCSTOCK_INVENTORY_VERIFY WHERE ITEM_CODE = @ItemCode AND LOCATION = @Location AND DB_CODE = @DbCode AND CREATED_DATE = CONVERT(DATE,GETDATE()))
                 UPDATE BCSTOCK_INVENTORY_VERIFY SET UNIT = @UnitStock,PHYSICAL = @Physical,ON_ORDER =  @OnOrder,SUBTOTAL  = @SubTotal,ITEM_COUNT = @Quantity,TOTAL = @Total WHERE DB_CODE = @DbCode
                 AND ITEM_CODE = @ItemCode AND LOCATION = @Location AND CREATED_DATE = CONVERT(DATE,GETDATE())
                 ELSE
@@ -115,124 +118,127 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
                 @Physical,@OnOrder,@SubTotal,@Quantity,
                 @Total,GETDATE(),@DbCode,@Period,@CreatedBy)";
 
-                foreach (var item in model)
+            foreach (var item in model)
+            {
+                var param = new
                 {
-                    var param = new
-                    {
-                        ItemCode = item.ItemCode,
-                        Location = item.Location,
-                        DbCode = item.DbCode,
-                        UnitStock = item.UnitStock,
-                        Physical = item.Physical,
-                        OnOrder = item.OnOrder,
-                        SubTotal = item.SubTotal,
-                        Quantity = item.Quantity,
-                        Total = item.Total,
-                        ItemName = item.ItemDescription,
-                        Period = DateTime.Now.ToString("MMyyyy"),
-                        CreatedBy = item.CreateBy
-                    };
-                    await _dbConnection.ExecuteAsync(sql, param,transaction);
-                }
-                transaction.Commit();
-                return 1;
+                    ItemCode = item.ItemCode,
+                    Location = item.Location,
+                    DbCode = item.DbCode,
+                    UnitStock = item.UnitStock,
+                    Physical = item.Physical,
+                    OnOrder = item.OnOrder,
+                    SubTotal = item.SubTotal,
+                    Quantity = item.Quantity,
+                    Total = item.Total,
+                    ItemName = item.ItemDescription,
+                    Period = DateTime.Now.ToString("MMyyyy"),
+                    CreatedBy = item.CreateBy
+                };
+                await _dbConnection.ExecuteAsync(sql, param, transaction);
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-                transaction.Rollback();
-            }
-            return 0;
+
+            transaction.Commit();
+            return 1;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex);
+            transaction.Rollback();
         }
 
-        public async Task<int> GetMaxSequence(string dbCode)
-        {
-            var sql = $@"SELECT MAX(SEQUENCE)+1 FROM {dbCode}SIINVMOV";
-            var execute = await _sqlDataAccess.LoadSingleData<int,dynamic>(sql,new {});
-            return execute;
-        }
+        return 0;
+    }
 
-        public async Task<BcModels> GetRecTypes(string dbCode,string movType)
-        {
-            var sql = @"SELECT CODE Code,SUBSTRING(SI_DATA,0,30) Description, SUBSTRING(SI_DATA,31,1) MovType
+    public async Task<int> GetMaxSequence(string dbCode)
+    {
+        var sql = $@"SELECT MAX(SEQUENCE)+1 FROM {dbCode}SIINVMOV";
+        var execute = await _sqlDataAccess.LoadSingleData<int, dynamic>(sql, new { });
+        return execute;
+    }
+
+    public async Task<BcModels> GetRecTypes(string dbCode, string movType)
+    {
+        var sql = @"SELECT CODE Code,SUBSTRING(SI_DATA,0,30) Description, SUBSTRING(SI_DATA,31,1) MovType
                     FROM SIDATA where DB_CODE = @DB_CODE AND SI_TYPE= 'ICMOV' AND CODE = @CODE";
-            var param = new { DB_CODE = dbCode, CODE = movType };
-            var results = await _sqlDataAccess.LoadSingleData<BcModels, dynamic>(sql, param);
-            return results;
-        }
-            
-        public async Task<double> GetItemCostAsync(string dbCode, string itemCode)
-        {
-            const string sql = @"SELECT ITEM_DCOST FROM SIITEMS WHERE ITEM_CODE = @ITEM_CODE AND DB_CODE = @DB_CODE";
-            var param = new { ITEM_CODE = itemCode, DB_CODE = dbCode, };
-            var itemCost =await _sqlDataAccess.LoadSingleData<double, dynamic>(sql, param);
-            return itemCost;
-        }
+        var param = new { DB_CODE = dbCode, CODE = movType };
+        var results = await _sqlDataAccess.LoadSingleData<BcModels, dynamic>(sql, param);
+        return results;
+    }
 
-        public async Task<int> AdjustInventory(InventoryAdjustmentModel inventory)
-        {
-            var sql = $@"{inventory.DbCode}_INSERT_SIINVMOV";
-            var param = new
-            {
-                SEQUENCE_0 = inventory.Sequence,
-                REC_TYPE_1 = inventory.RecType,
-                MOV_PRD_2 = inventory.Period,
-                MOV_REF_3 = inventory.MovRef,
-                MOV_LINE_4 = inventory.MovLine,
-                LOCATION_5 = inventory.Location,
-                ITEM_CODE_6 = inventory.ItemCode,
-                MOV_DATE_7 = inventory.MovDate,
-                STATUS_8 = inventory.StatusInv,
-                IR_STAT_9 = inventory.IRStat,
-                BATCH_NO_10 = inventory.BatchNo,
-                BATCH_LINE_11 = inventory.BatchLine,
-                LINE_REF_12 = inventory.LineRef,
-                QUANTITY_13 = inventory.Quantity,
-                COST_14 = inventory.Cost,
-                TOTAL_15 = inventory.TotalPrice,
-                MOV_UNITS_16 = inventory.MovUnits,
-                MOV_TYPE_17 = inventory.MovType,
-                UPDTE_PHYS_18 = inventory.UpdatePhysical,
-                UPDTE_ORDR_19 = inventory.UpdateOrder,
-                ALLOC_REF_20 = inventory.AllocRef,
-                ACCNT_CODE_21 = inventory.AccountCode,
-                ASSET_CODE_22 = inventory.AssetCode,
-                ANAL_M0_23 = inventory.AnalM0,
-                ANAL_M1_24 = inventory.AnalM1,
-                ANAL_M2_25 = inventory.AnalM2,
-                ANAL_M3_26 = inventory.AnalM3,
-                ANAL_M4_27 = inventory.AnalM4,
-                ANAL_M5_28 = inventory.AnalM5,
-                ANAL_M6_29 = inventory.AnalM6,
-                ANAL_M7_30 = inventory.AnalM7,
-                ANAL_M8_31 = inventory.AnalM8,
-                ANAL_M9_32 = inventory.AnalM9,
-                ORIG_LINE_NO_33 = inventory.OrigLineNo,
-                PO_VALUE_34 = inventory.PoValue,
-                ID_ENTERED_35 = inventory.IdEntered,
-                ID_ALLOC_36 = inventory.IdAlloc,
-                ANAL_M0_37 = inventory.AnalM0,
-                ANAL_M1_38 = inventory.AnalM1,
-                ANAL_M2_39 = inventory.AnalM2,
-                ANAL_M3_40 = inventory.AnalM3,
-                ANAL_M4_41 = inventory.AnalM4,
-                ANAL_M5_42 = inventory.AnalM5,
-                ANAL_M6_43 = inventory.AnalM6,
-                ANAL_M7_44 = inventory.AnalM7,
-                ANAL_M8_45 = inventory.AnalM8,
-                ANAL_M9_46 = inventory.AnalM9,
-                DB_CODE_47 = inventory.DbCode,
-                LOC_TRAN_48 = inventory.Location
-            };
-            var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param, commandType: CommandType.StoredProcedure);
-            return rowAffected;
-        }
+    public async Task<double> GetItemCostAsync(string dbCode, string itemCode)
+    {
+        const string sql = @"SELECT ITEM_DCOST FROM SIITEMS WHERE ITEM_CODE = @ITEM_CODE AND DB_CODE = @DB_CODE";
+        var param = new { ITEM_CODE = itemCode, DB_CODE = dbCode };
+        var itemCost = await _sqlDataAccess.LoadSingleData<double, dynamic>(sql, param);
+        return itemCost;
+    }
 
-        #region Verification Inventory Report
-
-        public async Task<List<VerificationStockReportDto>> GetVerificationStockReport(string dbCode, DateTime fromDate, DateTime toDate)
+    public async Task<int> AdjustInventory(InventoryAdjustmentModel inventory)
+    {
+        var sql = $@"{inventory.DbCode}_INSERT_SIINVMOV";
+        var param = new
         {
-            var sql = $@"SELECT ID Id,
+            SEQUENCE_0 = inventory.Sequence,
+            REC_TYPE_1 = inventory.RecType,
+            MOV_PRD_2 = inventory.Period,
+            MOV_REF_3 = inventory.MovRef,
+            MOV_LINE_4 = inventory.MovLine,
+            LOCATION_5 = inventory.Location,
+            ITEM_CODE_6 = inventory.ItemCode,
+            MOV_DATE_7 = inventory.MovDate,
+            STATUS_8 = inventory.StatusInv,
+            IR_STAT_9 = inventory.IRStat,
+            BATCH_NO_10 = inventory.BatchNo,
+            BATCH_LINE_11 = inventory.BatchLine,
+            LINE_REF_12 = inventory.LineRef,
+            QUANTITY_13 = inventory.Quantity,
+            COST_14 = inventory.Cost,
+            TOTAL_15 = inventory.TotalPrice,
+            MOV_UNITS_16 = inventory.MovUnits,
+            MOV_TYPE_17 = inventory.MovType,
+            UPDTE_PHYS_18 = inventory.UpdatePhysical,
+            UPDTE_ORDR_19 = inventory.UpdateOrder,
+            ALLOC_REF_20 = inventory.AllocRef,
+            ACCNT_CODE_21 = inventory.AccountCode,
+            ASSET_CODE_22 = inventory.AssetCode,
+            ANAL_M0_23 = inventory.AnalM0,
+            ANAL_M1_24 = inventory.AnalM1,
+            ANAL_M2_25 = inventory.AnalM2,
+            ANAL_M3_26 = inventory.AnalM3,
+            ANAL_M4_27 = inventory.AnalM4,
+            ANAL_M5_28 = inventory.AnalM5,
+            ANAL_M6_29 = inventory.AnalM6,
+            ANAL_M7_30 = inventory.AnalM7,
+            ANAL_M8_31 = inventory.AnalM8,
+            ANAL_M9_32 = inventory.AnalM9,
+            ORIG_LINE_NO_33 = inventory.OrigLineNo,
+            PO_VALUE_34 = inventory.PoValue,
+            ID_ENTERED_35 = inventory.IdEntered,
+            ID_ALLOC_36 = inventory.IdAlloc,
+            ANAL_M0_37 = inventory.AnalM0,
+            ANAL_M1_38 = inventory.AnalM1,
+            ANAL_M2_39 = inventory.AnalM2,
+            ANAL_M3_40 = inventory.AnalM3,
+            ANAL_M4_41 = inventory.AnalM4,
+            ANAL_M5_42 = inventory.AnalM5,
+            ANAL_M6_43 = inventory.AnalM6,
+            ANAL_M7_44 = inventory.AnalM7,
+            ANAL_M8_45 = inventory.AnalM8,
+            ANAL_M9_46 = inventory.AnalM9,
+            DB_CODE_47 = inventory.DbCode,
+            LOC_TRAN_48 = inventory.Location
+        };
+        var rowAffected = await _sqlDataAccess.ExecuteAsync(sql, param, CommandType.StoredProcedure);
+        return rowAffected;
+    }
+
+    #region Verification Inventory Report
+
+    public async Task<List<VerificationStockReportDto>> GetVerificationStockReport(string dbCode, DateTime fromDate,
+        DateTime toDate)
+    {
+        var sql = $@"SELECT ID Id,
                            LOCATION Location,
                            ITEM_CODE ItemCode,
                            ITEM_NAME ItemName,
@@ -246,19 +252,20 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
                            DB_CODE DbCode,
                            PERIOD Period,
                            CREATED_BY CreateBy FROM BCSTOCK_INVENTORY_VERIFY WHERE CREATED_DATE BETWEEN @FROM_DATE AND @TO_DATE AND DB_CODE = @DB_CODE";
-            var param = new 
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate
-            };
-            var execute = await _sqlDataAccess.LoadData<VerificationStockReportDto, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<List<VerificationStockReportDto>> GetVerificationStockReportByPeriod(string dbCode, int month, int year)
+        var param = new
         {
-            var sql = $@"SELECT ID Id,
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<VerificationStockReportDto, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<VerificationStockReportDto>> GetVerificationStockReportByPeriod(string dbCode, int month,
+        int year)
+    {
+        var sql = $@"SELECT ID Id,
                            LOCATION Location,
                            ITEM_CODE ItemCode,
                            ITEM_NAME ItemName,
@@ -272,58 +279,50 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
                            DB_CODE DbCode,
                            PERIOD Period,
                            CREATED_BY CreateBy FROM BCSTOCK_INVENTORY_VERIFY WHERE YEAR(CREATED_DATE) = @YEAR AND MONTH(CREATE_DATE) = @YEAR AND DB_CODE = @DB_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                MONTH = month,
-                YEAR = year    
-            };
-            var execute = await _sqlDataAccess.LoadData<VerificationStockReportDto, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<List<CheckingStockByBranch>> GetCheckingStockByBranchAsync(CheckingStockByBranchDto model)
+        var param = new
         {
-            var lsItem = new List<CheckingStockByBranch>();
-            var procedure = $@"BCSTOCKCONTROLL";
-            var param = new
-            {
-                MOV_PRD = model.Period,
-                LOCATION = model.Location,
-                REC_TYPE = model.RecType,
-                DATE_FROM = model.FromDate,
-                DATE_TO = model.ToDate,
-                DATE = model.ByAccountPeriod ? 0 : 1,
-                ITEM_FROM = model.FromItemCode,
-                ITEM_TO = model.ToItemCode,
-            };
-            var executeProcedure =
-                await _dbConnection.QueryAsync<dynamic>(procedure,param);
-            foreach (var item in executeProcedure)
-            {
-                var dict = (IDictionary<string, object>)item;
-                var checkingStock = new CheckingStockByBranch();
-                foreach (var row in dict.ToDictionary(x => x.Key, x => x.Value))
-                {
-                    if (row.Key == "ITEM_CODE")
-                    {
-                        checkingStock.ItemCode = row.Value?.ToString();
-                    }
-                    else if (row.Key == "TOTAL")
-                    {
-                        checkingStock.Total = Convert.ToDouble(row.Value??0);
-                    }
-                    else
-                    {
-                        checkingStock.Values[row.Key] = Convert.ToDouble(row.Value??0);
-                    }
-                }
-                lsItem.Add(checkingStock);
-            }
-            return lsItem;
+            DB_CODE = dbCode,
+            MONTH = month,
+            YEAR = year
+        };
+        var execute = await _sqlDataAccess.LoadData<VerificationStockReportDto, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<CheckingStockByBranch>> GetCheckingStockByBranchAsync(CheckingStockByBranchDto model)
+    {
+        var lsItem = new List<CheckingStockByBranch>();
+        var procedure = $@"BCSTOCKCONTROLL";
+        var param = new
+        {
+            MOV_PRD = model.Period,
+            LOCATION = model.Location,
+            REC_TYPE = model.RecType,
+            DATE_FROM = model.FromDate,
+            DATE_TO = model.ToDate,
+            DATE = model.ByAccountPeriod ? 0 : 1,
+            ITEM_FROM = model.FromItemCode,
+            ITEM_TO = model.ToItemCode
+        };
+        var executeProcedure =
+            await _dbConnection.QueryAsync<dynamic>(procedure, param);
+        foreach (var item in executeProcedure)
+        {
+            var dict = (IDictionary<string, object>)item;
+            var checkingStock = new CheckingStockByBranch();
+            foreach (var row in dict.ToDictionary(x => x.Key, x => x.Value))
+                if (row.Key == "ITEM_CODE")
+                    checkingStock.ItemCode = row.Value?.ToString();
+                else if (row.Key == "TOTAL")
+                    checkingStock.Total = Convert.ToDouble(row.Value ?? 0);
+                else
+                    checkingStock.Values[row.Key] = Convert.ToDouble(row.Value ?? 0);
+
+            lsItem.Add(checkingStock);
         }
 
-        #endregion
-
+        return lsItem;
     }
+
+    #endregion
 }

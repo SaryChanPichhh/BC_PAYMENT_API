@@ -1,15 +1,13 @@
-﻿
-namespace BC.PAYMENT.CORE.Enums
+﻿namespace BC.PAYMENT.CORE.Enums;
+
+public enum ExchangeStatus
 {
-    public enum ExchangeStatus
-    {
-        Pending,
-        Yes,
-        CreditNote,
-        ExChanged,
-        Invoice,
-        PostCredit,
-        Completed,
-        Rejected
-    }
+    Pending,
+    Yes,
+    CreditNote,
+    ExChanged,
+    Invoice,
+    PostCredit,
+    Completed,
+    Rejected
 }

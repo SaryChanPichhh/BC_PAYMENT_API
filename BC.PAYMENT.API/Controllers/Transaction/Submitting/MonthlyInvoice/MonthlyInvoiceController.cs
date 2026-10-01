@@ -9,82 +9,81 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.InvoiceVerify
+namespace BC.PAYMENT.API.Controllers.Transaction.Submitting.InvoiceVerify;
+
+public class MonthlyInvoiceController : BaseApiController
 {
-    public class MonthlyInvoiceController : BaseApiController
+    private readonly IUnitOfWork _unitOfWork;
+
+    public MonthlyInvoiceController(IUnitOfWork unitOfWork)
     {
-        private readonly IUnitOfWork _unitOfWork;
+        _unitOfWork = unitOfWork;
+    }
 
-        public MonthlyInvoiceController(IUnitOfWork unitOfWork)
+    [HttpPost]
+    [Route("getinvoiceverifybyperiod")]
+    public async Task<ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>> GetInvoiceVerifyByPeriod(
+        [FromBody] ByPeriodDto model)
+    {
+        var credential = Common.DecodeJwt(User);
+
+        try
         {
-            _unitOfWork = unitOfWork;
+            var execute =
+                await _unitOfWork.InvoiceVerify.GetInvoiceVerifyByPeriodAsync(credential.DbCode!, model.Month,
+                    model.Year);
+            var newResponds = execute.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
+            if (execute.Any())
+                return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
+                    .WithResult(new PaginatedResponse<MonthlyInvoiceModel>(newResponds, execute.Count, model.Page,
+                        model.PageSize))
+                    .WithStatusCode(StatusCodes.Status200OK)
+                    .WithMessage("Invoice Verify fetched successfully")
+                    .WithSuccess(true)
+                    .Build();
+            else
+                return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
+                    .WithStatusCode(StatusCodes.Status400BadRequest)
+                    .WithMessage("Invoice Verify fetched unsuccessfully")
+                    .WithSuccess(false)
+                    .Build();
         }
-
-        [HttpPost]
-        [Route("getinvoiceverifybyperiod")]
-        public async Task<ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>> GetInvoiceVerifyByPeriod([FromBody] ByPeriodDto model)
+        catch (Exception ex)
         {
-            var credential = Common.DecodeJwt(User);
-
-            try
-            {
-                var execute = await _unitOfWork.InvoiceVerify.GetInvoiceVerifyByPeriodAsync(credential.DbCode!, model.Month, model.Year);
-                var newResponds = execute.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
-                if(execute.Any())
-                {
-                    return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
-                        .WithResult(new PaginatedResponse<MonthlyInvoiceModel>(newResponds, execute.Count,model.Page,model.PageSize))
-                        .WithStatusCode(StatusCodes.Status200OK)
-                        .WithMessage("Invoice Verify fetched successfully")
-                        .WithSuccess(true)
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
-                        .WithStatusCode(StatusCodes.Status400BadRequest)
-                        .WithMessage("Invoice Verify fetched unsuccessfully")
-                        .WithSuccess(false)
-                        .Build();
-                }
-            }
-            catch (Exception ex)
-            {
-                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<MonthlyInvoiceModel>>(ex.Message);
-            }
+            return GlobalExceptionHandler.ExceptionError<PaginatedResponse<MonthlyInvoiceModel>>(ex.Message);
         }
-        
-        [HttpPost]
-        [Route("getinvoiceverifybydate")]
-        public async Task<ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>> GetInvoiceVerifyByDate([FromBody] ByDateDto model )
+    }
+
+    [HttpPost]
+    [Route("getinvoiceverifybydate")]
+    public async Task<ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>> GetInvoiceVerifyByDate(
+        [FromBody] ByDateDto model)
+    {
+        var credential = Common.DecodeJwt(User);
+        try
         {
-            var credential = Common.DecodeJwt(User);
-            try
-            {
-                var execute = await _unitOfWork.InvoiceVerify.GetInvoiceVerifyByDateAsync(credential.DbCode!, model.FromDate, model.ToDate);
-                var newResponds = execute.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
-                if(execute.Any())
-                {
-                    return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
-                        .WithResult(new PaginatedResponse<MonthlyInvoiceModel>(newResponds, execute.Count,model.Page,model.PageSize))
-                        .WithStatusCode(StatusCodes.Status200OK)
-                        .WithMessage("Invoice Verify fetched successfully")
-                        .WithSuccess(true)
-                        .Build();
-                }
-                else
-                {
-                    return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
-                        .WithStatusCode(StatusCodes.Status400BadRequest)
-                        .WithMessage("Invoice Verify fetched unsuccessfully")
-                        .WithSuccess(false)
-                        .Build();
-                }
-            }
-            catch (Exception ex)
-            {
-                return GlobalExceptionHandler.ExceptionError<PaginatedResponse<MonthlyInvoiceModel>>(ex.Message);
-            }
+            var execute =
+                await _unitOfWork.InvoiceVerify.GetInvoiceVerifyByDateAsync(credential.DbCode!, model.FromDate,
+                    model.ToDate);
+            var newResponds = execute.Skip(model.Page - 1 * model.PageSize).Take(model.PageSize).ToList();
+            if (execute.Any())
+                return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
+                    .WithResult(new PaginatedResponse<MonthlyInvoiceModel>(newResponds, execute.Count, model.Page,
+                        model.PageSize))
+                    .WithStatusCode(StatusCodes.Status200OK)
+                    .WithMessage("Invoice Verify fetched successfully")
+                    .WithSuccess(true)
+                    .Build();
+            else
+                return ApiResponse<PaginatedResponse<MonthlyInvoiceModel>>.Builder()
+                    .WithStatusCode(StatusCodes.Status400BadRequest)
+                    .WithMessage("Invoice Verify fetched unsuccessfully")
+                    .WithSuccess(false)
+                    .Build();
+        }
+        catch (Exception ex)
+        {
+            return GlobalExceptionHandler.ExceptionError<PaginatedResponse<MonthlyInvoiceModel>>(ex.Message);
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace BC.PAYMENT.CORE.Entities.Report.DailyPaymentReport.AmountCollected
+﻿namespace BC.PAYMENT.CORE.Entities.Report.DailyPaymentReport.AmountCollected;
+
+public class AmountCollectedReportModel
 {
-    public class AmountCollectedReportModel
-    {
-    }
 }

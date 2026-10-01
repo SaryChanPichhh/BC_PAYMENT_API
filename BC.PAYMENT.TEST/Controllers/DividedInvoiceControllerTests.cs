@@ -15,202 +15,201 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BC.PAYMENT.TEST.Controllers
+namespace BC.PAYMENT.TEST.Controllers;
+
+public class DividedInvoiceControllerTests
 {
-    public class DividedInvoiceControllerTests
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IDividedInvoiceRepository> _mockRepo;
+    private readonly Mock<IInvoiceRepository> _mockInvoiceRepo;
+    private readonly DividedInvoiceController _controller;
+
+    public DividedInvoiceControllerTests()
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<IDividedInvoiceRepository> _mockRepo;
-        private readonly Mock<IInvoiceRepository> _mockInvoiceRepo;
-        private readonly DividedInvoiceController _controller;
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockRepo = new Mock<IDividedInvoiceRepository>();
+        _mockInvoiceRepo = new Mock<IInvoiceRepository>();
 
-        public DividedInvoiceControllerTests()
+        _mockUnitOfWork.Setup(u => u.DividedInvoice).Returns(_mockRepo.Object);
+        _mockUnitOfWork.Setup(u => u.Invoices).Returns(_mockInvoiceRepo.Object);
+
+        _controller = new DividedInvoiceController(_mockUnitOfWork.Object);
+
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockRepo = new Mock<IDividedInvoiceRepository>();
-            _mockInvoiceRepo = new Mock<IInvoiceRepository>();
+            new Claim("DbCode", "TEST_DB"),
+            new Claim("Username", "TEST_USER"),
+            new Claim("InvoiceEntryCode", "ENTRY_01"),
+            new Claim("CurrentDate", DateTime.Today.ToString("MM/dd/yyyy"))
+        }, "mock"));
 
-            _mockUnitOfWork.Setup(u => u.DividedInvoice).Returns(_mockRepo.Object);
-            _mockUnitOfWork.Setup(u => u.Invoices).Returns(_mockInvoiceRepo.Object);
-
-            _controller = new DividedInvoiceController(_mockUnitOfWork.Object);
-
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
-                new Claim("DbCode", "TEST_DB"),
-                new Claim("Username", "TEST_USER"),
-                new Claim("InvoiceEntryCode", "ENTRY_01"),
-                new Claim("CurrentDate", DateTime.Today.ToString("MM/dd/yyyy"))
-            }, "mock"));
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = user }
-            };
-        }
-
-        [Fact]
-        public async Task GetDividedInvoiceByDeliverIdAndDate_ShouldReturnOk_WhenFound()
+        _controller.ControllerContext = new ControllerContext
         {
-            var mockData = new List<DividedInvoiceResponse>
-            {
-                new() { Id = "1", DeliveryName = "DEL01", TransactionCode = "INV01" }
-            };
-            var date = DateTime.Today;
-            _mockRepo.Setup(r => r.GetDividedInvoicesByDeliveryIdAndDateAsync("TEST_DB", "DEL01", date))
-                .ReturnsAsync(mockData);
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+    }
 
-            var result = await _controller.GetDividedInvoiceByDeliverIdAndDate("DEL01", date);
-
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.NotNull(result.Result);
-            Assert.Single(result.Result);
-        }
-
-        [Fact]
-        public async Task GetDividedInvoiceByDeliverIdAndDate_ShouldReturnBadRequest_WhenEmpty()
+    [Fact]
+    public async Task GetDividedInvoiceByDeliverIdAndDate_ShouldReturnOk_WhenFound()
+    {
+        var mockData = new List<DividedInvoiceResponse>
         {
-            var date = DateTime.Today;
-            _mockRepo.Setup(r => r.GetDividedInvoicesByDeliveryIdAndDateAsync("TEST_DB", "DEL01", date))
-                .ReturnsAsync(new List<DividedInvoiceResponse>());
+            new() { Id = "1", DeliveryName = "DEL01", TransactionCode = "INV01" }
+        };
+        var date = DateTime.Today;
+        _mockRepo.Setup(r => r.GetDividedInvoicesByDeliveryIdAndDateAsync("TEST_DB", "DEL01", date))
+            .ReturnsAsync(mockData);
 
-            var result = await _controller.GetDividedInvoiceByDeliverIdAndDate("DEL01", date);
+        var result = await _controller.GetDividedInvoiceByDeliverIdAndDate("DEL01", date);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.NotNull(result.Result);
-            Assert.Empty(result.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.NotNull(result.Result);
+        Assert.Single(result.Result);
+    }
 
-        [Fact]
-        public async Task DeleteDividedInvoiceByDeliverIdAndDate_ShouldReturnOk_WhenSuccessful()
+    [Fact]
+    public async Task GetDividedInvoiceByDeliverIdAndDate_ShouldReturnBadRequest_WhenEmpty()
+    {
+        var date = DateTime.Today;
+        _mockRepo.Setup(r => r.GetDividedInvoicesByDeliveryIdAndDateAsync("TEST_DB", "DEL01", date))
+            .ReturnsAsync(new List<DividedInvoiceResponse>());
+
+        var result = await _controller.GetDividedInvoiceByDeliverIdAndDate("DEL01", date);
+
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.NotNull(result.Result);
+        Assert.Empty(result.Result);
+    }
+
+    [Fact]
+    public async Task DeleteDividedInvoiceByDeliverIdAndDate_ShouldReturnOk_WhenSuccessful()
+    {
+        var model = new DeleteDividedInvoiceRequest
         {
-            var model = new DeleteDividedInvoiceRequest
-            {
-                InvoiceId = 1,
-                TransactionCode = "INV01",
-                DeliveryId = "DEL01",
-                Note = "Note"
-            };
-            _mockRepo.Setup(r => r.DeleteDividedInvoiceAsync(1, "INV01", "DEL01", "Note"))
-                .ReturnsAsync(1);
+            InvoiceId = 1,
+            TransactionCode = "INV01",
+            DeliveryId = "DEL01",
+            Note = "Note"
+        };
+        _mockRepo.Setup(r => r.DeleteDividedInvoiceAsync(1, "INV01", "DEL01", "Note"))
+            .ReturnsAsync(1);
 
-            var result = await _controller.DeleteDividedInvoiceByDeliverIdAndDate(model);
+        var result = await _controller.DeleteDividedInvoiceByDeliverIdAndDate(model);
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+    }
 
-        [Fact]
-        public async Task DeleteDividedInvoiceByDeliverIdAndDate_ShouldReturnBadRequest_WhenFailed()
+    [Fact]
+    public async Task DeleteDividedInvoiceByDeliverIdAndDate_ShouldReturnBadRequest_WhenFailed()
+    {
+        var model = new DeleteDividedInvoiceRequest
         {
-            var model = new DeleteDividedInvoiceRequest
-            {
-                InvoiceId = 1,
-                TransactionCode = "INV01",
-                DeliveryId = "DEL01",
-                Note = "Note"
-            };
-            _mockRepo.Setup(r => r.DeleteDividedInvoiceAsync(1, "INV01", "DEL01", "Note"))
-                .ReturnsAsync(0);
+            InvoiceId = 1,
+            TransactionCode = "INV01",
+            DeliveryId = "DEL01",
+            Note = "Note"
+        };
+        _mockRepo.Setup(r => r.DeleteDividedInvoiceAsync(1, "INV01", "DEL01", "Note"))
+            .ReturnsAsync(0);
 
-            var result = await _controller.DeleteDividedInvoiceByDeliverIdAndDate(model);
+        var result = await _controller.DeleteDividedInvoiceByDeliverIdAndDate(model);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-        }
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+    }
 
-        [Fact]
-        public async Task GetInvoiceByAreaAndTransCodeAsync_ShouldReturnOk_WhenFound()
+    [Fact]
+    public async Task GetInvoiceByAreaAndTransCodeAsync_ShouldReturnOk_WhenFound()
+    {
+        var mockData = new List<InvoiceResponse>
         {
-            var mockData = new List<InvoiceResponse>
-            {
-                new() { CustomerCode = "C01", InvoiceCode = "T01" }
-            };
-            _mockInvoiceRepo.Setup(r => r.GetInvoiceByAreaAndTransCodeAsync("TEST_DB", "A01", "T01"))
-                .ReturnsAsync(mockData);
+            new() { CustomerCode = "C01", InvoiceCode = "T01" }
+        };
+        _mockInvoiceRepo.Setup(r => r.GetInvoiceByAreaAndTransCodeAsync("TEST_DB", "A01", "T01"))
+            .ReturnsAsync(mockData);
 
-            var result = await _controller.GetInvoiceByAreaAndTransCodeAsync("A01", "T01");
+        var result = await _controller.GetInvoiceByAreaAndTransCodeAsync("A01", "T01");
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.NotNull(result.Result);
-            Assert.Single(result.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.NotNull(result.Result);
+        Assert.Single(result.Result);
+    }
 
-        [Fact]
-        public async Task GetInvoiceByAreaAndTransCodeAsync_ShouldReturnBadRequest_WhenEmpty()
+    [Fact]
+    public async Task GetInvoiceByAreaAndTransCodeAsync_ShouldReturnBadRequest_WhenEmpty()
+    {
+        _mockInvoiceRepo.Setup(r => r.GetInvoiceByAreaAndTransCodeAsync("TEST_DB", "A01", "T01"))
+            .ReturnsAsync(new List<InvoiceResponse>());
+
+        var result = await _controller.GetInvoiceByAreaAndTransCodeAsync("A01", "T01");
+
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.NotNull(result.Result);
+        Assert.Empty(result.Result);
+    }
+
+    [Fact]
+    public async Task SaveDividedInvoiceAsync_ShouldReturnOk_WhenSavedSuccessfully()
+    {
+        var requests = new List<CreateDividedInvoiceRequest>
         {
-            _mockInvoiceRepo.Setup(r => r.GetInvoiceByAreaAndTransCodeAsync("TEST_DB", "A01", "T01"))
-                .ReturnsAsync(new List<InvoiceResponse>());
+            new() { InvoiceId = 1, DeliveryId = "DEL01" }
+        };
+        _mockRepo.Setup(r => r.SaveDividedInvoiceAsync(requests, "TEST_DB", "TEST_USER"))
+            .ReturnsAsync(1);
 
-            var result = await _controller.GetInvoiceByAreaAndTransCodeAsync("A01", "T01");
+        var result = await _controller.SaveDividedInvoiceAsync(requests);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.NotNull(result.Result);
-            Assert.Empty(result.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(1, result.Result);
+    }
 
-        [Fact]
-        public async Task SaveDividedInvoiceAsync_ShouldReturnOk_WhenSavedSuccessfully()
+    [Fact]
+    public async Task SaveDividedInvoiceAsync_ShouldReturnBadRequest_WhenFailed()
+    {
+        var requests = new List<CreateDividedInvoiceRequest>
         {
-            var requests = new List<CreateDividedInvoiceRequest>
-            {
-                new() { InvoiceId = 1, DeliveryId = "DEL01" }
-            };
-            _mockRepo.Setup(r => r.SaveDividedInvoiceAsync(requests, "TEST_DB", "TEST_USER"))
-                .ReturnsAsync(1);
+            new() { InvoiceId = 1, DeliveryId = "DEL01" }
+        };
+        _mockRepo.Setup(r => r.SaveDividedInvoiceAsync(requests, "TEST_DB", "TEST_USER"))
+            .ReturnsAsync(0);
 
-            var result = await _controller.SaveDividedInvoiceAsync(requests);
+        var result = await _controller.SaveDividedInvoiceAsync(requests);
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(1, result.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+    }
 
-        [Fact]
-        public async Task SaveDividedInvoiceAsync_ShouldReturnBadRequest_WhenFailed()
+    [Fact]
+    public async Task GetDividedInvoiceStatusByDateAsync_ShouldReturnOk_WhenFound()
+    {
+        var mockData = new List<DividedInvoiceStatusResponse>
         {
-            var requests = new List<CreateDividedInvoiceRequest>
-            {
-                new() { InvoiceId = 1, DeliveryId = "DEL01" }
-            };
-            _mockRepo.Setup(r => r.SaveDividedInvoiceAsync(requests, "TEST_DB", "TEST_USER"))
-                .ReturnsAsync(0);
+            new() { Id = 1, Delivery = "DEL01", TransactionCode = "INV01", InvoiceValue = 100 }
+        };
+        var date = DateTime.Today;
+        var deliveryId = "DEL01";
+        _mockRepo.Setup(r => r.GetDividedInvoiceStatusByDateAsync("TEST_DB", date, deliveryId))
+            .ReturnsAsync(mockData);
 
-            var result = await _controller.SaveDividedInvoiceAsync(requests);
+        var result = await _controller.GetDividedInvoiceStatusByDateAsync(date, deliveryId);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.True(result.Success);
+        Assert.NotNull(result.Result);
+        Assert.Single(result.Result);
+    }
 
-        [Fact]
-        public async Task GetDividedInvoiceStatusByDateAsync_ShouldReturnOk_WhenFound()
-        {
-            var mockData = new List<DividedInvoiceStatusResponse>
-            {
-                new() { Id = 1, Delivery = "DEL01", TransactionCode = "INV01", InvoiceValue = 100 }
-            };
-            var date = DateTime.Today;
-            var deliveryId = "DEL01";
-            _mockRepo.Setup(r => r.GetDividedInvoiceStatusByDateAsync("TEST_DB", date, deliveryId))
-                .ReturnsAsync(mockData);
+    [Fact]
+    public async Task GetDividedInvoiceStatusByDateAsync_ShouldReturnBadRequest_WhenEmpty()
+    {
+        var date = DateTime.Today;
+        var deliveryId = "DEL01";
+        _mockRepo.Setup(r => r.GetDividedInvoiceStatusByDateAsync("TEST_DB", date, deliveryId))
+            .ReturnsAsync(new List<DividedInvoiceStatusResponse>());
 
-            var result = await _controller.GetDividedInvoiceStatusByDateAsync(date, deliveryId);
+        var result = await _controller.GetDividedInvoiceStatusByDateAsync(date, deliveryId);
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.True(result.Success);
-            Assert.NotNull(result.Result);
-            Assert.Single(result.Result);
-        }
-
-        [Fact]
-        public async Task GetDividedInvoiceStatusByDateAsync_ShouldReturnBadRequest_WhenEmpty()
-        {
-            var date = DateTime.Today;
-            var deliveryId = "DEL01";
-            _mockRepo.Setup(r => r.GetDividedInvoiceStatusByDateAsync("TEST_DB", date, deliveryId))
-                .ReturnsAsync(new List<DividedInvoiceStatusResponse>());
-
-            var result = await _controller.GetDividedInvoiceStatusByDateAsync(date, deliveryId);
-
-            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.NotNull(result.Result);
-            Assert.Empty(result.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.NotNull(result.Result);
+        Assert.Empty(result.Result);
     }
 }

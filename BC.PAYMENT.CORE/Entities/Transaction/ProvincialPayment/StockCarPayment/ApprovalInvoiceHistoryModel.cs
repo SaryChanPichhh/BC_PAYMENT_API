@@ -1,9 +1,8 @@
-namespace BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment
+namespace BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.StockCarPayment;
+
+public class ApprovalInvoiceHistoryModel : PaidInvoiceRequestDto
 {
-    public class ApprovalInvoiceHistoryModel : PaidInvoiceRequestDto
-    {
-        public int RequestId;
-        public string? Status { get; set; }
-        public string ApprovalStatus => Status == "Approved" ? "អនុម័ត" : "បដិសេធ";
-    }
+    public int RequestId;
+    public string? Status { get; set; }
+    public string ApprovalStatus => Status == "Approved" ? "អនុម័ត" : "បដិសេធ";
 }

@@ -28,7 +28,8 @@ public class StockCarExpenseRepository(ISqlDataAccess sqlDataAccess) : IStockCar
         return data.ToList();
     }
 
-    public async Task<StockCarExpenseResponse?> GetByTemplateIdAndExpenseIdAsync(string dbCode, int templateId, int expenseId)
+    public async Task<StockCarExpenseResponse?> GetByTemplateIdAndExpenseIdAsync(string dbCode, int templateId,
+        int expenseId)
     {
         const string sql =
             @"SELECT E.ID, UPPER(Employee.USER_NAME) [Employee], T.EXPENSE_NAME ExpenseType, E.EXPENS_TYPE_ID ExpenseTypeId, E.QTY Quantity,

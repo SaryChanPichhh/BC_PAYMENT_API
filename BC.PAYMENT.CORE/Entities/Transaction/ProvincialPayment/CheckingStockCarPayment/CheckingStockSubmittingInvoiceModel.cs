@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.CheckingStockCarPayment
+namespace BC.PAYMENT.CORE.Entities.Transaction.ProvincialPayment.CheckingStockCarPayment;
+
+public class CheckingStockSubmittingInvoiceModel : PaidInvoiceRequestDto
 {
-    public class CheckingStockSubmittingInvoiceModel : PaidInvoiceRequestDto
-    {
-        public string? Employee { get; set; }
-    }
+    public string? Employee { get; set; }
 }

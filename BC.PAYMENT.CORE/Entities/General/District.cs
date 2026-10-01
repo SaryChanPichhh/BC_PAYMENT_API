@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.CORE.Entities.General
+namespace BC.PAYMENT.CORE.Entities.General;
+
+public class District
 {
-    public class District
-    {
-        public int DistrictId { get; set; }
-    }
+    public int DistrictId { get; set; }
 }

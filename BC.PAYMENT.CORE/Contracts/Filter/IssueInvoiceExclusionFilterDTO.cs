@@ -1,8 +1,6 @@
-namespace BC.PAYMENT.CORE.DTO.Filter
+namespace BC.PAYMENT.CORE.DTO.Filter;
+
+public record IssueInvoiceExclusionFilterDTO : IssueInvoiceFilterDTO
 {
-    public record IssueInvoiceExclusionFilterDTO : IssueInvoiceFilterDTO
-    {
-        [Required]
-        public string TransRef { get; set; }
-    }
+    [Required] public string TransRef { get; set; }
 }

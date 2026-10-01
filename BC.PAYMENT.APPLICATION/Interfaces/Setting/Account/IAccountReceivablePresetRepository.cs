@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account
+namespace BC.PAYMENT.APPLICATION.Interfaces.Prepare.Account;
+
+public interface IAccountReceivablePresetRepository : IBaseRepository<AccountReceivablePresetModel>
 {
-    public interface IAccountReceivablePresetRepository : IBaseRepository<AccountReceivablePresetModel>
-    {
-        Task<int> DeleteAccountReceivableAsync(AccountReceivablePresetModel model);
-    }
+    Task<int> DeleteAccountReceivableAsync(AccountReceivablePresetModel model);
 }

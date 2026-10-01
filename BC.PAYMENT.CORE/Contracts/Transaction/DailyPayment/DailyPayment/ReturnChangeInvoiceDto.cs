@@ -1,7 +1,6 @@
-﻿namespace BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment
+﻿namespace BC.PAYMENT.CORE.DTO.Transaction.DailyPayment.DailyPayment;
+
+public class ReturnChangeInvoiceDto
 {
-    public class ReturnChangeInvoiceDto
-    {
-        public int ReturnId { get; set; }
-    }
+    public int ReturnId { get; set; }
 }

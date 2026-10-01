@@ -1,11 +1,8 @@
-namespace BC.PAYMENT.CORE.DTO.Accounting
-{
-    public class AnalysisCodeCreateRequest
-    {
-        [Required]
-        public string AnamCode { get; set; }
+namespace BC.PAYMENT.CORE.DTO.Accounting;
 
-        [JsonIgnore]
-        public string? DbCode { get; set; }
-    }
+public class AnalysisCodeCreateRequest
+{
+    [Required] public string AnamCode { get; set; }
+
+    [JsonIgnore] public string? DbCode { get; set; }
 }

@@ -1,12 +1,10 @@
 using BC.PAYMENT.CORE.Contracts.Response.SubmitInvoice;
 using BC.PAYMENT.CORE.Entities.Transaction.Submitting.SubmittingInvoice;
 
-namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice
+namespace BC.PAYMENT.APPLICATION.Interfaces.Transaction.Submitting.SubmittingInvoice;
+
+public interface ISubmittedInvoiceRepository
 {
-    public interface ISubmittedInvoiceRepository
-    {
-        Task<List<SubmittedInvoiceModel>> GetAllNotSubmitPaidInvoice(string dbCode, string fromDate, string toDate);
-        Task<int> UpdateInvoiceFromPendingToCancelAsync(string dbCode,string createBy, string submittedId);
-       
-    }
+    Task<List<SubmittedInvoiceModel>> GetAllNotSubmitPaidInvoice(string dbCode, string fromDate, string toDate);
+    Task<int> UpdateInvoiceFromPendingToCancelAsync(string dbCode, string createBy, string submittedId);
 }

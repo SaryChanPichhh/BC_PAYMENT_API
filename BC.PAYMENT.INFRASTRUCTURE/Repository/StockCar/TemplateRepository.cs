@@ -8,7 +8,8 @@ public class TemplateRepository(ISqlDataAccess sqlDataAccess) : ITemplateReposit
 {
     public async Task<List<TemplateResponse>> GetTemplatesAsync(string dbCode)
     {
-        var sql = $@"SELECT Id,FORMAT(CreatedDate, 'MM-dd-yyyy') CreatedDate,CreatedBy,UPPER(EmployeeName) Employee,EmployeeId,Description FROM TEMPLATE INNER JOIN (SELECT USER_ID EmployeeId,USER_NAME EmployeeName FROM BCUSERS)
+        var sql =
+            $@"SELECT Id,FORMAT(CreatedDate, 'MM-dd-yyyy') CreatedDate,CreatedBy,UPPER(EmployeeName) Employee,EmployeeId,Description FROM TEMPLATE INNER JOIN (SELECT USER_ID EmployeeId,USER_NAME EmployeeName FROM BCUSERS)
                    Employee on Employee.EmployeeId = TEMPLATE.Employee WHERE DbCode = @DB_CODE AND IsEnable = '1';";
         var param = new
         {
@@ -27,7 +28,8 @@ public class TemplateRepository(ISqlDataAccess sqlDataAccess) : ITemplateReposit
 
     public async Task<int> AddNewTemplateAsync(Template req)
     {
-        var sql = $@"INSERT INTO TEMPLATE(Employee,CreatedDate,CreatedBy,Description,DbCode,IsEnable) OUTPUT inserted.Id VALUES(@EMPLOYEE,@CREATED_DATE,@CREATED_BY,@DESCRIPTION,@DB_CODE,@IS_ENABLE)";
+        var sql =
+            $@"INSERT INTO TEMPLATE(Employee,CreatedDate,CreatedBy,Description,DbCode,IsEnable) OUTPUT inserted.Id VALUES(@EMPLOYEE,@CREATED_DATE,@CREATED_BY,@DESCRIPTION,@DB_CODE,@IS_ENABLE)";
         var param = new
         {
             EMPLOYEE = req.Employee,
@@ -35,11 +37,12 @@ public class TemplateRepository(ISqlDataAccess sqlDataAccess) : ITemplateReposit
             CREATED_BY = req.CreatedBy,
             DESCRIPTION = req.Description,
             DB_CODE = req.DbCode,
-            IS_ENABLE = true,
+            IS_ENABLE = true
         };
         var affectedRow = await sqlDataAccess.ExecuteAsync(sql, param);
         return affectedRow;
     }
+
     public async Task<int> UpdateTemplateAsync(Template model)
     {
         const string sql = "UPDATE TEMPLATE SET Employee = @EMPLOYEE,Description = @DESCRIPTION WHERE Id = @ID";
@@ -55,7 +58,7 @@ public class TemplateRepository(ISqlDataAccess sqlDataAccess) : ITemplateReposit
 
     public async Task<int> DeleteTemplateAsync(int id)
     {
-         var sql = "DELETE FROM TEMPLATE WHERE Id = @ID";
+        var sql = "DELETE FROM TEMPLATE WHERE Id = @ID";
         var parameter = new
         {
             ID = id

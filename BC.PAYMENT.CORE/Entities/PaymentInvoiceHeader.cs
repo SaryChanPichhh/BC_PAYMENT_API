@@ -7,7 +7,7 @@ public class PaymentInvoiceHeader
     public string DeliveryId { get; set; } = string.Empty;
     public int Period { get; set; }
     public DateTime InvoiceDividendDate { get; set; }
-    public string EntriesCode { get; set; } =  string.Empty;
+    public string EntriesCode { get; set; } = string.Empty;
     public string CreatedBy { get; set; } = string.Empty;
-    public DateTime CreatedDate { get; set; } 
+    public DateTime CreatedDate { get; set; }
 }

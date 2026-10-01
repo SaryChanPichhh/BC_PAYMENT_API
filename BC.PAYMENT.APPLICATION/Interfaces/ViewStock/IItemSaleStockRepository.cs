@@ -5,5 +5,6 @@ namespace BC.PAYMENT.APPLICATION.Interfaces.General;
 
 public interface IItemSaleStockRepository
 {
-    Task<List<ItemSaleStockModel>> GetItemSaleStockAsync(ItemSaleStockRequestDto request, string? imageUrl, CancellationToken cancellationToken = default);
+    Task<List<ItemSaleStockModel>> GetItemSaleStockAsync(ItemSaleStockRequestDto request, string? imageUrl,
+        CancellationToken cancellationToken = default);
 }

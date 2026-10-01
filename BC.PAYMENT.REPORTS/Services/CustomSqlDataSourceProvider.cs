@@ -4,81 +4,78 @@ using DevExpress.DataAccess.Web;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 
-namespace BC.ACCOUNTING.REPORT.Services
+namespace BC.ACCOUNTING.REPORT.Services;
+
+public class CustomSqlDataSourceProvider : IConnectionStringsProvider
 {
-    public class CustomSqlDataSourceProvider : IConnectionStringsProvider
+    private readonly IConfiguration _configuration;
+
+    public CustomSqlDataSourceProvider(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
+        _configuration = configuration;
+    }
 
-        public CustomSqlDataSourceProvider(IConfiguration configuration)
+    // Shown in the Web Designer's data source dropdown
+    public Dictionary<string, string> GetConnectionDescriptions()
+    {
+        return new Dictionary<string, string>
         {
-            _configuration = configuration;
-        }
+            { "MSSQL_DataSource", "SQL Server (MyDatabase)" }
+        };
+    }
 
-        // Shown in the Web Designer's data source dropdown
-        public Dictionary<string, string> GetConnectionDescriptions()
+    // Used to retrieve the raw connection string
+    public IConnectionStringInfo[] GetConnections()
+    {
+        // Returning the connection info using the updated ConnectionStringInfo class
+        return new IConnectionStringInfo[]
         {
-            return new Dictionary<string, string>
+            new ConnectionStringInfo
             {
-                { "MSSQL_DataSource", "SQL Server (MyDatabase)" }
-            };
-        }
-
-        // Used to retrieve the raw connection string
-        public IConnectionStringInfo[] GetConnections()
-        {
-            // Returning the connection info using the updated ConnectionStringInfo class
-            return new IConnectionStringInfo[]
-            {
-                new ConnectionStringInfo
-                {
-                    Name = "MSSQL_DataSource",
-                    ConnectionString = _configuration.GetConnectionString("MSSQL_DataSource"),
-                    Location = DataConnectionLocation.SettingsFile, // Enum value
-                    ProviderName = "System.Data.SqlClient"
-                }
-            };
-        }
-
-        public IConnectionStringInfo[] GetConfigFileConnections()
-        {
-            return new IConnectionStringInfo[]
-            {
-                new ConnectionStringInfo
-                {
-                    Name = "MSSQL_DataSource",
-                    ConnectionString = _configuration.GetConnectionString("MSSQL_DataSource"),
-                    Location = DataConnectionLocation.SettingsFile, // Enum value
-                    ProviderName = "System.Data.SqlClient"
-                }
-            };
-        }
-
-        public IConnectionStringInfo GetConnectionStringInfo(string connectionStringName)
-        {
-            if (connectionStringName == "MSSQL_DataSource")
-            {
-                return new ConnectionStringInfo
-                {
-                    Name = "MSSQL_DataSource",
-                    ConnectionString = _configuration.GetConnectionString("MSSQL_DataSource"),
-                    Location = DataConnectionLocation.SettingsFile, // Enum value
-                    ProviderName = "System.Data.SqlClient"
-                };
+                Name = "MSSQL_DataSource",
+                ConnectionString = _configuration.GetConnectionString("MSSQL_DataSource"),
+                Location = DataConnectionLocation.SettingsFile, // Enum value
+                ProviderName = "System.Data.SqlClient"
             }
-            return null;
-        }
+        };
+    }
 
-        public string GetConnectionString(string name)
+    public IConnectionStringInfo[] GetConfigFileConnections()
+    {
+        return new IConnectionStringInfo[]
         {
-            try
+            new ConnectionStringInfo
             {
-                return _configuration.GetConnectionString(name);
+                Name = "MSSQL_DataSource",
+                ConnectionString = _configuration.GetConnectionString("MSSQL_DataSource"),
+                Location = DataConnectionLocation.SettingsFile, // Enum value
+                ProviderName = "System.Data.SqlClient"
             }
-            catch (Exception ex)
+        };
+    }
+
+    public IConnectionStringInfo GetConnectionStringInfo(string connectionStringName)
+    {
+        if (connectionStringName == "MSSQL_DataSource")
+            return new ConnectionStringInfo
             {
-                throw new Exception($"Connection string error: {ex.Message}", ex);
-            }
+                Name = "MSSQL_DataSource",
+                ConnectionString = _configuration.GetConnectionString("MSSQL_DataSource"),
+                Location = DataConnectionLocation.SettingsFile, // Enum value
+                ProviderName = "System.Data.SqlClient"
+            };
+        return null;
+    }
+
+    public string GetConnectionString(string name)
+    {
+        try
+        {
+            return _configuration.GetConnectionString(name);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Connection string error: {ex.Message}", ex);
         }
     }
 }

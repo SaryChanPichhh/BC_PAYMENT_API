@@ -6,94 +6,95 @@ using System.Data;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BC.PAYMENT.TEST.Repositories
+namespace BC.PAYMENT.TEST.Repositories;
+
+public class DeliveryRepositoryTests
 {
-    public class DeliveryRepositoryTests
+    private readonly Mock<ISqlDataAccess> _mockSqlDataAccess;
+    private readonly DeliveryRepository _repository;
+
+    public DeliveryRepositoryTests()
     {
-        private readonly Mock<ISqlDataAccess> _mockSqlDataAccess;
-        private readonly DeliveryRepository _repository;
+        _mockSqlDataAccess = new Mock<ISqlDataAccess>();
+        _repository = new DeliveryRepository(_mockSqlDataAccess.Object);
+    }
 
-        public DeliveryRepositoryTests()
+    [Fact]
+    public async Task CreateDelivery_ShouldReturnTrue_WhenRowsAffected()
+    {
+        // Arrange
+        var delivery = new Delivery
         {
-            _mockSqlDataAccess = new Mock<ISqlDataAccess>();
-            _repository = new DeliveryRepository(_mockSqlDataAccess.Object);
-        }
+            DeliveryId = "DEL-001",
+            DbCode = "TEST",
+            DeliveryName = "Test"
+        };
 
-        [Fact]
-        public async Task CreateDelivery_ShouldReturnTrue_WhenRowsAffected()
+        _mockSqlDataAccess
+            .Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<Delivery>(), CommandType.Text, "Default"))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _repository.CreateDelivery(delivery);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task UpdateDelivery_ShouldReturnTrue_WhenRowsAffected()
+    {
+        // Arrange
+        var delivery = new Delivery
         {
-            // Arrange
-            var delivery = new Delivery
-            {
-                DeliveryId = "DEL-001",
-                DbCode = "TEST",
-                DeliveryName = "Test"
-            };
+            DeliveryId = "DEL-001",
+            DbCode = "TEST",
+            DeliveryName = "Updated"
+        };
 
-            _mockSqlDataAccess
-                .Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<Delivery>(), CommandType.Text, "Default"))
-                .ReturnsAsync(1);
+        _mockSqlDataAccess
+            .Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<Delivery>(), CommandType.Text, "Default"))
+            .ReturnsAsync(1);
 
-            // Act
-            var result = await _repository.CreateDelivery(delivery);
+        // Act
+        var result = await _repository.UpdateDelivery(delivery);
 
-            // Assert
-            Assert.True(result);
-        }
+        // Assert
+        Assert.True(result);
+    }
 
-        [Fact]
-        public async Task UpdateDelivery_ShouldReturnTrue_WhenRowsAffected()
+    [Fact]
+    public async Task DeleteDelivery_ShouldReturnTrue_WhenRowsAffected()
+    {
+        // Arrange
+        var id = "DEL-001";
+        _mockSqlDataAccess
+            .Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+            .ReturnsAsync(1);
+
+        // Act
+        var result = await _repository.DeleteDelivery(id);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task GetDeliveryByPermissionAsync_ShouldReturnList()
+    {
+        var mockData = new List<BC.PAYMENT.CORE.Contracts.Response.Delivery.DeliveryResponse>
         {
-            // Arrange
-            var delivery = new Delivery
-            {
-                DeliveryId = "DEL-001",
-                DbCode = "TEST",
-                DeliveryName = "Updated"
-            };
+            new() { DeliveryId = "DEL-001", DeliveryNameKhmer = "Test Delivery" }
+        };
+        _mockSqlDataAccess
+            .Setup(db =>
+                db.LoadData<BC.PAYMENT.CORE.Contracts.Response.Delivery.DeliveryResponse, dynamic>(It.IsAny<string>(),
+                    It.IsAny<object>(), CommandType.Text, "Default"))
+            .ReturnsAsync(mockData);
 
-            _mockSqlDataAccess
-                .Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<Delivery>(), CommandType.Text, "Default"))
-                .ReturnsAsync(1);
+        var result = await _repository.GetDeliveryByPermissionAsync("TEST_DB");
 
-            // Act
-            var result = await _repository.UpdateDelivery(delivery);
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public async Task DeleteDelivery_ShouldReturnTrue_WhenRowsAffected()
-        {
-            // Arrange
-            var id = "DEL-001";
-            _mockSqlDataAccess
-                .Setup(db => db.ExecuteAsync(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
-                .ReturnsAsync(1);
-
-            // Act
-            var result = await _repository.DeleteDelivery(id);
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public async Task GetDeliveryByPermissionAsync_ShouldReturnList()
-        {
-            var mockData = new List<BC.PAYMENT.CORE.Contracts.Response.Delivery.DeliveryResponse>
-            {
-                new() { DeliveryId = "DEL-001", DeliveryNameKhmer = "Test Delivery" }
-            };
-            _mockSqlDataAccess
-                .Setup(db => db.LoadData<BC.PAYMENT.CORE.Contracts.Response.Delivery.DeliveryResponse, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
-                .ReturnsAsync(mockData);
-
-            var result = await _repository.GetDeliveryByPermissionAsync("TEST_DB");
-
-            Assert.Single(result);
-            Assert.Equal("DEL-001", result[0].DeliveryId);
-        }
+        Assert.Single(result);
+        Assert.Equal("DEL-001", result[0].DeliveryId);
     }
 }

@@ -1,30 +1,32 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationRFID
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.VerificationRFID;
+
+internal class VerificationRFIDRepository : IVerificationRFIDRepository
 {
-    internal class VerificationRFIDRepository : IVerificationRFIDRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public VerificationRFIDRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public VerificationRFIDRepository(ISqlDataAccess sqlDataAccess)
+    public async Task<int> UpdateSubmittedStatus(string dbCode, string submitCode)
+    {
+        var sql = "UPDATE RFIDINVHDR SET IS_SUBMITTED = 1 WHERE SUBMIT_CODE = @SUBMIT_CODE AND DB_CODE = @DB_CODE";
+        var param = new
         {
-            _sqlDataAccess = sqlDataAccess;
-        }
+            DB_CODE = dbCode,
+            SUBMIT_CODE = submitCode
+        };
+        //using var connection = new SqlConnection(DatabaseConfiguration.Instance.GetConnection());
+        var results = await _sqlDataAccess.ExecuteAsync(sql, param);
+        return results;
+    }
 
-        public async Task<int> UpdateSubmittedStatus(string dbCode, string submitCode)
-        {
-            var sql = "UPDATE RFIDINVHDR SET IS_SUBMITTED = 1 WHERE SUBMIT_CODE = @SUBMIT_CODE AND DB_CODE = @DB_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                SUBMIT_CODE = submitCode
-            };
-            //using var connection = new SqlConnection(DatabaseConfiguration.Instance.GetConnection());
-            var results = await _sqlDataAccess.ExecuteAsync(sql, param);
-            return results;
-        }
-
-        public async Task<List<VerificationStockModel>> GetRFIDSubmittedItemDetail(string dbCode, string submitCode, string location)
-        {
-            const string sql = @"SELECT DB.DB_NAME DbCode, H.WAREHOUSE [Location], H.STOCKER Stocker, H.STOCK_CHECKER StockChecker, H.[ADMIN] [Admin],
+    public async Task<List<VerificationStockModel>> GetRFIDSubmittedItemDetail(string dbCode, string submitCode,
+        string location)
+    {
+        const string sql =
+            @"SELECT DB.DB_NAME DbCode, H.WAREHOUSE [Location], H.STOCKER Stocker, H.STOCK_CHECKER StockChecker, H.[ADMIN] [Admin],
                 D.ITEM_CODE ItemCode, D.QUANTITY Quantity, H.CREATED_DATE CreatedDate, D.EXPIRED_DATE ExpiredDate
                 FROM RFIDINVHDR H 
                 INNER JOIN dbo.RFIDINVDET D
@@ -33,44 +35,45 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
                 ON DB.DB_CODE = H.DB_CODE 
                 WHERE H.DB_CODE = @DB_CODE AND H.WAREHOUSE = @LOCATION AND H.SUBMIT_CODE = @SUBMIT_CODE AND H.STATUS = 'A' AND D.STATUS = 1
                 ";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                SUBMIT_CODE = submitCode,
-                LOCATION = location
-            };
-            var results = (await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param)).ToList();
-            return results;
-        }
-
-        public async Task<List<string>> GetAllWarehouse(string dbCode)
+        var param = new
         {
-            const string sql = @"SELECT WAR_CODE Location FROM SIWAREH WHERE DB_CODE = @DB_CODE AND WAR_STAT = 'A'";
-            var param = new
-            {
-                DB_CODE = dbCode
-            };
-            var results = (await _sqlDataAccess.LoadData<string,dynamic>(sql, param)).ToList();
-            return results;
-        }
+            DB_CODE = dbCode,
+            SUBMIT_CODE = submitCode,
+            LOCATION = location
+        };
+        var results = (await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param)).ToList();
+        return results;
+    }
 
-        public async Task<List<VerificationStockModel>> GetAllSubmitCodeEntries(string dbCode, string location)
+    public async Task<List<string>> GetAllWarehouse(string dbCode)
+    {
+        const string sql = @"SELECT WAR_CODE Location FROM SIWAREH WHERE DB_CODE = @DB_CODE AND WAR_STAT = 'A'";
+        var param = new
         {
-            const string sql = @"
+            DB_CODE = dbCode
+        };
+        var results = (await _sqlDataAccess.LoadData<string, dynamic>(sql, param)).ToList();
+        return results;
+    }
+
+    public async Task<List<VerificationStockModel>> GetAllSubmitCodeEntries(string dbCode, string location)
+    {
+        const string sql = @"
                        SELECT SUBMIT_CODE SubmitCode, WAREHOUSE [Location], STOCK_CHECKER StockChecker, [ADMIN] [Admin], CREATED_DATE CreatedDate 
             FROM RFIDINVHDR WHERE WAREHOUSE = @LOCATION AND DB_CODE = @DB_CODE AND STATUS = 'A' ORDER BY CREATED_DATE DESC";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                LOCATION = location
-            };
-            var results = (await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param)).ToList();
-            return results;
-        }
-
-        public async Task<List<VerificationStockModel>> GetAllStockItemByLocationAndSubmitCode(string dbCode, string submitCode, string location)
+        var param = new
         {
-            var sql = $@"SELECT CASE WHEN  C.WAREHOUSE IS NULL THEN S.LOCATION ELSE C.WAREHOUSE END Location, 
+            DB_CODE = dbCode,
+            LOCATION = location
+        };
+        var results = (await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param)).ToList();
+        return results;
+    }
+
+    public async Task<List<VerificationStockModel>> GetAllStockItemByLocationAndSubmitCode(string dbCode,
+        string submitCode, string location)
+    {
+        var sql = $@"SELECT CASE WHEN  C.WAREHOUSE IS NULL THEN S.LOCATION ELSE C.WAREHOUSE END Location, 
                             CASE WHEN  C.ITEM_CODE IS NULL THEN S.ITEM_CODE ELSE C.ITEM_CODE END ItemCode,  
                              S.ITEM_DESC ItemDescription,  
                                ISNULL(S.UNIT_STOCK,0) UnitStock,  
@@ -159,14 +162,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Inventory.Verificatio
 						        INNER JOIN dbo.RFIDINVDET D ON H.SUBMIT_CODE = D.SUBMIT_CODE
 						        WHERE H.DB_CODE = @DB_CODE AND H.SUBMIT_CODE = @SUBMIT_CODE
 						        ) C ON C.ITEM_CODE = S.ITEM_CODE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                SUBMIT_CODE = submitCode,
-                LOCATION = location
-            };
-            var execute = await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            SUBMIT_CODE = submitCode,
+            LOCATION = location
+        };
+        var execute = await _sqlDataAccess.LoadData<VerificationStockModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

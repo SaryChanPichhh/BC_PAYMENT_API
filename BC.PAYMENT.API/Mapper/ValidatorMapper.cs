@@ -7,7 +7,7 @@ public static class ValidatorMapper
 {
     public static List<ValidatorResponse> toProperties(this List<ValidationFailure> validationFailure)
     {
-        return validationFailure.Select(x=>new ValidatorResponse{errorMessage = x.ErrorMessage,PropertyName = x.PropertyName}).ToList();
+        return validationFailure.Select(x => new ValidatorResponse
+            { errorMessage = x.ErrorMessage, PropertyName = x.PropertyName }).ToList();
     }
-    
 }

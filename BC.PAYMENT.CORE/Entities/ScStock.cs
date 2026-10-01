@@ -12,11 +12,13 @@ public class ScStock
     public DateTime? CountDate { get; set; }
     public bool Status { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
+
     public string UserName
     {
         get => CreatedBy;
         set => CreatedBy = value;
     }
+
     public string? UpdatedBy { get; set; }
     public DateTime? UpdatedDate { get; set; }
 }

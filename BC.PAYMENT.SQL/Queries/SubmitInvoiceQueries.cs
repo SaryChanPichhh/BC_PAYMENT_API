@@ -2,7 +2,9 @@
 
 public static class SubmitInvoiceQueries
 {
-    public static string GetApprovedSubmittedInvoice(string criteria,string addReference = "",string addOnField = "") => $@"SELECT S.ID Id,DE.DELIVERIES_KHMER DeliveryName,
+    public static string GetApprovedSubmittedInvoice(string criteria, string addReference = "", string addOnField = "")
+    {
+        return $@"SELECT S.ID Id,DE.DELIVERIES_KHMER DeliveryName,
                 N.CUSTOMER_CODE CustomerCode,
                 CUSTOMER.CUSTOMER_NAME CustomerName,
                 N.TRANSACTION_REF InvoiceCode,1 Amount,
@@ -28,6 +30,7 @@ public static class SubmitInvoiceQueries
                 S.DB_CODE = @DB_CODE AND N.DB_CODE = @DB_CODE AND D.DB_CODE = @DB_CODE
                 AND DE.DB_CODE = @DB_CODE
                 {criteria}";
+    }
 
     public static string GetPendingSubmittedInvoice =>
         $@"SELECT S.ID Id,

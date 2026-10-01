@@ -4,10 +4,8 @@ namespace BC.PAYMENT.CORE.Contracts.Request.StockCar;
 
 public class UpdateTransferMoneyRequest
 {
-    [Required]
-    public int Id { get; set; }
-    [Required]
-    public DateTime TransactionDate { get; set; }
+    [Required] public int Id { get; set; }
+    [Required] public DateTime TransactionDate { get; set; }
     public string Description { get; set; } = string.Empty;
     public int Amount { get; set; }
     public double DollarFromEmployee { get; set; }

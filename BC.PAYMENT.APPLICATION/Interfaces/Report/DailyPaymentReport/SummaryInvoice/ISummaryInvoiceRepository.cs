@@ -1,7 +1,7 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Report.DailyPaymentReport.SummaryInvoice
+namespace BC.PAYMENT.APPLICATION.Interfaces.Report.DailyPaymentReport.SummaryInvoice;
+
+public interface ISummaryInvoiceRepository
 {
-    public interface ISummaryInvoiceRepository
-    {
-        Task<List<SummaryInvoiceReportModel>> GetSummaryInvoiceReportsByDateAsync(string dbCode, DateTime fromDate, DateTime toDate);
-    }
+    Task<List<SummaryInvoiceReportModel>> GetSummaryInvoiceReportsByDateAsync(string dbCode, DateTime fromDate,
+        DateTime toDate);
 }

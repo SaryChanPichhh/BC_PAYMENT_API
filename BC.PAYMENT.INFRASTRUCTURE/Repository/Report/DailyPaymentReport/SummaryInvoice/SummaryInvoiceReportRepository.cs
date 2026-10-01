@@ -1,17 +1,18 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.SummaryInvoice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.SummaryInvoice;
+
+public class SummaryInvoiceReportRepository : ISummaryInvoiceRepository
 {
-    public class SummaryInvoiceReportRepository : ISummaryInvoiceRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public SummaryInvoiceReportRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public SummaryInvoiceReportRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<SummaryInvoiceReportModel>> GetSummaryInvoiceReportsByDateAsync(string dbCode, DateTime fromDate, DateTime toDate)
-        {
-            var sql = @$"SELECT PD.CREATE_DATE CreateDate,
+    public async Task<List<SummaryInvoiceReportModel>> GetSummaryInvoiceReportsByDateAsync(string dbCode,
+        DateTime fromDate, DateTime toDate)
+    {
+        var sql = @$"SELECT PD.CREATE_DATE CreateDate,
                     D.DELIVERIES_NAME DeliveryName,
 	                A.AREA_NAME_KHMER AreaNameKhmer,
                     COUNT(CASE WHEN PD.STATUS = '1' THEN 1 END) AS 'CreditInvoice',
@@ -31,14 +32,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.Summary
                     AND PD.DB_CODE = @DB_CODE
                 GROUP BY 
                     D.DELIVERIES_NAME,A.AREA_NAME_KHMER,PD.CREATE_DATE";
-            var param = new
-            {
-                FROM_DATE = fromDate,
-                TO_DATE = toDate,
-                DB_CODE = dbCode,
-            };
-            var execute = await _sqlDataAccess.LoadData<SummaryInvoiceReportModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            FROM_DATE = fromDate,
+            TO_DATE = toDate,
+            DB_CODE = dbCode
+        };
+        var execute = await _sqlDataAccess.LoadData<SummaryInvoiceReportModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.General
+namespace BC.PAYMENT.APPLICATION.Interfaces.General;
+
+public interface IWarehouseRepository
 {
-    public interface IWarehouseRepository
-    {
-        Task<List<WarehouseDto>> GetWarehouseAsync(string dbCode);
-    }
+    Task<List<WarehouseDto>> GetWarehouseAsync(string dbCode);
 }

@@ -1,17 +1,18 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.PaidInvoice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.PaidInvoice;
+
+public class PaidInvoiceRepository : IPaidInvoiceRepository
 {
-    public class PaidInvoiceRepository : IPaidInvoiceRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public PaidInvoiceRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public PaidInvoiceRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<PaidInvoiceReportModel>> GetPaidInvoiceByDateAsync(string dbCode, DateTime fromDate, DateTime toDate)
-        {
-            var sql = $@"SELECT P.CREATE_DATE CreatedDate,D.DELIVERIES_KHMER Delivery,   
+    public async Task<List<PaidInvoiceReportModel>> GetPaidInvoiceByDateAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
+    {
+        var sql = $@"SELECT P.CREATE_DATE CreatedDate,D.DELIVERIES_KHMER Delivery,   
                  N.CUSTOMER_CODE CustomerCode,   
                  N.ACC_NAME_KH CustomerName,
                  Customer.Market,
@@ -34,14 +35,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.PaidInv
                  WHERE
                  P.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND 
                  P.DB_CODE = @DB_CODE AND N.DB_CODE = @DB_CODE ";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate,
-            };
-            var execute = await _sqlDataAccess.LoadData<PaidInvoiceReportModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<PaidInvoiceReportModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

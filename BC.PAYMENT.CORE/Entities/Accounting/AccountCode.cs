@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.CORE.Entities.Accounting
+namespace BC.PAYMENT.CORE.Entities.Accounting;
+
+public class AccountCode
 {
-    public class AccountCode
-    {
-        public string AccCode { get; set; }
-        public string AccCom { get; set; }
-    }
+    public string AccCode { get; set; }
+    public string AccCom { get; set; }
 }

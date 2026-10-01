@@ -5,7 +5,7 @@ public sealed class Logger : ILogger
     #region ===[ Private Members ]=============================================================
 
     private static readonly ILog _logger = LogManager.GetLogger(MethodBase.GetCurrentMethod()?.DeclaringType);
-    private static readonly Lazy<Logger> _loggerInstance = new Lazy<Logger>(() => new Logger());
+    private static readonly Lazy<Logger> _loggerInstance = new(() => new Logger());
 
     private const string ExceptionName = "Exception";
     private const string InnerExceptionName = "Inner Exception";
@@ -19,10 +19,7 @@ public sealed class Logger : ILogger
     /// <summary>
     /// Gets the Logger instance.
     /// </summary>
-    public static Logger Instance
-    {
-        get { return _loggerInstance.Value; }
-    }
+    public static Logger Instance => _loggerInstance.Value;
 
     #endregion
 
@@ -177,11 +174,9 @@ public sealed class Logger : ILogger
             exceptionMessage, Environment.NewLine, ex.Message, Environment.NewLine, ex.StackTrace);
 
         if (ex.InnerException != null)
-        {
             mesgAndStackTrace = string.Format(ExceptionMessageWithInnerException, mesgAndStackTrace,
                 Environment.NewLine,
                 SerializeException(ex.InnerException, InnerExceptionName));
-        }
 
         return mesgAndStackTrace + Environment.NewLine;
     }

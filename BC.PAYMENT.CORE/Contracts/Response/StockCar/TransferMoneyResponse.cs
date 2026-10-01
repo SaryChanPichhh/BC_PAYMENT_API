@@ -14,7 +14,13 @@ public class TransferMoneyResponse
     public double? DepositExchange { get; set; }
     public string Employee { get; set; } = string.Empty;
     public int EmployeeId { get; set; }
-    public double TotalFromEmployee => (ExchangeRateEmployee != 0 ? (RielFromEmployee / ExchangeRateEmployee) : 0) + DollarFromEmployee;
-    public double? TotalDeposit => (DepositExchange.HasValue && DepositExchange.Value != 0 ? (DepositRiel / DepositExchange.Value) : 0) + DepositDollar;
+
+    public double TotalFromEmployee =>
+        (ExchangeRateEmployee != 0 ? RielFromEmployee / ExchangeRateEmployee : 0) + DollarFromEmployee;
+
+    public double? TotalDeposit =>
+        (DepositExchange.HasValue && DepositExchange.Value != 0 ? DepositRiel / DepositExchange.Value : 0) +
+        DepositDollar;
+
     public double? BiasedAmount => TotalFromEmployee - (TotalDeposit ?? 0);
 }

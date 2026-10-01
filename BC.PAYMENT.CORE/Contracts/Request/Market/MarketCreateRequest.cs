@@ -12,5 +12,5 @@ public class MarketCreateRequest
     public int DistrictId { get; set; }
     public int ProvinceId { get; set; }
     public byte[]? Image { get; set; }
-    public string Other { get; set; }   
+    public string Other { get; set; }
 }

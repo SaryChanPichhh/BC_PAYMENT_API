@@ -10,6 +10,5 @@ public class NewInvoiceRequest
     public InvoiceStatus InvoiceType { get; set; }
     public string CreatedBy { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
-    public string CustomerField1 { get; set; } = string.Empty;  
-    
+    public string CustomerField1 { get; set; } = string.Empty;
 }

@@ -6,9 +6,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.StockCar;
 
 public class StockCarInvoiceRepository(ISqlDataAccess sqlDataAccess) : IStockCarInvoiceRepository
 {
-    public async Task<List<StockCarInvoiceResponse>> GetStockCarInvoicesByInvoiceTypeAsync(string dbCode, int templateId, InvoiceStatus invoiceStatus)
+    public async Task<List<StockCarInvoiceResponse>> GetStockCarInvoicesByInvoiceTypeAsync(string dbCode,
+        int templateId, InvoiceStatus invoiceStatus)
     {
-        var sql = $@"SELECT N.ID InvoiceId,CUSTOMER_CODE CustomerCode,CUSTOMER_NAME CustomerName,CODE TransactionCode,VALUE InvoiceValue,
+        var sql =
+            $@"SELECT N.ID InvoiceId,CUSTOMER_CODE CustomerCode,CUSTOMER_NAME CustomerName,CODE TransactionCode,VALUE InvoiceValue,
              TRANSACTION_DATE TransactionDate,
              UPPER(Employee.USER_NAME) Employee,Market,Area
           FROM BCSTOCK_CAR N INNER JOIN TEMPLATE T ON T.Id = N.TEMPLATE_ID 
@@ -24,9 +26,9 @@ public class StockCarInvoiceRepository(ISqlDataAccess sqlDataAccess) : IStockCar
         {
             INVOICE_STATUS = Enum.GetName(typeof(InvoiceStatus), invoiceStatus)?[..1],
             DB_CODE = dbCode,
-            TEMPLATE_ID = templateId,
+            TEMPLATE_ID = templateId
         };
-        return (await sqlDataAccess.LoadData<StockCarInvoiceResponse,dynamic>(sql,param)).ToList();
+        return (await sqlDataAccess.LoadData<StockCarInvoiceResponse, dynamic>(sql, param)).ToList();
     }
 
     public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoicesByTemplateIdAsync(string dbCode, int templateId)

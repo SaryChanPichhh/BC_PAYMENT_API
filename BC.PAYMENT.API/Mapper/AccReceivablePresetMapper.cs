@@ -7,7 +7,8 @@ namespace BC.PAYMENT.API.Mapper;
 
 public static class AccReceivablePresetMapper
 {
-    public static AccountReceivablePresetModel FromCreateDtoToModel(this AccountReceivableCreateRequest model,ClaimDTO dto)
+    public static AccountReceivablePresetModel FromCreateDtoToModel(this AccountReceivableCreateRequest model,
+        ClaimDTO dto)
     {
         return new AccountReceivablePresetModel
         {
@@ -28,6 +29,7 @@ public static class AccReceivablePresetMapper
             CreatedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
     }
+
     public static AccountReceivablePresetModel ToResponse(AccountReceivableCreateRequest model)
     {
         return new AccountReceivablePresetModel
@@ -47,6 +49,7 @@ public static class AccReceivablePresetMapper
             CreatedDate = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
         };
     }
+
     public static AccountReceivablePresetModel FromUpdateDtoToModel(AccountReceivableUpdateRequest model)
     {
         return new AccountReceivablePresetModel

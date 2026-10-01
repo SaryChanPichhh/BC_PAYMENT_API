@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.CORE.Enums
+namespace BC.PAYMENT.CORE.Enums;
+
+public enum RepairStatus
 {
-    public enum RepairStatus
-    {
-        [Description("បានជួសជុលហើយ")] Repairable,
-        [Description("មិនអាចជួសជុលបាន")] Unrepairable
-    }
+    [Description("បានជួសជុលហើយ")] Repairable,
+    [Description("មិនអាចជួសជុលបាន")] Unrepairable
 }

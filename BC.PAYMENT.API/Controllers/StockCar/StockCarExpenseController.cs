@@ -16,13 +16,11 @@ public class StockCarExpenseController(IUnitOfWork unitOfWork) : BaseApiControll
         {
             var data = await unitOfWork.StockCarExpense.GetAllByTemplateIdAsync(credential?.DbCode, templateId);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<StockCarExpenseResponse>>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<StockCarExpenseResponse>>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -36,20 +34,20 @@ public class StockCarExpenseController(IUnitOfWork unitOfWork) : BaseApiControll
 
     [HttpGet]
     [Route("by-template/{templateId:int}/{expenseId:int}")]
-    public async Task<ApiResponse<StockCarExpenseResponse>> GetByTemplateIdAndExpenseIdAsync([Required] int templateId, [Required] int expenseId)
+    public async Task<ApiResponse<StockCarExpenseResponse>> GetByTemplateIdAndExpenseIdAsync([Required] int templateId,
+        [Required] int expenseId)
     {
         var credential = Common.DecodeJwt(User);
         try
         {
-            var data = await unitOfWork.StockCarExpense.GetByTemplateIdAndExpenseIdAsync(credential?.DbCode, templateId, expenseId);
+            var data = await unitOfWork.StockCarExpense.GetByTemplateIdAndExpenseIdAsync(credential?.DbCode, templateId,
+                expenseId);
             if (data != null)
-            {
                 return ApiResponse<StockCarExpenseResponse>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<StockCarExpenseResponse>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -63,20 +61,20 @@ public class StockCarExpenseController(IUnitOfWork unitOfWork) : BaseApiControll
 
     [HttpGet]
     [Route("total/by-template/{templateId:int}")]
-    public async Task<ApiResponse<TotalStockCarExpenseResponse>> GetTotalExpenseByTemplateIdAsync([Required] int templateId)
+    public async Task<ApiResponse<TotalStockCarExpenseResponse>> GetTotalExpenseByTemplateIdAsync(
+        [Required] int templateId)
     {
         var credential = Common.DecodeJwt(User);
         try
         {
-            var data = await unitOfWork.StockCarExpense.GetTotalExpenseByTemplateIdAsync(credential?.DbCode, templateId);
+            var data = await unitOfWork.StockCarExpense.GetTotalExpenseByTemplateIdAsync(credential?.DbCode,
+                templateId);
             if (data != null)
-            {
                 return ApiResponse<TotalStockCarExpenseResponse>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<TotalStockCarExpenseResponse>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -112,13 +110,11 @@ public class StockCarExpenseController(IUnitOfWork unitOfWork) : BaseApiControll
             };
             var data = await unitOfWork.StockCarExpense.SaveAsync(model);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data added successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data added unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -151,13 +147,11 @@ public class StockCarExpenseController(IUnitOfWork unitOfWork) : BaseApiControll
             };
             var data = await unitOfWork.StockCarExpense.UpdateAsync(model);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data updated successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data updated unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -178,13 +172,11 @@ public class StockCarExpenseController(IUnitOfWork unitOfWork) : BaseApiControll
         {
             var data = await unitOfWork.StockCarExpense.DeleteAsync(expenseId);
             if (data > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data deleted successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data deleted unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)

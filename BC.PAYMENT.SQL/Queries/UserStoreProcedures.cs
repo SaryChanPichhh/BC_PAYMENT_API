@@ -1,9 +1,9 @@
-﻿namespace BC.PAYMENT.SQL.Queries
+﻿namespace BC.PAYMENT.SQL.Queries;
+
+public static class UserStoreProcedures
 {
-    public static class UserStoreProcedures
-    {
-        public static string AllUser
-            => @"SELECT 
+    public static string AllUser
+        => @"SELECT 
                     U.USER_ID UserId, 
                     U.USER_NAME Username, 
                     M.DB_CODE DbCode, 
@@ -19,8 +19,9 @@
                     M.DB_CODE = @DB_CODE 
                     AND M.APP_CODE = @APP_CODE
                     AND U.USER_STATUS = 1";
-        public static string UserById 
-            => @"SELECT 
+
+    public static string UserById
+        => @"SELECT 
                     U.USER_ID UserId, 
                     U.USER_NAME Username, 
                     M.DB_CODE DbCode, 
@@ -37,9 +38,11 @@
                     AND M.DB_CODE = @DB_CODE 
                     AND M.APP_CODE = @APP_CODE
                     AND U.USER_STATUS = 1";
-        public static string IsUserAuthorized => "dbo.GET_BCUSER_CREDENTIAL "; 
-        public static string GetCredential 
-            => @"SELECT 
+
+    public static string IsUserAuthorized => "dbo.GET_BCUSER_CREDENTIAL ";
+
+    public static string GetCredential
+        => @"SELECT 
                     U.USER_ID UserId, 
                     U.USER_NAME Username, 
                     M.DB_CODE DbCode, 
@@ -57,8 +60,8 @@
                     AND M.APP_CODE = @APP_CODE
                     AND U.USER_STATUS = 1;";
 
-        public static string IsExistsUser =>
-            $@"
+    public static string IsExistsUser =>
+        $@"
     SELECT CAST(CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS BIT) IsExists
                   FROM 
                       dbo.BCUSERS U
@@ -70,7 +73,7 @@
                       AND M.APP_CODE = @APP_CODE
                       AND U.USER_STATUS = 1;
 ";
-        public static string GetUserId => "";
-        public static string GetAppCode => "";
-    }
+
+    public static string GetUserId => "";
+    public static string GetAppCode => "";
 }

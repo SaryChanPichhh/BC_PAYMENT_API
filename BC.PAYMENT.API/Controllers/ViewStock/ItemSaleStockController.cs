@@ -1,5 +1,6 @@
 using BC.PAYMENT.CORE.DTO.ViewStock;
 using BC.PAYMENT.CORE.Mappers;
+
 namespace BC.PAYMENT.API.Controllers.ViewStock;
 
 [Helper.Authorize]
@@ -51,7 +52,7 @@ public sealed class ItemSaleStockController : BaseApiController
 
             var models = await _repository.GetItemSaleStockAsync(request, _imageBaseUrl, cancellationToken);
 
-            response.Result = models.Select(x=>x.ToListDto()).ToList();
+            response.Result = models.Select(x => x.ToListDto()).ToList();
             response.Success = true;
             response.StatusCode = (int)HttpStatusCode.OK;
 

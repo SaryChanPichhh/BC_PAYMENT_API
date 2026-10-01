@@ -1,9 +1,8 @@
-namespace BC.PAYMENT.CORE.Entities.Invoice
+namespace BC.PAYMENT.CORE.Entities.Invoice;
+
+public class ChangeInvoice : Customer
 {
-    public class ChangeInvoice : Customer
-    {
-        public string TransactionCode { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public double InvoiceValue { get; set; }
-    }
+    public string TransactionCode { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public double InvoiceValue { get; set; }
 }

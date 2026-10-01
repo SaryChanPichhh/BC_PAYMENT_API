@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.CORE.DTO.ClosingInventoryAndInvoice.ClosingInventory
+namespace BC.PAYMENT.CORE.DTO.ClosingInventoryAndInvoice.ClosingInventory;
+
+public class NewItemDto : InventoryExpiredDto
 {
-    public class NewItemDto : InventoryExpiredDto
-    {
-        public string ItemCode { get; set; }
-    }
+    public string ItemCode { get; set; }
 }

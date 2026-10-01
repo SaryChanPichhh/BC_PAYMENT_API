@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net8.0": {
       "Azure.Core/1.38.0": {
@@ -2150,11 +2150,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.INFRASTRUCTURE\\BC.PAYMENT.INFRASTRUCTURE.csproj",
+      "projectUniqueName": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.INFRASTRUCTURE\\BC.PAYMENT.INFRASTRUCTURE.csproj",
       "projectName": "BC.PAYMENT.INFRASTRUCTURE",
-      "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.INFRASTRUCTURE\\BC.PAYMENT.INFRASTRUCTURE.csproj",
+      "projectPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.INFRASTRUCTURE\\BC.PAYMENT.INFRASTRUCTURE.csproj",
       "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-      "outputPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.INFRASTRUCTURE\\obj\\",
+      "outputPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.INFRASTRUCTURE\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\DevExpress 25.2\\Components\\Offline Packages",
@@ -2175,20 +2175,22 @@
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\DevExpress 25.2\\Components\\System\\Components\\Packages": {},
         "C:\\Program Files\\DevExpress 26.1\\Components\\System\\Components\\Packages": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj": {
-              "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj"
+            "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj": {
+              "projectPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj"
             },
-            "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.CORE\\BC.PAYMENT.CORE.csproj": {
-              "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.CORE\\BC.PAYMENT.CORE.csproj"
+            "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.CORE\\BC.PAYMENT.CORE.csproj": {
+              "projectPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.CORE\\BC.PAYMENT.CORE.csproj"
             },
-            "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.SQL\\BC.PAYMENT.SQL.csproj": {
-              "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.SQL\\BC.PAYMENT.SQL.csproj"
+            "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.SQL\\BC.PAYMENT.SQL.csproj": {
+              "projectPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.SQL\\BC.PAYMENT.SQL.csproj"
             }
           }
         }
@@ -2203,10 +2205,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.300"
+      "SdkAnalysisLevel": "10.0.400"
     },
     "frameworks": {
       "net8.0": {
+        "framework": "net8.0",
         "targetAlias": "net8.0",
         "dependencies": {
           "Dapper": {
@@ -2242,7 +2245,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

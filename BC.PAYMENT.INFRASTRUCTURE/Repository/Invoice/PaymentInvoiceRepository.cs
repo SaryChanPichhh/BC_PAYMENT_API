@@ -9,16 +9,16 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Invoice;
 
 public class PaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IPaymentInvoiceRepository
 {
-    
     public async Task<bool> IsExistsPaymentHeaderId(string dbCode, DateTime invoiceDate, string deliveryId)
     {
-        return (await sqlDataAccess.LoadSingleData<bool,dynamic>(PaymentInvoiceQueries.IsExistsHeaderId,new
+        return await sqlDataAccess.LoadSingleData<bool, dynamic>(PaymentInvoiceQueries.IsExistsHeaderId, new
         {
             DELIVERY_ID = deliveryId,
-            INVOICE_DIVIDEND_DATE =  invoiceDate,
+            INVOICE_DIVIDEND_DATE = invoiceDate,
             DB_CODE = dbCode
-        }));
+        });
     }
+
     public async Task<int> CreatePaymentHeader(PaymentInvoiceHeader headerModel)
     {
         var param = new
@@ -73,22 +73,23 @@ public class PaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IPaymentIn
     public async Task<int> CreatePcPaymentInvoiceAsync(PcPaymentInvoice item)
     {
         var rowAffected = 0;
-            var param = new
-            {
-                DB = item.DbCode,
-                DB_CODE = item.DbCode,
-                DDID = item.DividedInvoiceId,
-                DIVIDED_ID = item.DividedInvoiceId,
-                PAYMENT_HEADER_ID = item.PaymentHeaderId,
-                AMOUNT = item.Amount,
-                CREATED_BY = item.CreatedBy,
-                CREATED_DATE = item.CreatedDate
-            };
-            rowAffected += await sqlDataAccess.ExecuteAsync(PaymentInvoiceQueries.CreatePaymentInvoice, param);
+        var param = new
+        {
+            DB = item.DbCode,
+            DB_CODE = item.DbCode,
+            DDID = item.DividedInvoiceId,
+            DIVIDED_ID = item.DividedInvoiceId,
+            PAYMENT_HEADER_ID = item.PaymentHeaderId,
+            AMOUNT = item.Amount,
+            CREATED_BY = item.CreatedBy,
+            CREATED_DATE = item.CreatedDate
+        };
+        rowAffected += await sqlDataAccess.ExecuteAsync(PaymentInvoiceQueries.CreatePaymentInvoice, param);
         return rowAffected;
     }
 
-    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailByDateAsync(string dbCode, DateTime fromDate, DateTime toDate)
+    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailByDateAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
     {
         var param = new
         {
@@ -98,11 +99,14 @@ public class PaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IPaymentIn
         };
         var condition = $@"WHERE P.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE
         AND P.DB_CODE = @DB_CODE";
-        var results = await sqlDataAccess.LoadData<PaymentInvoiceResponse, dynamic>(PaymentInvoiceQueries.GetPaymentInvoiceDetail(condition), param);
+        var results =
+            await sqlDataAccess.LoadData<PaymentInvoiceResponse, dynamic>(
+                PaymentInvoiceQueries.GetPaymentInvoiceDetail(condition), param);
         return results.ToList();
     }
 
-    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailByPeriodAsync(string dbCode, int month, int year)
+    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailByPeriodAsync(string dbCode, int month,
+        int year)
     {
         var param = new
         {
@@ -111,11 +115,14 @@ public class PaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IPaymentIn
             YEAR = year
         };
         var condition = $@"MONTH(P.CREATE_DATE) = @MONTH AND YEAR(P.CREATE_DATE) = @YEAR AND P.DB_CODE = @DB_CODE";
-        var results = await sqlDataAccess.LoadData<PaymentInvoiceResponse, dynamic>(PaymentInvoiceQueries.GetPaymentInvoiceDetail(condition), param);
+        var results =
+            await sqlDataAccess.LoadData<PaymentInvoiceResponse, dynamic>(
+                PaymentInvoiceQueries.GetPaymentInvoiceDetail(condition), param);
         return results.ToList();
     }
 
-    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailByInvoiceCodeAsync(string dbCode, DateTime date, string invoiceCode)
+    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailByInvoiceCodeAsync(string dbCode,
+        DateTime date, string invoiceCode)
     {
         var param = new
         {
@@ -123,88 +130,102 @@ public class PaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IPaymentIn
             DATE = date,
             INVOICE_CODE = invoiceCode
         };
-        var addOnField = $@", PAID.CREATED_DATE PaymentDate, CASE WHEN A.SUBMITTED_ID IS NULL THEN 'Submitted' ELSE 'Approved' END [StatusDesc] ";
+        var addOnField =
+            $@", PAID.CREATED_DATE PaymentDate, CASE WHEN A.SUBMITTED_ID IS NULL THEN 'Submitted' ELSE 'Approved' END [StatusDesc] ";
         var addReference = $@"INNER JOIN BCINVOICE_SUMITTED S ON S.INVOICE_ID = N.ID and S.DB_CODE = @DB_CODE
             LEFT JOIN BCAPPROVAL_INVOICE A ON A.SUBMITTED_ID = S.ID";
         var criteria = $@"WHERE N.DB_CODE = @DB_CODE AND P.CREATE_DATE <= @DATE AND N.TRANSACTION_REF = @INVOICE_CODE";
         var sortBy = $@"ORDER BY Total";
         var groupBy = $@",PAID.CREATED_DATE,A.SUBMITTED_ID";
         var results = await sqlDataAccess.LoadData<PaymentInvoiceResponse, dynamic>
-            (PaymentInvoiceQueries.GetPaymentInvoiceDetail(criteria:criteria,addReference:addReference,sortBy:sortBy,addOnFields:addOnField,addOnGroupBy:groupBy), param);
+        (PaymentInvoiceQueries.GetPaymentInvoiceDetail(criteria, addReference: addReference, sortBy: sortBy, addOnFields: addOnField, addOnGroupBy: groupBy),
+            param);
         return results.ToList();
     }
 
-    public async Task<int> UpdatePaidValueAsync(PcPaymentInvoice paymentInvoice, NewInvoiceModel invoice, PcEditDividedInvoice editDividedInvoice)
+    public async Task<int> UpdatePaidValueAsync(PcPaymentInvoice paymentInvoice, NewInvoiceModel invoice,
+        PcEditDividedInvoice editDividedInvoice)
+    {
+        var totalAffected = 0;
+        var oldMoney = editDividedInvoice.OldAmount != 0 ? editDividedInvoice.OldAmount : invoice.InvoiceAmount;
+        var newMoney = editDividedInvoice.NewAmount;
+        var dividedId = editDividedInvoice.DividedId != 0
+            ? editDividedInvoice.DividedId
+            : paymentInvoice.DividedInvoiceId;
+        var invoiceId = invoice.InvoiceId != 0 ? invoice.InvoiceId : invoice.Id;
+        var dbCode = !string.IsNullOrWhiteSpace(editDividedInvoice.DbCode)
+            ? editDividedInvoice.DbCode
+            : !string.IsNullOrWhiteSpace(paymentInvoice.DbCode)
+                ? paymentInvoice.DbCode
+                : invoice.DbCode ?? string.Empty;
+        var userName = !string.IsNullOrWhiteSpace(editDividedInvoice.CreatedBy)
+            ? editDividedInvoice.CreatedBy
+            : !string.IsNullOrWhiteSpace(paymentInvoice.CreatedBy)
+                ? paymentInvoice.CreatedBy
+                : invoice.CreatedBy ?? string.Empty;
+        var createDate = editDividedInvoice.CreateDate != default ? editDividedInvoice.CreateDate : DateTime.Now;
+        if (!oldMoney.Equals(newMoney))
         {
-            var totalAffected = 0;
-            var oldMoney = editDividedInvoice.OldAmount != 0 ? editDividedInvoice.OldAmount : invoice.InvoiceAmount;
-            var newMoney = editDividedInvoice.NewAmount;
-            var dividedId = editDividedInvoice.DividedId != 0 ? editDividedInvoice.DividedId : paymentInvoice.DividedInvoiceId;
-            var invoiceId = invoice.InvoiceId != 0 ? invoice.InvoiceId : invoice.Id;
-            var dbCode = !string.IsNullOrWhiteSpace(editDividedInvoice.DbCode)
-                ? editDividedInvoice.DbCode
-                : (!string.IsNullOrWhiteSpace(paymentInvoice.DbCode) ? paymentInvoice.DbCode : (invoice.DbCode ?? string.Empty));
-            var userName = !string.IsNullOrWhiteSpace(editDividedInvoice.CreatedBy)
-                ? editDividedInvoice.CreatedBy
-                : (!string.IsNullOrWhiteSpace(paymentInvoice.CreatedBy) ? paymentInvoice.CreatedBy : (invoice.CreatedBy ?? string.Empty));
-            var createDate = editDividedInvoice.CreateDate != default ? editDividedInvoice.CreateDate : DateTime.Now;
-            if (!oldMoney.Equals(newMoney))
-            {
-                const string insertEditSql = @"
+            const string insertEditSql = @"
                     INSERT INTO PC_EDIT_VALUE_DIVIDED_INVOICE (DB_CODE, DIVIDED_INVOICE_ID, OLD_VALUE, NEW_VALUE, DESCRIPTION, CREATE_DATE, CREATE_BY)
                     VALUES (@DB, @DDID, @OV, @NV, @D, @CD, @CB);";
-                var insertParam = new
-                {
-                    DB = dbCode,
-                    DDID = dividedId,
-                    OV = oldMoney,
-                    NV = newMoney,
-                    D = editDividedInvoice.Description,
-                    CD = createDate,
-                    CB = userName
-                };
-                var insertResult = await sqlDataAccess.ExecuteAsync(insertEditSql, insertParam);
-                if (insertResult > 0)
-                {
-                    totalAffected += insertResult;
-                    var updateInvoiceSql = invoiceId != 0
-                        ? @"UPDATE NEW_INVOICE SET HEADER_TRANSACTION_VALUES = @VALUE WHERE ID = @ID;"
-                        : @"UPDATE NEW_INVOICE SET HEADER_TRANSACTION_VALUES = @VALUE WHERE ID IN (SELECT INVOICE_ID FROM PC_DIVIDED_INVOICE WHERE DIVIDED_INVOICE_ID = @ID);";
+            var insertParam = new
+            {
+                DB = dbCode,
+                DDID = dividedId,
+                OV = oldMoney,
+                NV = newMoney,
+                D = editDividedInvoice.Description,
+                CD = createDate,
+                CB = userName
+            };
+            var insertResult = await sqlDataAccess.ExecuteAsync(insertEditSql, insertParam);
+            if (insertResult > 0)
+            {
+                totalAffected += insertResult;
+                var updateInvoiceSql = invoiceId != 0
+                    ? @"UPDATE NEW_INVOICE SET HEADER_TRANSACTION_VALUES = @VALUE WHERE ID = @ID;"
+                    : @"UPDATE NEW_INVOICE SET HEADER_TRANSACTION_VALUES = @VALUE WHERE ID IN (SELECT INVOICE_ID FROM PC_DIVIDED_INVOICE WHERE DIVIDED_INVOICE_ID = @ID);";
 
-                    var updateInvoiceParam = new
-                    {
-                        VALUE = newMoney,
-                        ID = invoiceId != 0 ? invoiceId : dividedId
-                    };
-                    totalAffected += await sqlDataAccess.ExecuteAsync(updateInvoiceSql, updateInvoiceParam);
-                }
-            }
-            var paidId = paymentInvoice.PaymentId;
-            if (paidId <= 0 && paymentInvoice.DividedInvoiceId > 0)
-            {
-                const string getPaymentIdSql = "SELECT PAYMENT_ID FROM PC_PAYMENT_INVOICE WHERE DIVDIE_INVOICE_ID = @DIVIDED_ID;";
-                paidId = await sqlDataAccess.ExecuteScalarAsync<int, dynamic>(getPaymentIdSql, new { DIVIDED_ID = paymentInvoice.DividedInvoiceId });
-            }
-            if (paidId > 0)
-            {
-                const string getPaidSql = "SELECT AMOUNT FROM PC_PAYMENT_INVOICE WHERE PAYMENT_ID = @ID;";
-                var currentPaid = await sqlDataAccess.ExecuteScalarAsync<double?, dynamic>(getPaidSql, new { ID = paidId });
-                if (currentPaid.HasValue && !currentPaid.Value.Equals(paymentInvoice.Amount))
+                var updateInvoiceParam = new
                 {
-                    const string updatePaymentSql = @"
+                    VALUE = newMoney,
+                    ID = invoiceId != 0 ? invoiceId : dividedId
+                };
+                totalAffected += await sqlDataAccess.ExecuteAsync(updateInvoiceSql, updateInvoiceParam);
+            }
+        }
+
+        var paidId = paymentInvoice.PaymentId;
+        if (paidId <= 0 && paymentInvoice.DividedInvoiceId > 0)
+        {
+            const string getPaymentIdSql =
+                "SELECT PAYMENT_ID FROM PC_PAYMENT_INVOICE WHERE DIVDIE_INVOICE_ID = @DIVIDED_ID;";
+            paidId = await sqlDataAccess.ExecuteScalarAsync<int, dynamic>(getPaymentIdSql,
+                new { DIVIDED_ID = paymentInvoice.DividedInvoiceId });
+        }
+
+        if (paidId > 0)
+        {
+            const string getPaidSql = "SELECT AMOUNT FROM PC_PAYMENT_INVOICE WHERE PAYMENT_ID = @ID;";
+            var currentPaid = await sqlDataAccess.ExecuteScalarAsync<double?, dynamic>(getPaidSql, new { ID = paidId });
+            if (currentPaid.HasValue && !currentPaid.Value.Equals(paymentInvoice.Amount))
+            {
+                const string updatePaymentSql = @"
                         UPDATE PC_PAYMENT_INVOICE 
                         SET AMOUNT = @AMOUNT 
                         WHERE PAYMENT_ID = @ID;";
-                    var updatePaymentParam = new
-                    {
-                        AMOUNT = paymentInvoice.Amount,
-                        ID = paidId
-                    };
-                    totalAffected += await sqlDataAccess.ExecuteAsync(updatePaymentSql, updatePaymentParam);
-                }
+                var updatePaymentParam = new
+                {
+                    AMOUNT = paymentInvoice.Amount,
+                    ID = paidId
+                };
+                totalAffected += await sqlDataAccess.ExecuteAsync(updatePaymentSql, updatePaymentParam);
             }
-            return totalAffected;
         }
+
+        return totalAffected;
+    }
 
     public async Task<int> DeletePaymentInvoiceAsync(int paymentId, int dividedId)
     {
@@ -299,18 +320,21 @@ public class PaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IPaymentIn
         return results.ToList();
     }
 
-    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailExcludeSubmitInvoiceAsync(string dbCode, DateTime fromDate, DateTime toDate)
+    public async Task<List<PaymentInvoiceResponse>> GetPaymentInvoiceDetailExcludeSubmitInvoiceAsync(string dbCode,
+        DateTime fromDate, DateTime toDate)
     {
-        var addReference = $@"LEFT JOIN (SELECT TRANS_REF FROM {dbCode}SISOHDR WHERE VOID_STATUS = 'N') H ON H.TRANS_REF = N.TRANSACTION_REF ";
+        var addReference =
+            $@"LEFT JOIN (SELECT TRANS_REF FROM {dbCode}SISOHDR WHERE VOID_STATUS = 'N') H ON H.TRANS_REF = N.TRANSACTION_REF ";
         var criteria = $@"WHERE
             PAID.STATUS = '1'
             AND P.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND P.DB_CODE = @DB_CODE
             AND N.ID NOT IN (SELECT INVOICE_ID FROM BCINVOICE_SUMITTED S WHERE S.SUBMISSION_STATUS != 'Cancel'  AND S.DB_CODE = @DB_CODE)
 			AND (LEFT(N.TRANSACTION_REF,2) = 'FF' OR H.TRANS_REF IS NOT NULL)";
-        var addOnFields = $@",ISNULL(CASE WHEN N.HEADER_TRANSACTION_VALUES = PAID.AMOUNT THEN PAID.AMOUNT END, 0) 'Paid',N.STATUS [InvoiceType],P.CREATE_DATE CreateDate";
+        var addOnFields =
+            $@",ISNULL(CASE WHEN N.HEADER_TRANSACTION_VALUES = PAID.AMOUNT THEN PAID.AMOUNT END, 0) 'Paid',N.STATUS [InvoiceType],P.CREATE_DATE CreateDate";
         var addOnGroupBy = $@",N.STATUS,P.CREATE_DATE";
         var response = await sqlDataAccess.LoadData<PaymentInvoiceResponse, dynamic>(
-            PaymentInvoiceQueries.GetPaymentInvoiceDetail(criteria:criteria,addOnFields:addOnFields,addOnGroupBy:addOnGroupBy,addReference:addReference),new
+            PaymentInvoiceQueries.GetPaymentInvoiceDetail(criteria, addOnFields, addOnGroupBy, addReference), new
             {
                 DB_CODE = dbCode,
                 FROM_DATE = fromDate,

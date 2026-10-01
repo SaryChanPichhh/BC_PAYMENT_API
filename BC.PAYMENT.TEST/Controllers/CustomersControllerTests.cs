@@ -14,80 +14,79 @@ using System.Threading.Tasks;
 using BC.PAYMENT.API.Helper;
 using Xunit;
 
-namespace BC.PAYMENT.TEST.Controllers
+namespace BC.PAYMENT.TEST.Controllers;
+
+public class CustomersControllerTests
 {
-    public class CustomersControllerTests
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<ICustomerRepository> _mockRepo;
+    private readonly Mock<IOptions<AppSettings>> _mockOptions;
+    private readonly CustomersController _controller;
+
+    public CustomersControllerTests()
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<ICustomerRepository> _mockRepo;
-        private readonly Mock<IOptions<AppSettings>> _mockOptions;
-        private readonly CustomersController _controller;
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockRepo = new Mock<ICustomerRepository>();
+        _mockOptions = new Mock<IOptions<AppSettings>>();
 
-        public CustomersControllerTests()
+        _mockUnitOfWork.Setup(u => u.Customers).Returns(_mockRepo.Object);
+
+        _controller = new CustomersController(_mockUnitOfWork.Object, _mockOptions.Object);
+
+        var user = new ClaimsPrincipal(new ClaimsIdentity([
+            new Claim("DbCode", "TEST_DB"),
+            new Claim("Username", "TEST_USER")
+        ], "mock"));
+
+        _controller.ControllerContext = new ControllerContext
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockRepo = new Mock<ICustomerRepository>();
-            _mockOptions = new Mock<IOptions<AppSettings>>();
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+    }
 
-            _mockUnitOfWork.Setup(u => u.Customers).Returns(_mockRepo.Object);
-
-            _controller = new CustomersController(_mockUnitOfWork.Object, _mockOptions.Object);
-
-            var user = new ClaimsPrincipal(new ClaimsIdentity([
-                new Claim("DbCode", "TEST_DB"),
-                new Claim("Username", "TEST_USER")
-            ], "mock"));
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = user }
-            };
-        }
-
-        [Fact]
-        public async Task GetCustomer_ShouldReturnOk_WhenCustomersExist()
+    [Fact]
+    public async Task GetCustomer_ShouldReturnOk_WhenCustomersExist()
+    {
+        var mockCustomers = new List<Customer>
         {
-            var mockCustomers = new List<Customer>
-            {
-                new Customer { CustomerCode = "C001", CustomerName = "John Doe" },
-                new Customer { CustomerCode = "C002", CustomerName = "Jane Doe" }
-            };
-            
-            _mockRepo.Setup(r => r.GetCustomer(1, 10)).ReturnsAsync(mockCustomers);
+            new() { CustomerCode = "C001", CustomerName = "John Doe" },
+            new() { CustomerCode = "C002", CustomerName = "Jane Doe" }
+        };
 
-            var result = await _controller.GetCustomer(1, 10);
+        _mockRepo.Setup(r => r.GetCustomer(1, 10)).ReturnsAsync(mockCustomers);
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal(2, result.Result.TotalRecords);
-            Assert.Equal(2, result.Result.Data.Count);
-        }
-        
-        [Fact]
-        public async Task GetCustomer_ShouldReturnBadRequest_WhenNoCustomers()
+        var result = await _controller.GetCustomer(1, 10);
+
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(2, result.Result.TotalRecords);
+        Assert.Equal(2, result.Result.Data.Count);
+    }
+
+    [Fact]
+    public async Task GetCustomer_ShouldReturnBadRequest_WhenNoCustomers()
+    {
+        _mockRepo.Setup(r => r.GetCustomer(1, 10)).ReturnsAsync(new List<Customer>());
+
+        var result = await _controller.GetCustomer(1, 10);
+
+        Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
+        Assert.Empty(result.Result.Data);
+    }
+
+    [Fact]
+    public async Task GetCustomerInfoByMarketId_ShouldReturnOk_WhenCustomersExist()
+    {
+        var mockData = new List<CustomerResponse>
         {
-            _mockRepo.Setup(r => r.GetCustomer(1, 10)).ReturnsAsync(new List<Customer>());
+            new() { CustomerCode = "C001", CustomerName = "John Doe" }
+        };
 
-            var result = await _controller.GetCustomer(1, 10);
+        _mockRepo.Setup(r => r.GetCustomerInfoByMarketIdAsync("M01")).ReturnsAsync(mockData);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, result.StatusCode);
-            Assert.Empty(result.Result.Data);
-        }
+        var result = await _controller.GetCustomerInfoByMarketId("M01");
 
-        [Fact]
-        public async Task GetCustomerInfoByMarketId_ShouldReturnOk_WhenCustomersExist()
-        {
-            var mockData = new List<CustomerResponse>
-            {
-                new CustomerResponse { CustomerCode = "C001", CustomerName = "John Doe" }
-            };
-            
-            _mockRepo.Setup(r => r.GetCustomerInfoByMarketIdAsync("M01")).ReturnsAsync(mockData);
-
-            var result = await _controller.GetCustomerInfoByMarketId("M01");
-
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.Single(result.Result);
-            Assert.Equal("C001", result.Result[0].CustomerCode);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.Single(result.Result);
+        Assert.Equal("C001", result.Result[0].CustomerCode);
     }
 }

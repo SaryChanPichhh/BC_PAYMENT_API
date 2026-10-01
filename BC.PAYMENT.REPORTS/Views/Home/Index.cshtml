@@ -67,16 +67,16 @@
         align-items: stretch; /* This makes both items the same height */
     }
 
-        .otp-section .form-control {
-            flex: 1; /* Make the input box expand */
-        }
+    .otp-section .form-control {
+        flex: 1; /* Make the input box expand */
+    }
 
-        .otp-section .btn {
-            width: 140px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+    .otp-section .btn {
+        width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
 
     .error-msg {
@@ -96,11 +96,11 @@
         <form id="otpForm">
             <div class="mb-3">
                 <label for="username" class="form-label">Username / Phone / Email</label>
-                <input class="form-control" id="username" required />
+                <input class="form-control" id="username" required/>
             </div>
 
             <div class="otp-section">
-                <input type="text" class="form-control" id="otp" placeholder="Enter OTP" maxlength="6" required />
+                <input type="text" class="form-control" id="otp" placeholder="Enter OTP" maxlength="6" required/>
                 <button type="button" class="btn btn-login" id="sendOtpBtn">Send OTP</button>
             </div>
 
@@ -110,6 +110,7 @@
         </form>
     </div>
 </div>
+
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -156,8 +157,8 @@
 
                 const res = await fetch("/api/otp/request", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username })
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({username})
                 });
 
                 const result = await res.json();
@@ -165,7 +166,7 @@
                 if (result.success) {
                     messageBox.className = "success-msg";
                     messageBox.innerText = "OTP has been sent.";
-                    otpInput.focus(); 
+                    otpInput.focus();
                     startCooldown();
                 } else {
                     messageBox.className = "error-msg";
@@ -176,7 +177,7 @@
             otpInput.addEventListener("keypress", function (e) {
                 if (e.key === "Enter") {
                     e.preventDefault();
-                    otpForm.requestSubmit(); 
+                    otpForm.requestSubmit();
                 }
             });
 
@@ -188,8 +189,8 @@
 
                 const res = await fetch("/api/otp/verify", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, otp })
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({username, otp})
                 });
 
                 const result = await res.json();

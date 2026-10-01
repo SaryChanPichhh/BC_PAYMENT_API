@@ -12,49 +12,49 @@ build_property.EntryPointFilePath =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = BC.PAYMENT.REPORTS
 build_property.RootNamespace = BC.PAYMENT.REPORTS
-build_property.ProjectDir = D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.REPORTS\
+build_property.ProjectDir = D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.REPORTS\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.REPORTS
+build_property.MSBuildProjectDirectory = D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.REPORTS
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/Home/Designer.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/Home/Designer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxEZXNpZ25lci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/Home/Index.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/Home/Login.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/Home/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/Home/Viewer.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/Home/Viewer.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxWaWV3ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/IssuranceInvoicesReport/ReportDivideInvoices.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/IssuranceInvoicesReport/ReportDivideInvoices.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSXNzdXJhbmNlSW52b2ljZXNSZXBvcnRcUmVwb3J0RGl2aWRlSW52b2ljZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/Reports/Invoice.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/Reports/Invoice.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVwb3J0c1xJbnZvaWNlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/Shared/_Layout.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/_ViewImports.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/TD System/TD Api/BC.PAYMENT.SYSTEM/BC.PAYMENT.REPORTS/Views/_ViewStart.cshtml]
+[D:/coder/API/BC_PAYMENT_API/BC.PAYMENT.REPORTS/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

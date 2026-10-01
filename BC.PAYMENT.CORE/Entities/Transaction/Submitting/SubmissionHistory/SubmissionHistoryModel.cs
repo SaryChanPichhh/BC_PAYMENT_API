@@ -1,6 +1,5 @@
-namespace BC.PAYMENT.CORE.Entities.Transaction.Submitting.HistoryApproval
+namespace BC.PAYMENT.CORE.Entities.Transaction.Submitting.HistoryApproval;
+
+public class SubmissionHistoryModel : RejectedInvoicePerDelivery
 {
-    public class SubmissionHistoryModel : RejectedInvoicePerDelivery
-    {
-    }
 }

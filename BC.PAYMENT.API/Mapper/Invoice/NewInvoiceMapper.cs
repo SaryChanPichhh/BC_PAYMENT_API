@@ -10,29 +10,31 @@ public static class NewInvoiceMapper
     {
         return new NewInvoiceModel
         {
-          CustomerCode = res.CustomerCode,
-          CustomerName = res.CustomerName,
-          InvoiceCode =  res.InvoiceCode,
-          InvoiceType =  res.InvoiceType,
-          InvoiceAmount =  res.InvoiceAmount,
-          EntriesCode =   res.EntriesCode,
-          CreatedBy =  res.CreatedBy,
-          CreatedDate =  res.CreatedDate,
-          DbCode =  res.DbCode,
+            CustomerCode = res.CustomerCode,
+            CustomerName = res.CustomerName,
+            InvoiceCode = res.InvoiceCode,
+            InvoiceType = res.InvoiceType,
+            InvoiceAmount = res.InvoiceAmount,
+            EntriesCode = res.EntriesCode,
+            CreatedBy = res.CreatedBy,
+            CreatedDate = res.CreatedDate,
+            DbCode = res.DbCode
         };
-    }public static NewInvoiceModel FromRequestToModel(this NewInvoiceRequest req)
+    }
+
+    public static NewInvoiceModel FromRequestToModel(this NewInvoiceRequest req)
     {
         return new NewInvoiceModel
         {
-          CustomerCode = req.CustomerCode,
-          CustomerName = req.CustomerName,
-          InvoiceCode =  req.InvoiceCode,
-          InvoiceType =  req.InvoiceType,
-          InvoiceAmount =  req.InvoiceAmount,
-          CreatedDate =  req.CreatedAt,
-          CreatedBy =  req.CreatedBy,
-          CustomerField = req.CustomerField1,
-          AccNameKh = req.AccNameKh,
+            CustomerCode = req.CustomerCode,
+            CustomerName = req.CustomerName,
+            InvoiceCode = req.InvoiceCode,
+            InvoiceType = req.InvoiceType,
+            InvoiceAmount = req.InvoiceAmount,
+            CreatedDate = req.CreatedAt,
+            CreatedBy = req.CreatedBy,
+            CustomerField = req.CustomerField1,
+            AccNameKh = req.AccNameKh
         };
     }
 }

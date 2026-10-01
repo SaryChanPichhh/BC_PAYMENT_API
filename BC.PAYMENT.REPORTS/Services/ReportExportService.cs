@@ -34,7 +34,7 @@ public class ReportExportService
             Export.Pdf => ("application/pdf", "pdf"),
             Export.Excel => ("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xlsx"),
             Export.Word => ("application/vnd.openxmlformats-officedocument.wordprocessingml.document", "docx"),
-            
+
             _ => ("application/octet-stream", "bin")
         };
     }

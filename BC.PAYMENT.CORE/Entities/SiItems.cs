@@ -36,5 +36,4 @@ public class SiItems
     public DateTime? UserUpdated { get; set; }
     public string? UserCode { get; set; }
     public string? Img { get; set; }
-    
 }

@@ -1,10 +1,11 @@
-namespace BC.PAYMENT.SQL.Queries
+namespace BC.PAYMENT.SQL.Queries;
+
+public static class BranchQueries
 {
-    public static class BranchQueries
-    {
-        public static string AllBranches => "SELECT DB_CODE DbCode,DB_NAME DbName FROM SIDBINFO WHERE DB_STAT = 'A'";
-        public static string LoginBranches =>
-            @" IF(@USER_NAME='BCSA')
+    public static string AllBranches => "SELECT DB_CODE DbCode,DB_NAME DbName FROM SIDBINFO WHERE DB_STAT = 'A'";
+
+    public static string LoginBranches =>
+        @" IF(@USER_NAME='BCSA')
             BEGIN 
               SELECT DB_CODE DbCode,DB_NAME DbName FROM SIDBINFO WHERE DB_STAT = 'A';
             END
@@ -17,5 +18,4 @@ namespace BC.PAYMENT.SQL.Queries
                       INNER JOIN   dbo.BCUSERS bu ON ba.USER_ID = bu.USER_ID
                      WHERE  S.DB_STAT = 'A' AND ba.APP_CODE = @APP_CODE AND bu.USER_NAME = @USER_NAME
               END";
-    }
 }

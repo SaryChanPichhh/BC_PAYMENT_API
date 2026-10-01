@@ -1,20 +1,22 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ExchangeItemAnalysis
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ExchangeItemAnalysis;
+
+public class ExchangeItemAnalysisRepository : IExchangeItemAnalysisRepository
 {
-    public class ExchangeItemAnalysisRepository : IExchangeItemAnalysisRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public ExchangeItemAnalysisRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public ExchangeItemAnalysisRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
+    public async Task<List<ExchangeItemAnalysisModel>> GetAllByDateAsync(string type, string isReceived, string dbCode,
+        DateTime fromDate, DateTime toDate)
+    {
+        var statusCondition = isReceived == "None" ? "" : $@"AND TBC.IS_RECEIVED = {isReceived}";
+        var sql = string.Empty;
 
-        public async Task<List<ExchangeItemAnalysisModel>> GetAllByDateAsync(string type, string isReceived, string dbCode, DateTime fromDate, DateTime toDate)
-        {
-            string statusCondition = isReceived=="None"? "" : $@"AND TBC.IS_RECEIVED = {isReceived}";
-            string sql = string.Empty;
-
-                sql = @$"SELECT Date,Seller,ItemName,MarketNameKhmer,Store,CustomerCode,CustomerName,Reason,AreaId,AreaNameKhmer,ItemCode,DbCode,DbName,SUM(Quantity)AMOUNT FROM 
+        sql =
+            @$"SELECT Date,Seller,ItemName,MarketNameKhmer,Store,CustomerCode,CustomerName,Reason,AreaId,AreaNameKhmer,ItemCode,DbCode,DbName,SUM(Quantity)AMOUNT FROM 
 					(SELECT CAST(TBC.CREATED_DATE AS DATE) Date,TBCD.ITEM_CODE ItemCode,QUANTITY Quantity,CUSTOMER.DbCode,CUSTOMER.DbName,
 					CUSTOMER.CustomerCode,CUSTOMER.CustomerName,TBCD.DESCRIPION Reason, CUSTOMER.AreaId,CUSTOMER.AreaNameKhmer,
 					CUSTOMER.MarketNameKhmer,CUSTOMER.Store,ITEM.ITEM_DESC ItemName ,
@@ -37,24 +39,26 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ExchangeItemAnalysis
 						  ,C.MarketNameKhmer,C.Store,C.ItemName,C.Seller,C.Date ORDER BY Date
 						  ;";
 
-                var param = new
-            {
-                DB_CODE = dbCode,
-                TYPE = type,
-                STARTDATE = fromDate,
-                ENDDATE = toDate,
-            };
-            var execute = await _sqlDataAccess.LoadData<ExchangeItemAnalysisModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
-        
-        public async Task<List<ExchangeItemAnalysisModel>> GetAllByPeriodAsync(string type, string isReceived, string dbCode, int fromPeriod,
-            int toPeriod)
+        var param = new
         {
-            string statusCondition = isReceived=="None"? "" : $@"AND TBC.IS_RECEIVED = {isReceived}";
-            string sql = string.Empty;
+            DB_CODE = dbCode,
+            TYPE = type,
+            STARTDATE = fromDate,
+            ENDDATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<ExchangeItemAnalysisModel, dynamic>(sql, param);
+        return execute.ToList();
+    }
 
-                sql = @$"SELECT Date,Seller,ItemName,MarketNameKhmer,Store,CustomerCode,CustomerName,Reason,AreaId,AreaNameKhmer,ItemCode,DbCode,DbName,SUM(Quantity)AMOUNT FROM 
+    public async Task<List<ExchangeItemAnalysisModel>> GetAllByPeriodAsync(string type, string isReceived,
+        string dbCode, int fromPeriod,
+        int toPeriod)
+    {
+        var statusCondition = isReceived == "None" ? "" : $@"AND TBC.IS_RECEIVED = {isReceived}";
+        var sql = string.Empty;
+
+        sql =
+            @$"SELECT Date,Seller,ItemName,MarketNameKhmer,Store,CustomerCode,CustomerName,Reason,AreaId,AreaNameKhmer,ItemCode,DbCode,DbName,SUM(Quantity)AMOUNT FROM 
 					(SELECT CAST(TBC.CREATED_DATE AS DATE) Date,TBCD.ITEM_CODE ItemCode,QUANTITY Quantity,CUSTOMER.DbCode,CUSTOMER.DbName,
 					CUSTOMER.CustomerCode,CUSTOMER.CustomerName,TBCD.DESCRIPION Reason, CUSTOMER.AreaId,CUSTOMER.AreaNameKhmer,
 					CUSTOMER.MarketNameKhmer,CUSTOMER.Store,ITEM.ITEM_DESC ItemName ,
@@ -77,15 +81,14 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.ExchangeItemAnalysis
 						  ,C.MarketNameKhmer,C.Store,C.ItemName,C.Seller,C.Date ORDER BY Date
 						  ;";
 
-                var param = new
-            {
-                DB_CODE = dbCode,
-                TYPE = type,
-                FROMPERIOD = fromPeriod,
-                TOPERIOD = toPeriod,
-            };
-            var execute = await _sqlDataAccess.LoadData<ExchangeItemAnalysisModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            TYPE = type,
+            FROMPERIOD = fromPeriod,
+            TOPERIOD = toPeriod
+        };
+        var execute = await _sqlDataAccess.LoadData<ExchangeItemAnalysisModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

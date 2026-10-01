@@ -1,10 +1,9 @@
-namespace BC.PAYMENT.CORE.Enums
+namespace BC.PAYMENT.CORE.Enums;
+
+public enum RequestStatus
 {
-    public enum RequestStatus
-    {
-        Yes,
-        No,
-        Pending,
-        Completed
-    }
+    Yes,
+    No,
+    Pending,
+    Completed
 }

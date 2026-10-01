@@ -5,7 +5,7 @@ using BC.PAYMENT.CORE.Entities;
 
 namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Expense;
 
-public class ExpenseRepository(ISqlDataAccess sqlDataAccess ) : IExpenseRepository
+public class ExpenseRepository(ISqlDataAccess sqlDataAccess) : IExpenseRepository
 {
     public async Task<int> CreatePaymentExpense(PaymentInvoiceExpense model)
     {
@@ -27,7 +27,8 @@ public class ExpenseRepository(ISqlDataAccess sqlDataAccess ) : IExpenseReposito
         return rowAffected;
     }
 
-    public async Task<List<BcPaymentDetailResponse>> LoadBcPaymentDetailAsync(string dbCode,string deliveryId,DateTime date)
+    public async Task<List<BcPaymentDetailResponse>> LoadBcPaymentDetailAsync(string dbCode, string deliveryId,
+        DateTime date)
     {
         var argument = new
         {
@@ -39,11 +40,13 @@ public class ExpenseRepository(ISqlDataAccess sqlDataAccess ) : IExpenseReposito
         if (!string.IsNullOrEmpty(deliveryId))
             condition += @" AND DELIVERYID = @DELIVERY_ID";
         condition += @" AND CREATED_DATE >= @DATE AND CREATED_DATE < DATEADD(DAY, 1, @DATE)";
-        var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>(ExpenseQueries.GetBcPaymentDetail(condition), argument);
+        var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>(
+            ExpenseQueries.GetBcPaymentDetail(condition), argument);
         return data.ToList();
     }
 
-    public async Task<List<BcPaymentDetailResponse>> LoadBcPaymentDetailAsync(string dbCode, DateTime fromDate, DateTime toDate)
+    public async Task<List<BcPaymentDetailResponse>> LoadBcPaymentDetailAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
     {
         var argument = new
         {
@@ -52,11 +55,13 @@ public class ExpenseRepository(ISqlDataAccess sqlDataAccess ) : IExpenseReposito
             DB_CODE = dbCode
         };
         var condition = @" AND CREATED_DATE BETWEEN @FROM_DATE AND @TO_DATE";
-        var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>(ExpenseQueries.GetBcPaymentDetail(condition), argument);
+        var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>(
+            ExpenseQueries.GetBcPaymentDetail(condition), argument);
         return data.ToList();
     }
 
-    public async Task<List<BcPaymentDetailResponse>> LoadBcPaymentDetailWithPaidAsync(string dbCode, DateTime fromDate, DateTime toDate)
+    public async Task<List<BcPaymentDetailResponse>> LoadBcPaymentDetailWithPaidAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
     {
         var argument = new
         {
@@ -64,13 +69,14 @@ public class ExpenseRepository(ISqlDataAccess sqlDataAccess ) : IExpenseReposito
             TO_DATE = toDate,
             DB_CODE = dbCode
         };
-        var addReference = $@"INNER JOIN(SELECT D.DELIVERY_ID, SUM(P.AMOUNT) PAID FROM PC_DIVIDED_INVOICE D INNER JOIN PC_PAYMENT_INVOICE P ON P.DIVDIE_INVOICE_ID = D.DIVIDED_INVOICE_ID
+        var addReference =
+            $@"INNER JOIN(SELECT D.DELIVERY_ID, SUM(P.AMOUNT) PAID FROM PC_DIVIDED_INVOICE D INNER JOIN PC_PAYMENT_INVOICE P ON P.DIVDIE_INVOICE_ID = D.DIVIDED_INVOICE_ID
                 WHERE D.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND P.DB_CODE = @DB_CODE
                 GROUP BY D.DELIVERY_ID) TAB1
                 ON TAB1.DELIVERY_ID = D.DELIVERIES_ID";
         var criteria = @" AND CREATED_DATE BETWEEN @FROM_DATE AND @TO_DATE";
         var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>
-            (ExpenseQueries.GetBcPaymentDetail(criteria:criteria,addReference:addReference), argument);
+            (ExpenseQueries.GetBcPaymentDetail(criteria, addReference), argument);
         return data.ToList();
     }
 
@@ -83,7 +89,8 @@ public class ExpenseRepository(ISqlDataAccess sqlDataAccess ) : IExpenseReposito
             DB_CODE = dbCode
         };
         var condition = @" AND YEAR(CREATED_DATE) = @YEAR AND MONTH(CREATED_DATE) = @MONTH";
-        var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>(ExpenseQueries.GetBcPaymentDetail(condition), argument);
+        var data = await sqlDataAccess.LoadData<BcPaymentDetailResponse, dynamic>(
+            ExpenseQueries.GetBcPaymentDetail(condition), argument);
         return data.ToList();
     }
 

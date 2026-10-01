@@ -6,6 +6,7 @@ public class InvoiceClosingEntriesValidate : AbstractValidator<InvoiceClosingEnt
 {
     public InvoiceClosingEntriesValidate()
     {
-        RuleFor(x => x.Description).NotNull().WithMessage("Description is required").NotEmpty().WithMessage("Description Code is required");
+        RuleFor(x => x.Description).NotNull().WithMessage("Description is required").NotEmpty()
+            .WithMessage("Description Code is required");
     }
 }

@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.CORE.Entities.Accounting
+namespace BC.PAYMENT.CORE.Entities.Accounting;
+
+public class AnalysisCodeType
 {
-    public class AnalysisCodeType
-    {
-        public string AnadCode { get; set; }
-        public string AnadDesc { get; set; }
-    }
+    public string AnadCode { get; set; }
+    public string AnadDesc { get; set; }
 }

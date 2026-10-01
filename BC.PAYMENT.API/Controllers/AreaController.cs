@@ -1,8 +1,7 @@
-
-
 using BC.PAYMENT.CORE.Contracts.Response.Area;
 using BC.PAYMENT.CORE.Contracts.Request.Area;
 using BC.PAYMENT.CORE.Entities.General;
+
 namespace BC.PAYMENT.API.Controllers;
 
 public class AreaController(IUnitOfWork unitOfWork) : BaseApiController
@@ -23,7 +22,7 @@ public class AreaController(IUnitOfWork unitOfWork) : BaseApiController
         catch (Exception ex)
         {
             return GlobalExceptionHandler.ExceptionError<List<AreaResponse>>(ex.Message);
-        }   
+        }
     }
 
     [HttpPost("")]

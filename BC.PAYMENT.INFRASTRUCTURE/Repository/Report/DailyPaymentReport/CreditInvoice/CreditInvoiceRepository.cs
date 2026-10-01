@@ -1,18 +1,19 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.CreditInvoice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.CreditInvoice;
+
+public class CreditInvoiceRepository : ICreditInvoiceRepository
+
 {
-    public class CreditInvoiceRepository : ICreditInvoiceRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
 
+    public CreditInvoiceRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public CreditInvoiceRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<CreditInvoiceReportModel>> GetCreditInvoiceAsync(string dbCode, DateTime fromDate, DateTime toDate)
-        {
-            var sql = @"SELECT N.STATUS Status,P.CREATE_DATE CreateDate,
+    public async Task<List<CreditInvoiceReportModel>> GetCreditInvoiceAsync(string dbCode, DateTime fromDate,
+        DateTime toDate)
+    {
+        var sql = @"SELECT N.STATUS Status,P.CREATE_DATE CreateDate,
                             D.DELIVERIES_KHMER Delivery,
                             N.CUSTOMER_CODE CustomerCode,
                             N.ACC_NAME_KH CustomerName,
@@ -39,14 +40,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Report.DailyPaymentReport.CreditI
                             P.DIVIDED_INVOICE_ID NOT IN (SELECT PM.DIVDIE_INVOICE_ID FROM PC_PAYMENT_INVOICE PM)
                             AND N.DB_CODE = @DB_CODE
                             ";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate
-            };
-            var execute = await _sqlDataAccess.LoadData<CreditInvoiceReportModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<CreditInvoiceReportModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

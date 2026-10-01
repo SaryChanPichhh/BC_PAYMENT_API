@@ -6,6 +6,7 @@ public static class Convertor
     {
         return Convert.ToDouble(value);
     }
+
     public static int ToInt(this object value)
     {
         return Convert.ToInt32(value);

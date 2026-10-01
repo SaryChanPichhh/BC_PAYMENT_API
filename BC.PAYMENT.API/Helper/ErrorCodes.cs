@@ -12,6 +12,6 @@ public static class ErrorCodes
     // BACKEND-specific
     public const string CbsTimeout = "CBS_TIMEOUT";
     public const string CbsConnectionFailed = "CBS_CONNECTION_FAILED";
-    public const string CbsRejected = "CBS_REJECTED";        // CBS returned a business rejection
+    public const string CbsRejected = "CBS_REJECTED"; // CBS returned a business rejection
     public const string CbsInvalidResponse = "CBS_INVALID_RESPONSE";
 }

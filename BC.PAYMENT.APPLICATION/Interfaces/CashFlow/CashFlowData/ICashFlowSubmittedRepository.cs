@@ -1,8 +1,9 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData
+namespace BC.PAYMENT.APPLICATION.Interfaces.CashFlow.CashFlowData;
+
+public interface ICashFlowSubmittedRepository
 {
-    public interface ICashFlowSubmittedRepository
-    {
-       Task<List<PaymentCashFlowSubmittedModel>> GetPaymentCashFlowModelSubmittedAsync(string dbCode);
-       Task<List<PaymentCashFlowSubmittedModel>> GetPaymentCashFlowModelSubmittedByDateAsync(string dbCode,DateTime fromDate,DateTime toDate);
-    }
+    Task<List<PaymentCashFlowSubmittedModel>> GetPaymentCashFlowModelSubmittedAsync(string dbCode);
+
+    Task<List<PaymentCashFlowSubmittedModel>> GetPaymentCashFlowModelSubmittedByDateAsync(string dbCode,
+        DateTime fromDate, DateTime toDate);
 }

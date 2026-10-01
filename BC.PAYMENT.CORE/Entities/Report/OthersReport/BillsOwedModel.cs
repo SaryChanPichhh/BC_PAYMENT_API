@@ -1,6 +1,5 @@
-namespace BC.PAYMENT.CORE.Entities.Report.OthersReport
+namespace BC.PAYMENT.CORE.Entities.Report.OthersReport;
+
+public class BillsOwedModel
 {
-    public class BillsOwedModel
-    {
-    }
 }

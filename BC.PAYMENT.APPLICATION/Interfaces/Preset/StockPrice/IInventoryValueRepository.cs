@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.Preset.StockPrice
+namespace BC.PAYMENT.APPLICATION.Interfaces.Preset.StockPrice;
+
+public interface IInventoryValueRepository
 {
-    public interface IInventoryValueRepository
-    {
-        Task<List<InventoryValueModel>> GetInventoryValueAsync(Dictionary<string,string> branch,int page,int pageSize);
-    }
+    Task<List<InventoryValueModel>> GetInventoryValueAsync(Dictionary<string, string> branch, int page, int pageSize);
 }

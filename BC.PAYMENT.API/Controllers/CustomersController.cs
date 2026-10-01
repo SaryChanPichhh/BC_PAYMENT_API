@@ -73,7 +73,8 @@ public class CustomersController(IUnitOfWork unitOfWork, IOptions<AppSettings> a
 
     [Helper.Authorize]
     [HttpGet("info")]
-    public async Task<ApiResponse<PaginatedResponse<CustomerResponse>>> GetAllCustomerInfo([FromQuery] int pageNumber, int pageSize)
+    public async Task<ApiResponse<PaginatedResponse<CustomerResponse>>> GetAllCustomerInfo([FromQuery] int pageNumber,
+        int pageSize)
     {
         try
         {
@@ -82,13 +83,12 @@ public class CustomersController(IUnitOfWork unitOfWork, IOptions<AppSettings> a
             var totalRecords = paginatedData.Count;
 
             if (!paginatedData.Any())
-            {
                 return ApiResponse<PaginatedResponse<CustomerResponse>>.Builder()
                     .WithMessage("No customers info found.")
                     .WithStatusCode((int)HttpStatusCode.BadRequest)
-                    .WithResult(new PaginatedResponse<CustomerResponse>(new List<CustomerResponse>(), 0, pageNumber, pageSize))
+                    .WithResult(new PaginatedResponse<CustomerResponse>(new List<CustomerResponse>(), 0, pageNumber,
+                        pageSize))
                     .Build();
-            }
 
             paginatedData.ForEach(x =>
             {
@@ -153,15 +153,15 @@ public class CustomersController(IUnitOfWork unitOfWork, IOptions<AppSettings> a
         {
             var decryptedPayload = EncryptionHelper.DecryptAES(Uri.UnescapeDataString(customerId));
             var parts = decryptedPayload.Split('|');
-            
+
             if (parts.Length != 2)
                 return BadRequest("Invalid image token format.");
-                
+
             var dbCode = parts[0];
             var decryptedId = parts[1];
-            
+
             var imageBytes = await unitOfWork.Customers.GetCustomerImageAsync(dbCode, decryptedId);
-            
+
             if (imageBytes is null)
                 return Ok("This customer does not have an image.");
             if (imageBytes.Length == 0)

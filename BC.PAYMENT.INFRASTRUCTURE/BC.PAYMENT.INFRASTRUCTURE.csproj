@@ -1,26 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BC.PAYMENT.APPLICATION\BC.PAYMENT.APPLICATION.csproj" />
-    <ProjectReference Include="..\BC.PAYMENT.CORE\BC.PAYMENT.CORE.csproj" />
-    <ProjectReference Include="..\BC.PAYMENT.SQL\BC.PAYMENT.SQL.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\BC.PAYMENT.APPLICATION\BC.PAYMENT.APPLICATION.csproj"/>
+        <ProjectReference Include="..\BC.PAYMENT.CORE\BC.PAYMENT.CORE.csproj"/>
+        <ProjectReference Include="..\BC.PAYMENT.SQL\BC.PAYMENT.SQL.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.1.35" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Dapper" Version="2.1.35"/>
+        <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repository\Transaction\DailyPayment\DailyPayment\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Repository\Transaction\DailyPayment\DailyPayment\"/>
+    </ItemGroup>
 
 </Project>

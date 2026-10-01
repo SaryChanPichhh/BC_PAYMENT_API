@@ -1,8 +1,6 @@
-namespace BC.PAYMENT.CORE.DTO.Filter
+namespace BC.PAYMENT.CORE.DTO.Filter;
+
+public record IssueInvoiceFilterDTO : BaseFilterDTO
 {
-    public record IssueInvoiceFilterDTO:BaseFilterDTO
-    {
-        [Required]
-        public string AreaId { get; set; }
-    }
+    [Required] public string AreaId { get; set; }
 }

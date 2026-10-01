@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net8.0": {
       "FluentValidation/12.1.1": {
@@ -673,11 +673,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.LOGGING\\BC.PAYMENT.LOGGING.csproj",
+      "projectUniqueName": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.LOGGING\\BC.PAYMENT.LOGGING.csproj",
       "projectName": "BC.PAYMENT.LOGGING",
-      "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.LOGGING\\BC.PAYMENT.LOGGING.csproj",
+      "projectPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.LOGGING\\BC.PAYMENT.LOGGING.csproj",
       "packagesPath": "C:\\Users\\USER\\.nuget\\packages\\",
-      "outputPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.LOGGING\\obj\\",
+      "outputPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.LOGGING\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\DevExpress 25.2\\Components\\Offline Packages",
@@ -698,14 +698,16 @@
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\DevExpress 25.2\\Components\\System\\Components\\Packages": {},
         "C:\\Program Files\\DevExpress 26.1\\Components\\System\\Components\\Packages": {},
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0": {
+          "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {
-            "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj": {
-              "projectPath": "D:\\TD System\\TD Api\\BC.PAYMENT.SYSTEM\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj"
+            "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj": {
+              "projectPath": "D:\\coder\\API\\BC_PAYMENT_API\\BC.PAYMENT.APPLICATION\\BC.PAYMENT.APPLICATION.csproj"
             }
           }
         }
@@ -720,10 +722,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.300"
+      "SdkAnalysisLevel": "10.0.400"
     },
     "frameworks": {
       "net8.0": {
+        "framework": "net8.0",
         "targetAlias": "net8.0",
         "dependencies": {
           "log4net": {
@@ -747,7 +750,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.401/PortableRuntimeIdentifierGraph.json"
       }
     }
   },

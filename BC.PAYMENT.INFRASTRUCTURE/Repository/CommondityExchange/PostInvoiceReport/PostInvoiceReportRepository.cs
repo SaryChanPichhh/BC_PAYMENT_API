@@ -1,6 +1,5 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.PostInvoiceReport
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.PostInvoiceReport;
+
+public class PostInvoiceReportRepository : IPostInvoiceReportRepository
 {
-    public class PostInvoiceReportRepository : IPostInvoiceReportRepository
-    {
-    }
 }

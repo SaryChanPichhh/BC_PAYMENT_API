@@ -16,14 +16,12 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var execute = await unitOfWork.Expense.LoadBcPaymentDetailAsync(credential.DbCode, deliveryId, date);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                     .WithMessage("Expense details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
 
             return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                 .WithMessage("Expense details fetched unsuccessfully")
@@ -36,6 +34,7 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
             return GlobalExceptionHandler.ExceptionError<List<BcPaymentDetailResponse>>(ex.Message);
         }
     }
+
     [HttpGet]
     [Route("expense-detail-with-paid-by-date")]
     public async Task<ApiResponse<List<BcPaymentDetailResponse>>> LoadBcPaymentDetailWithPaidAsync(
@@ -45,16 +44,15 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         var credential = Common.DecodeJwt(User);
         try
         {
-            var execute = await unitOfWork.Expense.LoadBcPaymentDetailWithPaidAsync(credential.DbCode, fromDate, toDate);
+            var execute =
+                await unitOfWork.Expense.LoadBcPaymentDetailWithPaidAsync(credential.DbCode, fromDate, toDate);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                     .WithMessage("Expense details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                 .WithMessage("Expense details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -65,7 +63,9 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         {
             return GlobalExceptionHandler.ExceptionError<List<BcPaymentDetailResponse>>(ex.Message);
         }
-    }[HttpGet]
+    }
+
+    [HttpGet]
     [Route("expense-detail-by-date")]
     public async Task<ApiResponse<List<BcPaymentDetailResponse>>> LoadBcPaymentDetailByDateRangeAsync(
         [FromQuery] DateTime fromDate,
@@ -76,14 +76,12 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var execute = await unitOfWork.Expense.LoadBcPaymentDetailAsync(credential.DbCode, fromDate, toDate);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                     .WithMessage("Expense details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                 .WithMessage("Expense details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -107,14 +105,12 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var execute = await unitOfWork.Expense.LoadBcPaymentDetailAsync(credential.DbCode, month, year);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                     .WithMessage("Expense details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<BcPaymentDetailResponse>>.Builder()
                 .WithMessage("Expense details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -135,14 +131,12 @@ public class ExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var affectedRows = await unitOfWork.Expense.UpdateBcPaymentDetailAsync(request);
             if (affectedRows > 0)
-            {
                 return ApiResponse<bool>.Builder()
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithMessage("Payment detail updated successfully.")
                     .WithSuccess(true)
                     .WithResult(true)
                     .Build();
-            }
 
             return ApiResponse<bool>.Builder()
                 .WithStatusCode((int)HttpStatusCode.BadRequest)

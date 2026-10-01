@@ -10,7 +10,7 @@ public class PaymentInvoiceExpense
     public int Quantity { get; set; }
     public double UnitPrice { get; set; }
     public double Total { get; set; }
-    public string CurrencyType { get; set; } =  string.Empty;
+    public string CurrencyType { get; set; } = string.Empty;
     public double ExchangeRate { get; set; }
     public DateTime CreatedDate { get; set; }
     public string CreatedBy { get; set; } = string.Empty;

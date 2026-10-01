@@ -20,3 +20,15 @@ D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYME
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\refint\BC.PAYMENT.SQL.dll
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.pdb
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.SQL\obj\Release\net8.0\ref\BC.PAYMENT.SQL.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\bin\Release\net8.0\BC.PAYMENT.SQL.deps.json
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\bin\Release\net8.0\BC.PAYMENT.SQL.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\bin\Release\net8.0\BC.PAYMENT.SQL.pdb
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.GeneratedMSBuildEditorConfig.editorconfig
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.AssemblyInfoInputs.cache
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.AssemblyInfo.cs
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.csproj.CoreCompileInputs.cache
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.sourcelink.json
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\refint\BC.PAYMENT.SQL.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\BC.PAYMENT.SQL.pdb
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.SQL\obj\Release\net8.0\ref\BC.PAYMENT.SQL.dll

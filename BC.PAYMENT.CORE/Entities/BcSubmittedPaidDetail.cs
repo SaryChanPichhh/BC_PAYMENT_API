@@ -11,7 +11,13 @@ public class BcSubmittedPaidDetail
     public double ExpenseRiel { get; set; }
     public double ExpenseDollar { get; set; }
     public double MoneyBais { get; set; }
-    public double MoneyBias { get => MoneyBais; set => MoneyBais = value; }
+
+    public double MoneyBias
+    {
+        get => MoneyBais;
+        set => MoneyBais = value;
+    }
+
     public bool Status { get; set; }
     public string DbCode { get; set; } = string.Empty;
     public DateTime SubmittedDate { get; set; }

@@ -2,13 +2,12 @@ using BC.PAYMENT.CORE.Entities.General;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BC.PAYMENT.APPLICATION.Interfaces.General
+namespace BC.PAYMENT.APPLICATION.Interfaces.General;
+
+public interface IExpenseTypeRepository
 {
-    public interface IExpenseTypeRepository
-    {
-        Task<List<ExpenseType>> GetExpenseTypes(string dbCode);
-        Task<bool> CreateExpenseType(ExpenseType expenseType);
-        Task<bool> UpdateExpenseType(ExpenseType expenseType);
-        Task<bool> DeleteExpenseType(string expenseId);
-    }
+    Task<List<ExpenseType>> GetExpenseTypes(string dbCode);
+    Task<bool> CreateExpenseType(ExpenseType expenseType);
+    Task<bool> UpdateExpenseType(ExpenseType expenseType);
+    Task<bool> DeleteExpenseType(string expenseId);
 }

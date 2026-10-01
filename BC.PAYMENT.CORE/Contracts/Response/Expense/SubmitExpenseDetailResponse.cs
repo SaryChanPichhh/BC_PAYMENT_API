@@ -5,7 +5,7 @@ public class SubmitExpenseDetailResponse
     public int SubmittedId { get; set; }
     public string DeliveryName { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; }
-    public string SubmittedBy { get; set; } =  string.Empty;
+    public string SubmittedBy { get; set; } = string.Empty;
     public double Dollar { get; set; }
     public double Riel { get; set; }
     public double SubTotal { get; set; }
@@ -16,7 +16,7 @@ public class SubmitExpenseDetailResponse
     public double Exchange { get; set; }
     public string Other { get; set; } = string.Empty;
     public DateTime SubmittedDate { get; set; }
-    public string ExpenseDesc { get; set; } =  string.Empty;
+    public string ExpenseDesc { get; set; } = string.Empty;
     public string ExpenseDesc1 { get; set; } = string.Empty;
     public string ExpenseDesc2 { get; set; } = string.Empty;
     public string ExpenseDesc3 { get; set; } = string.Empty;

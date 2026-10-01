@@ -27,3 +27,34 @@ D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.CORE\bin\TestOut\BC.PAYMENT.COR
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.CORE\bin\Debug_Test\BC.PAYMENT.CORE.deps.json
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.CORE\bin\Debug_Test\BC.PAYMENT.CORE.dll
 D:\TD System\TD Api\BC.PAYMENT.SYSTEM\BC.PAYMENT.CORE\bin\Debug_Test\BC.PAYMENT.CORE.pdb
+D:\BuildTemp\claude\D--coder-API-BC-PAYMENT-API\8af85b8f-ef07-4d20-83b7-f09117872f97\scratchpad\out\BC.PAYMENT.CORE.deps.json
+D:\BuildTemp\claude\D--coder-API-BC-PAYMENT-API\8af85b8f-ef07-4d20-83b7-f09117872f97\scratchpad\out\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API-BC-PAYMENT-API\8af85b8f-ef07-4d20-83b7-f09117872f97\scratchpad\out\BC.PAYMENT.CORE.pdb
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\94623753-8f79-4cfb-be33-a09d6ed4555a\scratchpad\apibuild\BC.PAYMENT.CORE.deps.json
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\94623753-8f79-4cfb-be33-a09d6ed4555a\scratchpad\apibuild\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\94623753-8f79-4cfb-be33-a09d6ed4555a\scratchpad\apibuild\BC.PAYMENT.CORE.pdb
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\2740625e-7813-410a-a118-7383bbadab9f\scratchpad\apibuild\BC.PAYMENT.CORE.deps.json
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\2740625e-7813-410a-a118-7383bbadab9f\scratchpad\apibuild\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\2740625e-7813-410a-a118-7383bbadab9f\scratchpad\apibuild\BC.PAYMENT.CORE.pdb
+D:\BuildTemp\claude\D--coder-API-BC-PAYMENT-API\53b6eeaf-cb1b-4a71-b3c0-65dfaf279eb8\scratchpad\apibuild\BC.PAYMENT.CORE.deps.json
+D:\BuildTemp\claude\D--coder-API-BC-PAYMENT-API\53b6eeaf-cb1b-4a71-b3c0-65dfaf279eb8\scratchpad\apibuild\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API-BC-PAYMENT-API\53b6eeaf-cb1b-4a71-b3c0-65dfaf279eb8\scratchpad\apibuild\BC.PAYMENT.CORE.pdb
+D:\BuildTemp\claude\D--coder-API\6ac654cf-949c-4f81-a9d4-02f7a05886ae\scratchpad\apiout\BC.PAYMENT.CORE.deps.json
+D:\BuildTemp\claude\D--coder-API\6ac654cf-949c-4f81-a9d4-02f7a05886ae\scratchpad\apiout\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API\6ac654cf-949c-4f81-a9d4-02f7a05886ae\scratchpad\apiout\BC.PAYMENT.CORE.pdb
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\bin\Debug\net8.0\BC.PAYMENT.CORE.deps.json
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\bin\Debug\net8.0\BC.PAYMENT.CORE.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\bin\Debug\net8.0\BC.PAYMENT.CORE.pdb
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.csproj.AssemblyReference.cache
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.GeneratedMSBuildEditorConfig.editorconfig
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.AssemblyInfoInputs.cache
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.AssemblyInfo.cs
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.csproj.CoreCompileInputs.cache
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.sourcelink.json
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\refint\BC.PAYMENT.CORE.dll
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\BC.PAYMENT.CORE.pdb
+D:\coder\API\BC_PAYMENT_API\BC.PAYMENT.CORE\obj\Debug\net8.0\ref\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\e78047ea-c4f5-4f4b-805c-90405d8852dd\scratch\apibuild\BC.PAYMENT.CORE.deps.json
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\e78047ea-c4f5-4f4b-805c-90405d8852dd\scratch\apibuild\BC.PAYMENT.CORE.dll
+D:\BuildTemp\claude\D--coder-API-PAYMENT-WINFORM\e78047ea-c4f5-4f4b-805c-90405d8852dd\scratch\apibuild\BC.PAYMENT.CORE.pdb

@@ -1,7 +1,5 @@
-namespace BC.PAYMENT.CORE.Entities.Invoice
-{
-    public class ReturnInvoice : ChangeInvoice
-    {
+namespace BC.PAYMENT.CORE.Entities.Invoice;
 
-    }
+public class ReturnInvoice : ChangeInvoice
+{
 }

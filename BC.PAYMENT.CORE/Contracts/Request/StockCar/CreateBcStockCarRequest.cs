@@ -8,5 +8,5 @@ public class CreateBcStockCarRequest
     public double InvoiceValue { get; set; }
     public DateTime TransactionDate { get; set; }
     public int TemplateId { get; set; }
-    public InvoiceStatus InvoiceType { get; set; } 
+    public InvoiceStatus InvoiceType { get; set; }
 }

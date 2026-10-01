@@ -32,7 +32,7 @@ public class MarketUpdateValidate : AbstractValidator<MarketUpdateRequest>
     public MarketUpdateValidate()
     {
         Include(new MarketValidate());
-        
+
         RuleFor(m => m.Status)
             .NotNull().WithMessage("Status is required.");
     }

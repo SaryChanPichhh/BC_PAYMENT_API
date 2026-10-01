@@ -1,20 +1,21 @@
 using ItemModel = BC.PAYMENT.CORE.Entities.CommondityExchange.DailyRefundItems.ItemModel;
 
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundItems
-{
-    public class DailyRefundItemsRepository : IDailyRefundItemRepository
-    {
-        private readonly ISqlDataAccess _sqlDataAccess;
-        private readonly IDbConnection _dbConnection;
-        public DailyRefundItemsRepository(ISqlDataAccess sqlDataAccess, IDbConnection dbConnection)
-        {
-            _sqlDataAccess = sqlDataAccess;
-            _dbConnection = dbConnection;
-        }
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundItems;
 
-        public async Task<List<ItemModel>> GetItemsRefundByAllBranchAsync()
-        {
-            const string sql = @"
+public class DailyRefundItemsRepository : IDailyRefundItemRepository
+{
+    private readonly ISqlDataAccess _sqlDataAccess;
+    private readonly IDbConnection _dbConnection;
+
+    public DailyRefundItemsRepository(ISqlDataAccess sqlDataAccess, IDbConnection dbConnection)
+    {
+        _sqlDataAccess = sqlDataAccess;
+        _dbConnection = dbConnection;
+    }
+
+    public async Task<List<ItemModel>> GetItemsRefundByAllBranchAsync()
+    {
+        const string sql = @"
                 SELECT TBC.ID MasterId,TBCD.ID Id,TBC.CREATED_DATE RequestDate,ADD_CODE CustomerCode,ADD_LINE_1 CustomerName,
            MARKET_KHMER_NAME Market,AREA_NAME_KHMER Area,ITEM.ITEM_CODE ItemCode,ITEM.ITEM_NAME ItemName,
 		   TBCD.DESCRIPION ChangeType,QUANTITY Quantity,dbo.RETURN_RECEIVED_STATUS_EXCHANGE(TBCD.IS_RECEIVED) Status,CASE WHEN TBCD.TYPE = 'REPAIR' 
@@ -33,13 +34,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundIte
                     ) ITEM
                 ON ITEM.ITEM_CODE = TBCD.ITEM_CODE
 				WHERE TBCD.IS_RECEIVED = 'Pending'";
-            var execute = await _sqlDataAccess.LoadData<ItemModel, dynamic>(sql, new { });
-            return execute.ToList();
-        }
+        var execute = await _sqlDataAccess.LoadData<ItemModel, dynamic>(sql, new { });
+        return execute.ToList();
+    }
 
-        public async Task<List<ItemModel>> GetItemsRefundByByBranchAsync(string dbCode)
-        {
-            const string sql = @"
+    public async Task<List<ItemModel>> GetItemsRefundByByBranchAsync(string dbCode)
+    {
+        const string sql = @"
                 SELECT S.LAST_NAME +'' + S.FIRST_NAME Seller,TBC.ID MasterId,TBCD.ID Id,TBC.CREATED_DATE RequestDate,ADD_CODE CustomerCode,ADD_LINE_1 CustomerName,
                 MARKET_KHMER_NAME Market,AREA_NAME_KHMER Area,ITEM.ITEM_CODE ItemCode,ITEM.ITEM_NAME ItemName,
                 TBCD.DESCRIPION ChangeType,QUANTITY Quantity,dbo.RETURN_RECEIVED_STATUS_EXCHANGE(TBCD.IS_RECEIVED) Status,CASE WHEN TBCD.TYPE = 'REPAIR' 
@@ -62,86 +63,90 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.CommondityExchange.DailyRefundIte
                      ON ITEM.ITEM_CODE = TBCD.ITEM_CODE
 		                INNER JOIN BCUSERS S ON S.USER_ID = TBC.USER_CODE
 		                WHERE TBCD.IS_RECEIVED = 'Pending'";
-            var param = new
-            {
-                DB_CODE = dbCode,
-            };
-            var execute = await _sqlDataAccess.LoadData<ItemModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<int> DeleteRequestItem(int requestMaster, int requestDetail)
+        var param = new
         {
-            const string sql = @"DELETE FROM TB_BC_CHANGEINVOICE_DETAIL WHERE ID = @DetailId
+            DB_CODE = dbCode
+        };
+        var execute = await _sqlDataAccess.LoadData<ItemModel, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<int> DeleteRequestItem(int requestMaster, int requestDetail)
+    {
+        const string sql = @"DELETE FROM TB_BC_CHANGEINVOICE_DETAIL WHERE ID = @DetailId
             IF NOT EXISTS (SELECT * FROM TB_BC_CHANGEINVOICE_DETAIL WHERE CHANGE_INVOICE_ID = @MasterId)
 	            DELETE FROM TB_BC_CHANGEINVOICE WHERE ID = @MasterId";
-            var param = new
-            {
-                DetailId = requestDetail,
-                MasterId = requestMaster
-            };
-            var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
-            return affectedRow;
-        }
-
-        public async Task<int> InsertReceivedItem(string userName, int detailId)
+        var param = new
         {
-            if (_dbConnection.State == ConnectionState.Closed)
-                _dbConnection.Open();
-            var transaction = _dbConnection.BeginTransaction();
-            try
+            DetailId = requestDetail,
+            MasterId = requestMaster
+        };
+        var affectedRow = await _sqlDataAccess.ExecuteAsync(sql, param);
+        return affectedRow;
+    }
+
+    public async Task<int> InsertReceivedItem(string userName, int detailId)
+    {
+        if (_dbConnection.State == ConnectionState.Closed)
+            _dbConnection.Open();
+        var transaction = _dbConnection.BeginTransaction();
+        try
+        {
+            const string insertChangeInvoiceReceived =
+                @"INSERT INTO TB_BC_CHANGEINVOICE_RECEIVED SELECT ID,ITEM_CODE,QUANTITY,DESCRIPION,0,GETDATE(),@CREATED_BY FROM TB_BC_CHANGEINVOICE_DETAIL WHERE ID = @ID";
+            var changeInvoiceReceivedParam = new
             {
-                const string insertChangeInvoiceReceived =
-                    @"INSERT INTO TB_BC_CHANGEINVOICE_RECEIVED SELECT ID,ITEM_CODE,QUANTITY,DESCRIPION,0,GETDATE(),@CREATED_BY FROM TB_BC_CHANGEINVOICE_DETAIL WHERE ID = @ID";
-                var changeInvoiceReceivedParam = new
+                ID = detailId,
+                CREATED_BY = userName
+            };
+            var affectedRow =
+                await _dbConnection.ExecuteAsync(insertChangeInvoiceReceived, changeInvoiceReceivedParam, transaction);
+            if (affectedRow > 0)
+            {
+                const string updateChangeInvoiceDetail =
+                    @"UPDATE TB_BC_CHANGEINVOICE_DETAIL SET IS_RECEIVED = 'Yes' WHERE ID = @ID";
+                var changeInvoiceDetailParam = new
                 {
-                    ID = detailId,
-                    CREATED_BY = userName,
+                    ID = detailId
                 };
-                var affectedRow = await _dbConnection.ExecuteAsync(insertChangeInvoiceReceived, changeInvoiceReceivedParam, transaction);
-                if (affectedRow > 0)
+                var updateAffected =
+                    await _dbConnection.ExecuteAsync(updateChangeInvoiceDetail, changeInvoiceDetailParam, transaction);
+                if (updateAffected > 0)
                 {
-                    const string updateChangeInvoiceDetail = @"UPDATE TB_BC_CHANGEINVOICE_DETAIL SET IS_RECEIVED = 'Yes' WHERE ID = @ID";
-                    var changeInvoiceDetailParam = new
-                    {
-                        ID = detailId
-                    };
-                    var updateAffected = await _dbConnection.ExecuteAsync(updateChangeInvoiceDetail, changeInvoiceDetailParam, transaction);
-                    if (updateAffected > 0)
-                    {
-                        transaction.Commit();
-                    }
-                    else
-                    { 
-                        transaction.Rollback();
-                        return 0;
-                    }
-                    return affectedRow;
+                    transaction.Commit();
                 }
                 else
                 {
                     transaction.Rollback();
                     return 0;
                 }
+
+                return affectedRow;
             }
-            catch (Exception ex)
+            else
             {
                 transaction.Rollback();
-                Debug.WriteLine(ex.Message);
+                return 0;
             }
-            return 0;
         }
-
-        public async Task<byte[]> GetImageByDetailIdAsync(int detailId)
+        catch (Exception ex)
         {
-            var sql = $@"SELECT IMAGE FROM TB_BC_CHANGEINVOICE_DETAIL WHERE ID = @DETAIL_ID";
-            var param = new
-            {
-                DETAIL_ID = detailId
-            };
-            var execute = await _sqlDataAccess.LoadData<byte[], dynamic>(sql, param);
-
-            return execute.FirstOrDefault() ?? Array.Empty<byte>();
+            transaction.Rollback();
+            Debug.WriteLine(ex.Message);
         }
+
+        return 0;
+    }
+
+    public async Task<byte[]> GetImageByDetailIdAsync(int detailId)
+    {
+        var sql = $@"SELECT IMAGE FROM TB_BC_CHANGEINVOICE_DETAIL WHERE ID = @DETAIL_ID";
+        var param = new
+        {
+            DETAIL_ID = detailId
+        };
+        var execute = await _sqlDataAccess.LoadData<byte[], dynamic>(sql, param);
+
+        return execute.FirstOrDefault() ?? Array.Empty<byte>();
     }
 }

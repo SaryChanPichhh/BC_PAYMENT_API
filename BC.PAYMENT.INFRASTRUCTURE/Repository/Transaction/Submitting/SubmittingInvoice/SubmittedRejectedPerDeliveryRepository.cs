@@ -1,18 +1,19 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.SubmittingInvoice;
+
+public class SubmittedRejectedPerDeliveryRepository : ISubmittedRejectedInvoicePerDeliveryRepository
 {
-    public class SubmittedRejectedPerDeliveryRepository : ISubmittedRejectedInvoicePerDeliveryRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public SubmittedRejectedPerDeliveryRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public SubmittedRejectedPerDeliveryRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<RejectedInvoicePerDelivery>> GetAllRejectedInvoicePerDeliveryByDateAsync(string dbCode, string fromDate, string toDate)
-        {
-            var sql =
-                $@"SELECT DL.DELIVERIES_KHMER DeliveryName,P.CREATED_DATE CreateDate,D.SUBMITTED_BY CreateBy,D.DOLLAR Dollar,D.RIEL Riel,D.TOTAL Total,D.MONEY_BIAS Misaligned,D.EXPENSE_DOLLAR ExpenseDollar,D.EXPENSE_RIEL ExpenseRiel,
+    public async Task<List<RejectedInvoicePerDelivery>> GetAllRejectedInvoicePerDeliveryByDateAsync(string dbCode,
+        string fromDate, string toDate)
+    {
+        var sql =
+            $@"SELECT DL.DELIVERIES_KHMER DeliveryName,P.CREATED_DATE CreateDate,D.SUBMITTED_BY CreateBy,D.DOLLAR Dollar,D.RIEL Riel,D.TOTAL Total,D.MONEY_BIAS Misaligned,D.EXPENSE_DOLLAR ExpenseDollar,D.EXPENSE_RIEL ExpenseRiel,
                 D.TOTAL - D.MONEY_BIAS/D.EXCHANGE-D.EXPENSE_DOLLAR Total,  D.EXCHANGE ExchangeRate,A.APPROVAL_STATUS ApprovalStatus,A.DESCRIPTION ExpenseDescription,A.APPROVAL_DATE ApprovalDate,A.APPROVAL_BY ApprovalBy
                 FROM BCSUBMITTED_PAID_DETAIL D
                 INNER JOIN BCPAYMENTDETAILA P ON
@@ -23,20 +24,21 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.Submitting
                  DL.DELIVERIES_ID = P.DELIVERYID
                  WHERE D.DB_CODE = @DB_CODE AND P.DB_CODE = @DB_CODE AND A.DB_CODE =  @DB_CODE AND DL.DB_CODE = @DB_CODE AND
                  P.CREATED_DATE BETWEEN @FROM_DATE AND @TO_DATE";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                YTO_DATEEAR = toDate
-            };
-            var execute = await _sqlDataAccess.LoadData<RejectedInvoicePerDelivery, dynamic>(sql, param);
-            return execute.ToList();
-        }
-
-        public async Task<List<RejectedInvoicePerDelivery>> GetAllRejectedInvoicePerDeliveryByPeriodAsync(string dbCode, int month, int year)
+        var param = new
         {
-            var sql =
-                $@"SELECT DL.DELIVERIES_KHMER DeliveryName,P.CREATED_DATE CreateDate,D.SUBMITTED_BY CreateBy,D.DOLLAR Dollar,D.RIEL Riel,D.TOTAL Total,D.MONEY_BIAS Misaligned,D.EXPENSE_DOLLAR ExpenseDollar,D.EXPENSE_RIEL ExpenseRiel,
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            YTO_DATEEAR = toDate
+        };
+        var execute = await _sqlDataAccess.LoadData<RejectedInvoicePerDelivery, dynamic>(sql, param);
+        return execute.ToList();
+    }
+
+    public async Task<List<RejectedInvoicePerDelivery>> GetAllRejectedInvoicePerDeliveryByPeriodAsync(string dbCode,
+        int month, int year)
+    {
+        var sql =
+            $@"SELECT DL.DELIVERIES_KHMER DeliveryName,P.CREATED_DATE CreateDate,D.SUBMITTED_BY CreateBy,D.DOLLAR Dollar,D.RIEL Riel,D.TOTAL Total,D.MONEY_BIAS Misaligned,D.EXPENSE_DOLLAR ExpenseDollar,D.EXPENSE_RIEL ExpenseRiel,
                 D.TOTAL - D.MONEY_BIAS/D.EXCHANGE-D.EXPENSE_DOLLAR Total,  D.EXCHANGE ExchangeRate,A.APPROVAL_STATUS ApprovalStatus,A.DESCRIPTION ExpenseDescription,A.APPROVAL_DATE ApprovalDate,A.APPROVAL_BY ApprovalBy
                 FROM BCSUBMITTED_PAID_DETAIL D
                 INNER JOIN BCPAYMENTDETAILA P ON
@@ -47,14 +49,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.Submitting.Submitting
                  DL.DELIVERIES_ID = P.DELIVERYID
                  WHERE D.DB_CODE = @DB_CODE AND P.DB_CODE = @DB_CODE AND A.DB_CODE =  @DB_CODE AND DL.DB_CODE = @DB_CODE AND
                  MONTH(P.CREATED_DATE) =@MONTH AND YEAR(P.CREATED_DATE) = @YEAR";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                MONTH = month,
-                YEAR = year
-            };
-            var execute = await _sqlDataAccess.LoadData<RejectedInvoicePerDelivery, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            MONTH = month,
+            YEAR = year
+        };
+        var execute = await _sqlDataAccess.LoadData<RejectedInvoicePerDelivery, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

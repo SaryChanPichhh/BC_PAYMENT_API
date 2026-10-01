@@ -1,24 +1,25 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.StockPrice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.StockPrice;
+
+public class InventoryValueRepository : IInventoryValueRepository
 {
-    public class InventoryValueRepository : IInventoryValueRepository
+    private readonly ISqlDataAccess _sqlDatAccess;
+
+    public InventoryValueRepository(ISqlDataAccess sqlDatAccess)
     {
-        private readonly ISqlDataAccess _sqlDatAccess;
+        _sqlDatAccess = sqlDatAccess;
+    }
 
-        public InventoryValueRepository(ISqlDataAccess sqlDatAccess)
+    public async Task<List<InventoryValueModel>> GetInventoryValueAsync(Dictionary<string, string> branch, int page,
+        int pageSize)
+    {
+        var inventoryValues = new List<InventoryValueModel>();
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 1;
+        var offSet = (page - 1) * pageSize;
+        foreach (var eachBranch in branch)
         {
-            _sqlDatAccess = sqlDatAccess;
-        }
-
-        public async Task<List<InventoryValueModel>> GetInventoryValueAsync(Dictionary<string,string> branch, int page, int pageSize)
-        {
-            var inventoryValues = new List<InventoryValueModel>();
-            if (page < 1) page = 1;
-            if(pageSize < 1) pageSize = 1;
-            var offSet = (page-1)*pageSize;
-            foreach (var eachBranch in branch)
-            {
-                var sql =
-                    @$"SELECT '{eachBranch.Key}' [BranchCode], N'{eachBranch.Value}' [BranchName], LOCATION [Location], ITEM_CODE [ItemCode], ITEM_DESC [ItemName], PHYSICAL - ON_ORDER [Quantity], TOTAL_AMOUNT [Amount],COST Cost
+            var sql =
+                @$"SELECT '{eachBranch.Key}' [BranchCode], N'{eachBranch.Value}' [BranchName], LOCATION [Location], ITEM_CODE [ItemCode], ITEM_DESC [ItemName], PHYSICAL - ON_ORDER [Quantity], TOTAL_AMOUNT [Amount],COST Cost
                 FROM(SELECT TAB5.LOCATION,
                         TAB5.ITEM_CODE,
                         TAB5.ITEM_DESC, 
@@ -106,17 +107,16 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.StockPrice
 														  TAB5.ITEM_DESC,
 														  TAB5.PHYSICAL,
 														  TAB5.ON_ORDER, COST) C where PHYSICAL - ON_ORDER <> 0 ORDER BY Location,ItemCode OFFSET @OFF_SET ROWS FETCH NEXT @PAGE_SIZE ROWS ONLY ";
-                var param = new
-                {
-                    DB_CODE = eachBranch.Key,
-                    OFF_SET = offSet,
-                    PAGE_SIZE = pageSize,
-                };
-                var execute = await _sqlDatAccess.LoadData<InventoryValueModel, dynamic>(sql, param);
-                inventoryValues.AddRange(execute.ToList());
-            }
-
-            return inventoryValues;
+            var param = new
+            {
+                DB_CODE = eachBranch.Key,
+                OFF_SET = offSet,
+                PAGE_SIZE = pageSize
+            };
+            var execute = await _sqlDatAccess.LoadData<InventoryValueModel, dynamic>(sql, param);
+            inventoryValues.AddRange(execute.ToList());
         }
+
+        return inventoryValues;
     }
 }

@@ -1,8 +1,5 @@
-﻿
+﻿namespace BC.PAYMENT.CORE.Entities.ClosingInventoryAndInvoice.ClosingInventory;
 
-namespace BC.PAYMENT.CORE.Entities.ClosingInventoryAndInvoice.ClosingInventory
+public class ClosingInventoryModel
 {
-    public class ClosingInventoryModel
-    {
-    }
 }

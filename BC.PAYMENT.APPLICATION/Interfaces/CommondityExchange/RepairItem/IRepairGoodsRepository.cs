@@ -1,26 +1,31 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem
+namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.RepairItem;
+
+public interface IRepairGoodsRepository
 {
-    public interface IRepairGoodsRepository
-    {
-        Task<List<RepairGoodsRespondDto>> GetReceivedRepairGoodsByBranchAsync(string dbCode);
-        Task<int> DeleteReceivedRepairGoodAsync(int receivedId,int detailId);
-        Task<string> GenerateTransactionCode(string dbCode);
-        Task<int> TransferRepairGoodsAsync(RepairGoodsRespondDto repairGoodsDto);
-        #region Repairing Goods
+    Task<List<RepairGoodsRespondDto>> GetReceivedRepairGoodsByBranchAsync(string dbCode);
+    Task<int> DeleteReceivedRepairGoodAsync(int receivedId, int detailId);
+    Task<string> GenerateTransactionCode(string dbCode);
+    Task<int> TransferRepairGoodsAsync(RepairGoodsRespondDto repairGoodsDto);
 
-        Task<List<ItemRepairInprogressDto>> GetReparingGoodsByDateAsync(string dbCode,DateTime fromDate, DateTime toDate);
-        Task<int> DeleteRepairItem(int receivedId, int repairId);
+    #region Repairing Goods
 
-        #endregion
+    Task<List<ItemRepairInprogressDto>> GetReparingGoodsByDateAsync(string dbCode, DateTime fromDate, DateTime toDate);
+    Task<int> DeleteRepairItem(int receivedId, int repairId);
 
-        #region RepairGoods Payment
+    #endregion
 
-        Task<List<CustomerDto>> GetAllCustomerHasCompletedRepair(string dbCode);
-        Task<List<ItemRepairCompletedDto>> GetAllItemHasCompletedRepairByCustomerCode(string dbCode,string customerCode);
-        Task<int> SwitchItemType(string dbCode, string userName, int id, string description, string fromType, string toType);
-        Task<int> IssuanceRepairGoodCompletedInvoiceAsync(List<IssuanceInvoiceDto> model, NewInvoiceCompletedDto newInvoiceCompleted);
-        Task<int> PaidRepairItemAsync(string createBy,double totalPrice,int repairCompletedId);
+    #region RepairGoods Payment
 
-        #endregion
-    }
+    Task<List<CustomerDto>> GetAllCustomerHasCompletedRepair(string dbCode);
+    Task<List<ItemRepairCompletedDto>> GetAllItemHasCompletedRepairByCustomerCode(string dbCode, string customerCode);
+
+    Task<int> SwitchItemType(string dbCode, string userName, int id, string description, string fromType,
+        string toType);
+
+    Task<int> IssuanceRepairGoodCompletedInvoiceAsync(List<IssuanceInvoiceDto> model,
+        NewInvoiceCompletedDto newInvoiceCompleted);
+
+    Task<int> PaidRepairItemAsync(string createBy, double totalPrice, int repairCompletedId);
+
+    #endregion
 }

@@ -13,149 +13,148 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BC.PAYMENT.TEST.Controllers
+namespace BC.PAYMENT.TEST.Controllers;
+
+public class ExpenseControllerTests
 {
-    public class ExpenseControllerTests
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IExpenseRepository> _mockExpenseRepo;
+    private readonly ExpenseController _controller;
+
+    public ExpenseControllerTests()
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<IExpenseRepository> _mockExpenseRepo;
-        private readonly ExpenseController _controller;
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockExpenseRepo = new Mock<IExpenseRepository>();
 
-        public ExpenseControllerTests()
+        _mockUnitOfWork.Setup(u => u.Expense).Returns(_mockExpenseRepo.Object);
+
+        _controller = new ExpenseController(_mockUnitOfWork.Object);
+
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockExpenseRepo = new Mock<IExpenseRepository>();
+            new Claim("DbCode", "TEST_DB"),
+            new Claim("Username", "TEST_USER")
+        }, "mock"));
 
-            _mockUnitOfWork.Setup(u => u.Expense).Returns(_mockExpenseRepo.Object);
-
-            _controller = new ExpenseController(_mockUnitOfWork.Object);
-
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new[]
-            {
-                new Claim("DbCode", "TEST_DB"),
-                new Claim("Username", "TEST_USER")
-            }, "mock"));
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = user }
-            };
-        }
-
-        [Fact]
-        public async Task LoadBcPaymentDetailByDateRangeAsync_ShouldReturnOk_WhenResultsExist()
+        _controller.ControllerContext = new ControllerContext
         {
-            var fromDate = new DateTime(2024, 5, 1);
-            var toDate = new DateTime(2024, 5, 10);
-            var mockData = new List<BcPaymentDetailResponse>
-            {
-                new() { Id = 1, DbCode = "TEST_DB", Total = 100 }
-            };
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+    }
 
-            _mockExpenseRepo
-                .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", fromDate, toDate))
-                .ReturnsAsync(mockData);
-
-            var response = await _controller.LoadBcPaymentDetailByDateRangeAsync(fromDate, toDate);
-
-            Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
-            Assert.True(response.Success);
-            Assert.Single(response.Result);
-        }
-
-        [Fact]
-        public async Task LoadBcPaymentDetailByDateRangeAsync_ShouldReturnBadRequest_WhenEmpty()
+    [Fact]
+    public async Task LoadBcPaymentDetailByDateRangeAsync_ShouldReturnOk_WhenResultsExist()
+    {
+        var fromDate = new DateTime(2024, 5, 1);
+        var toDate = new DateTime(2024, 5, 10);
+        var mockData = new List<BcPaymentDetailResponse>
         {
-            var fromDate = new DateTime(2024, 5, 1);
-            var toDate = new DateTime(2024, 5, 10);
+            new() { Id = 1, DbCode = "TEST_DB", Total = 100 }
+        };
 
-            _mockExpenseRepo
-                .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", fromDate, toDate))
-                .ReturnsAsync(new List<BcPaymentDetailResponse>());
+        _mockExpenseRepo
+            .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", fromDate, toDate))
+            .ReturnsAsync(mockData);
 
-            var response = await _controller.LoadBcPaymentDetailByDateRangeAsync(fromDate, toDate);
+        var response = await _controller.LoadBcPaymentDetailByDateRangeAsync(fromDate, toDate);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.False(response.Success);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Success);
+        Assert.Single(response.Result);
+    }
 
-        [Fact]
-        public async Task LoadBcPaymentDetailByPeriodAsync_ShouldReturnOk_WhenResultsExist()
+    [Fact]
+    public async Task LoadBcPaymentDetailByDateRangeAsync_ShouldReturnBadRequest_WhenEmpty()
+    {
+        var fromDate = new DateTime(2024, 5, 1);
+        var toDate = new DateTime(2024, 5, 10);
+
+        _mockExpenseRepo
+            .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", fromDate, toDate))
+            .ReturnsAsync(new List<BcPaymentDetailResponse>());
+
+        var response = await _controller.LoadBcPaymentDetailByDateRangeAsync(fromDate, toDate);
+
+        Assert.Equal((int)HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.False(response.Success);
+    }
+
+    [Fact]
+    public async Task LoadBcPaymentDetailByPeriodAsync_ShouldReturnOk_WhenResultsExist()
+    {
+        var month = 5;
+        var year = 2024;
+        var mockData = new List<BcPaymentDetailResponse>
         {
-            var month = 5;
-            var year = 2024;
-            var mockData = new List<BcPaymentDetailResponse>
-            {
-                new() { Id = 2, DbCode = "TEST_DB", Total = 200 }
-            };
+            new() { Id = 2, DbCode = "TEST_DB", Total = 200 }
+        };
 
-            _mockExpenseRepo
-                .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", month, year))
-                .ReturnsAsync(mockData);
+        _mockExpenseRepo
+            .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", month, year))
+            .ReturnsAsync(mockData);
 
-            var response = await _controller.LoadBcPaymentDetailByPeriodAsync(month, year);
+        var response = await _controller.LoadBcPaymentDetailByPeriodAsync(month, year);
 
-            Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
-            Assert.True(response.Success);
-            Assert.Single(response.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Success);
+        Assert.Single(response.Result);
+    }
 
-        [Fact]
-        public async Task LoadBcPaymentDetailByPeriodAsync_ShouldReturnBadRequest_WhenEmpty()
+    [Fact]
+    public async Task LoadBcPaymentDetailByPeriodAsync_ShouldReturnBadRequest_WhenEmpty()
+    {
+        var month = 5;
+        var year = 2024;
+
+        _mockExpenseRepo
+            .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", month, year))
+            .ReturnsAsync(new List<BcPaymentDetailResponse>());
+
+        var response = await _controller.LoadBcPaymentDetailByPeriodAsync(month, year);
+
+        Assert.Equal((int)HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.False(response.Success);
+    }
+
+    [Fact]
+    public async Task UpdateBcPaymentDetailAsync_ShouldReturnOk_WhenUpdateSucceeds()
+    {
+        var request = new UpdateBcPaymentDetailRequest
         {
-            var month = 5;
-            var year = 2024;
+            Id = 1,
+            Total = 500,
+            Dollar = 100,
+            Riel = 400000,
+            Exchange = 4000,
+            DescExp1 = "Desc1",
+            ExpAmount1 = 50,
+            MoneyBias = 10
+        };
 
-            _mockExpenseRepo
-                .Setup(r => r.LoadBcPaymentDetailAsync("TEST_DB", month, year))
-                .ReturnsAsync(new List<BcPaymentDetailResponse>());
+        _mockExpenseRepo
+            .Setup(r => r.UpdateBcPaymentDetailAsync(request))
+            .ReturnsAsync(1);
 
-            var response = await _controller.LoadBcPaymentDetailByPeriodAsync(month, year);
+        var response = await _controller.UpdateBcPaymentDetailAsync(request);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.False(response.Success);
-        }
+        Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
+        Assert.True(response.Success);
+        Assert.True(response.Result);
+    }
 
-        [Fact]
-        public async Task UpdateBcPaymentDetailAsync_ShouldReturnOk_WhenUpdateSucceeds()
-        {
-            var request = new UpdateBcPaymentDetailRequest
-            {
-                Id = 1,
-                Total = 500,
-                Dollar = 100,
-                Riel = 400000,
-                Exchange = 4000,
-                DescExp1 = "Desc1",
-                ExpAmount1 = 50,
-                MoneyBias = 10
-            };
+    [Fact]
+    public async Task UpdateBcPaymentDetailAsync_ShouldReturnBadRequest_WhenUpdateFails()
+    {
+        var request = new UpdateBcPaymentDetailRequest { Id = 99 };
 
-            _mockExpenseRepo
-                .Setup(r => r.UpdateBcPaymentDetailAsync(request))
-                .ReturnsAsync(1);
+        _mockExpenseRepo
+            .Setup(r => r.UpdateBcPaymentDetailAsync(request))
+            .ReturnsAsync(0);
 
-            var response = await _controller.UpdateBcPaymentDetailAsync(request);
+        var response = await _controller.UpdateBcPaymentDetailAsync(request);
 
-            Assert.Equal((int)HttpStatusCode.OK, response.StatusCode);
-            Assert.True(response.Success);
-            Assert.True(response.Result);
-        }
-
-        [Fact]
-        public async Task UpdateBcPaymentDetailAsync_ShouldReturnBadRequest_WhenUpdateFails()
-        {
-            var request = new UpdateBcPaymentDetailRequest { Id = 99 };
-
-            _mockExpenseRepo
-                .Setup(r => r.UpdateBcPaymentDetailAsync(request))
-                .ReturnsAsync(0);
-
-            var response = await _controller.UpdateBcPaymentDetailAsync(request);
-
-            Assert.Equal((int)HttpStatusCode.BadRequest, response.StatusCode);
-            Assert.False(response.Success);
-            Assert.False(response.Result);
-        }
+        Assert.Equal((int)HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.False(response.Success);
+        Assert.False(response.Result);
     }
 }

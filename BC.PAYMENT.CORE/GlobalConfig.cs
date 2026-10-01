@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.CORE
+namespace BC.PAYMENT.CORE;
+
+public static class GlobalConfig
 {
-    public static class GlobalConfig
-    {
-        public static string AppCode => "PYS";
-    }
+    public static string AppCode => "PYS";
 }

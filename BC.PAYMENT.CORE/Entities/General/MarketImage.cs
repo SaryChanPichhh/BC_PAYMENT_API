@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.CORE.Entities.General
+namespace BC.PAYMENT.CORE.Entities.General;
+
+public class MarketImage
 {
-    public class MarketImage
-    {
-        public byte Image { get; set; }
-    }
+    public byte Image { get; set; }
 }

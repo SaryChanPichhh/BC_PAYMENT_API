@@ -1,17 +1,18 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory;
+
+public class InventoryExpiredRepository : IInventoryExpiredRepository
 {
-    public class InventoryExpiredRepository : IInventoryExpiredRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public InventoryExpiredRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public InventoryExpiredRepository(ISqlDataAccess sqlDataAccess)
-        {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<InventoryExpiredModel>> GetItemExpiredAsync(string dbCode, string location)
-        {
-            var sql = @$"SELECT TAB3.ITEM_CODE ItemCode, si.ITEM_CUS10_KH ItemName, TOTAL_QTY ExpiredQty, EXPIRE_DATE ExpiredDate, EXPIRE_IN ExpiredDuration
+    public async Task<List<InventoryExpiredModel>> GetItemExpiredAsync(string dbCode, string location)
+    {
+        var sql =
+            @$"SELECT TAB3.ITEM_CODE ItemCode, si.ITEM_CUS10_KH ItemName, TOTAL_QTY ExpiredQty, EXPIRE_DATE ExpiredDate, EXPIRE_IN ExpiredDuration
                         FROM (SELECT TAB1.ITEM_CODE, PHYSICAL-ISNULL(HOLD_SALE, 0) TOTAL_QTY, TAB1.EXPIRE_DATE, DATEDIFF(DAY, GETDATE(), CAST(TAB1.EXPIRE_DATE AS DATE)) EXPIRE_IN
                         FROM (SELECT ITEM_CODE, ISNULL(SUM(QUANTITY),0) PHYSICAL, LINE_REF EXPIRE_DATE FROM {dbCode}SIINVMOV TAB1 
                         WHERE IR_STAT='I' AND STATUS='80' AND LOCATION = @LOCATION AND ALLOC_REF='' 
@@ -28,19 +29,19 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory
                         LEFT JOIN SIITEMS si ON TAB3.ITEM_CODE = si.ITEM_CODE AND si.DB_CODE = @DB_CODE
                         WHERE EXPIRE_IN < 0 AND TAB3.TOTAL_QTY > 0 ORDER BY CAST(EXPIRE_DATE AS DATE)";
 
-            var param = new
-            {
-                DB_CODE = dbCode,
-                LOCATION = location
-            };
-            var results = await _sqlDataAccess.LoadData<InventoryExpiredModel, dynamic>(sql, param);
-            return results.ToList();
-        }
-
-        public async Task<List<InventoryExpiredModel>> GetItemExpiredSoonAsync(string dbCode, string location)
+        var param = new
         {
-            var sql =
-                $@"SELECT TAB3.ITEM_CODE ItemCode, si.ITEM_CUS10_KH ItemName, TAB3.TOTAL_QTY ExpiredQty, EXPIRE_DATE ExpiredDate, TAB3.EXPIRE_IN ExpiredDuration 
+            DB_CODE = dbCode,
+            LOCATION = location
+        };
+        var results = await _sqlDataAccess.LoadData<InventoryExpiredModel, dynamic>(sql, param);
+        return results.ToList();
+    }
+
+    public async Task<List<InventoryExpiredModel>> GetItemExpiredSoonAsync(string dbCode, string location)
+    {
+        var sql =
+            $@"SELECT TAB3.ITEM_CODE ItemCode, si.ITEM_CUS10_KH ItemName, TAB3.TOTAL_QTY ExpiredQty, EXPIRE_DATE ExpiredDate, TAB3.EXPIRE_IN ExpiredDuration 
                 FROM (SELECT TAB1.ITEM_CODE, PHYSICAL, ISNULL(HOLD_SALE, 0) ON_HOLD, PHYSICAL-ISNULL(HOLD_SALE, 0) TOTAL_QTY, TAB1.EXPIRE_DATE, DATEDIFF(DAY, GETDATE(), CAST(TAB1.EXPIRE_DATE AS DATE)) EXPIRE_IN 
                 FROM (SELECT ITEM_CODE, ISNULL(SUM(QUANTITY),0) PHYSICAL, LINE_REF EXPIRE_DATE FROM {dbCode}SIINVMOV TAB1 WHERE IR_STAT='I' AND STATUS='80' AND LOCATION = @LOCATION AND ALLOC_REF='' GROUP BY LOCATION,TAB1.ITEM_CODE, LINE_REF) TAB1
                 LEFT JOIN (SELECT ITEM_CODE,SUM(CASE WHEN STK_QTY_VALUE=1 THEN VALUE_1 WHEN STK_QTY_VALUE=2 THEN VALUE_2 WHEN STK_QTY_VALUE=3 THEN VALUE_3 WHEN STK_QTY_VALUE=4 THEN VALUE_4 WHEN STK_QTY_VALUE=5 THEN VALUE_5 WHEN STK_QTY_VALUE=6 THEN VALUE_6 
@@ -48,13 +49,12 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Inventory
                 WHEN STK_QTY_VALUE=14 THEN VALUE_14 WHEN STK_QTY_VALUE=15 THEN VALUE_15 WHEN STK_QTY_VALUE=16 THEN VALUE_16 WHEN STK_QTY_VALUE=17 THEN VALUE_17 WHEN STK_QTY_VALUE=18 THEN VALUE_18 WHEN STK_QTY_VALUE=19 THEN VALUE_19 WHEN STK_QTY_VALUE=20 THEN VALUE_20 ELSE 0 END) HOLD_SALE, LINE_REF EXPIRE_DATE 
                 FROM {dbCode}SISODET WHERE REC_TYPE='D' AND STATUS<'80' AND CREDIT_STATUS='' AND LOCATION = @LOCATION GROUP BY ITEM_CODE,LINE_REF) TAB2 ON TAB1.ITEM_CODE=TAB2.ITEM_CODE AND TAB1.EXPIRE_DATE=TAB2.EXPIRE_DATE) TAB3 LEFT JOIN (SELECT TAB4.ITEM_CODE, TAB4.EXPIRE, TAB5.EXPIRE_ALERT FROM MB_COMPANY_PO_EXP_PRESET_DET TAB4 
                 LEFT JOIN MB_COMPANY_PO_PRESET TAB5 ON TAB4.PRESET_ID = TAB5.ID) TAB6 ON TAB3.ITEM_CODE = TAB6.ITEM_CODE LEFT JOIN SIITEMS si ON TAB3.ITEM_CODE = si.ITEM_CODE AND si.DB_CODE = @DB_CODE WHERE EXPIRE_IN >= 0 AND EXPIRE_IN <= ISNULL(TAB6.EXPIRE_ALERT, 90) AND TAB3.TOTAL_QTY > 0 ORDER BY CAST(EXPIRE_DATE AS DATE)";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                LOCATION = location                                                                         
-            };
-            var execute = await _sqlDataAccess.LoadData<InventoryExpiredModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            LOCATION = location
+        };
+        var execute = await _sqlDataAccess.LoadData<InventoryExpiredModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

@@ -1,20 +1,21 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice
-{
-    public class OpeningBalanceRepository : IOpeningBalanceRepository
-    {
-        private readonly ISqlDataAccess _sqlDataAccess;
-        private readonly IConfiguration _setting;
-        public OpeningBalanceRepository(ISqlDataAccess sqlDataAccess, IConfiguration setting)
-        {
-            _sqlDataAccess = sqlDataAccess;
-            _setting = setting;
-        }
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice;
 
-        public async Task<List<OpeningBalanceModel>> LoadItemInStockByBranItemInStockByBranchCode(string code,
-            string location)
-        {
-            var sql =
-                @$"SELECT TAB5.LOCATION,  
+public class OpeningBalanceRepository : IOpeningBalanceRepository
+{
+    private readonly ISqlDataAccess _sqlDataAccess;
+    private readonly IConfiguration _setting;
+
+    public OpeningBalanceRepository(ISqlDataAccess sqlDataAccess, IConfiguration setting)
+    {
+        _sqlDataAccess = sqlDataAccess;
+        _setting = setting;
+    }
+
+    public async Task<List<OpeningBalanceModel>> LoadItemInStockByBranItemInStockByBranchCode(string code,
+        string location)
+    {
+        var sql =
+            @$"SELECT TAB5.LOCATION,  
                                        TAB5.ITEM_CODE ItemCode,  
                                        TAB5.ITEM_DESC ItemDesc,  
                                        TAB5.UNIT_STOCK UnitStock,  
@@ -88,74 +89,74 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.ClosingInventoryAndInvoice
                                      GROUP BY LOCATION, ITEM_CODE)  
                                      AS TAB6 ON TAB5.LOCATION = TAB6.LOCATION AND TAB5.ITEM_CODE = TAB6.ITEM_CODE  
                                      WHERE TAB5.LOCATION = @LOCATION";
-            var param = new
-            {
-                DB_CODE = code,
-                LOCATION = location
-            };
-            var results = await _sqlDataAccess.LoadData<OpeningBalanceModel, dynamic>(sql, param);
-            return results.ToList();
-        }
-
-        public async Task<int> OpenClosingEntryInventoryAsync(List<OpeningBalanceModel> ls)
+        var param = new
         {
-            var affectedRows = 0;
-            var connection = new SqlConnection(_setting.GetConnectionString("DBConnection"));
-            if (connection.State == ConnectionState.Closed)
-                connection.Open();
+            DB_CODE = code,
+            LOCATION = location
+        };
+        var results = await _sqlDataAccess.LoadData<OpeningBalanceModel, dynamic>(sql, param);
+        return results.ToList();
+    }
 
-            var transaction =await connection.BeginTransactionAsync();
-            try
-            {
-                var sql =
-                    @"INSERT INTO TB_BC_OPENING_STOCK_BALANCE (DB_CODE,LOCATION,ITEM_CODE,ITEM_NAME,QUANTITY,STATUS,CREATED_DATE,CREATED_BY)
+    public async Task<int> OpenClosingEntryInventoryAsync(List<OpeningBalanceModel> ls)
+    {
+        var affectedRows = 0;
+        var connection = new SqlConnection(_setting.GetConnectionString("DBConnection"));
+        if (connection.State == ConnectionState.Closed)
+            connection.Open();
+
+        var transaction = await connection.BeginTransactionAsync();
+        try
+        {
+            var sql =
+                @"INSERT INTO TB_BC_OPENING_STOCK_BALANCE (DB_CODE,LOCATION,ITEM_CODE,ITEM_NAME,QUANTITY,STATUS,CREATED_DATE,CREATED_BY)
             VALUES (@DB_CODE,@LOCATION,@ITEM_CODE,@ITEM_NAME,@QUANTITY,@STATUS,@CREATED_DATE,@CREATED_BY)";
-                foreach (var item in ls)
+            foreach (var item in ls)
+            {
+                var param = new
                 {
-                    var param = new
+                    DB_CODE = item.DbCode,
+                    LOCATION = item.Location,
+                    ITEM_CODE = item.ItemCode,
+                    ITEM_NAME = item.ItemDesc,
+                    QUANTITY = item.Physical,
+                    STATUS = "OPB",
+                    CREATED_DATE = DateTime.Today,
+                    CREATED_BY = item.CreatedBy
+                };
+                await connection.ExecuteAsync(
+                    @"INSERT INTO TB_BC_CLOSING_ENTRY (DB_CODE,LOCATION,ITEM_CODE,OPENING_QTY,CREATED_DATE,CREATED_BY,STATUS,CLOSING_TYPE)
+			        VALUES (@DB_CODE,@LOCATION,@ITEM_CODE,@OPENING_QTY,@CREATED_DATE,@CREATED_BY,@STATUS,'Opening')",
+                    new
                     {
                         DB_CODE = item.DbCode,
                         LOCATION = item.Location,
                         ITEM_CODE = item.ItemCode,
                         ITEM_NAME = item.ItemDesc,
                         QUANTITY = item.Physical,
-                        STATUS = "OPB",
                         CREATED_DATE = DateTime.Today,
-                        CREATED_BY = item.CreatedBy
-                    };
-                    await connection.ExecuteAsync(
-                        @"INSERT INTO TB_BC_CLOSING_ENTRY (DB_CODE,LOCATION,ITEM_CODE,OPENING_QTY,CREATED_DATE,CREATED_BY,STATUS,CLOSING_TYPE)
-			        VALUES (@DB_CODE,@LOCATION,@ITEM_CODE,@OPENING_QTY,@CREATED_DATE,@CREATED_BY,@STATUS,'Opening')",
-                        new
-                        {
-                            DB_CODE = item.DbCode,
-                            LOCATION = item.Location,
-                            ITEM_CODE = item.ItemCode,
-                            ITEM_NAME = item.ItemDesc,
-                            QUANTITY = item.Physical,
-                            CREATED_DATE = DateTime.Today,
-                            CREATED_BY = item.CreatedBy,
-                            STATUS = 0,
-                        }, transaction);
+                        CREATED_BY = item.CreatedBy,
+                        STATUS = 0
+                    }, transaction);
 
-                    affectedRows += await connection.ExecuteAsync(sql, param, transaction);
-                }
-                if (ls.Count == affectedRows)
-                {
-                    await transaction.CommitAsync();
-                    return affectedRows;
-                }
-                else
-                {
-                    await transaction.RollbackAsync();
-                    return 0;
-                }
+                affectedRows += await connection.ExecuteAsync(sql, param, transaction);
             }
-            catch (Exception ex)
+
+            if (ls.Count == affectedRows)
+            {
+                await transaction.CommitAsync();
+                return affectedRows;
+            }
+            else
             {
                 await transaction.RollbackAsync();
-                throw new Exception("Error while opening inventory", ex);
+                return 0;
             }
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            throw new Exception("Error while opening inventory", ex);
         }
     }
 }

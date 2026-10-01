@@ -16,12 +16,14 @@ public static class ConfirmBalanceQueries
         @"SELECT ID Id,CONFIRM_BALANCE_OWNER ConfirmBalanceOwner,PARTICIPANTS Participants,DESCRIPTION Description,CREATED_DATE CreatedDate,CREATED_BY CreatedBy
         FROM DT_CONFIRM_ACCOUNT_RECEIVABLE
         WHERE STATUS = 'Inprogress' AND DB_CODE = @DB_CODE";
+
     public static string GetConfirmBalanceDetail =>
         $@"SELECT D.ID ConfirmBalanceDetailsId,D.CUSTOMER_CODE CustomerCode,CUS.CustomerName,CUS.Area,CUS.Market,CUS.Store,D.INVOICE_CODE InvoicedCode,INVOICE_AMOUNT InvoicedAmount,
                 D.BALANCE Balance,D.DESCRIPTION Description,D.IS_AGREE IsCustomerAgreed,UPDATED_DATE UpdatedDate,UPDATED_BY UpdatedBy,STATUS Status,D.CUSTOMER_STATUS IsMet
                 FROM DT_CONFIRM_ACCOUNT_RECEIVABLEDET D
                 LEFT JOIN GET_CUSTOMERS_BY_DB_CODE() CUS ON CUS.CustomerCode = D.CUSTOMER_CODE
                 WHERE D.DB_CODE = @DB_CODE AND D.HEADER_ID = @ID";
+
     public static string UpdateConfirmBalanceDetail =>
         $@"UPDATE DT_CONFIRM_ACCOUNT_RECEIVABLEDET SET 
             BALANCE = @BALANCE,

@@ -1,11 +1,12 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.DividingInvoices.DailyReport;
+
+public class CheckReturnInvoiceRepository(ISqlDataAccess sqlDataAccess) : ICheckReturnInvoiceRepository
 {
-    public class CheckReturnInvoiceRepository(ISqlDataAccess sqlDataAccess) : ICheckReturnInvoiceRepository
+    public async Task<List<PaymentInvoiceModel>> GetAllNewAndChangeDividedInvoiceByDate(string dbCode,
+        DateTime fromDate, DateTime toDate)
     {
-        public async Task<List<PaymentInvoiceModel>> GetAllNewAndChangeDividedInvoiceByDate(string dbCode, DateTime fromDate, DateTime toDate)
-        {
-            var sql =
-                $@"SELECT TRANSACTION_REF TransactionCode, CUSTOMER_CODE CustomerCode, ACC_NAME_KH CustomerName,ISNULL(Market,'-') Market,
+        var sql =
+            $@"SELECT TRANSACTION_REF TransactionCode, CUSTOMER_CODE CustomerCode, ACC_NAME_KH CustomerName,ISNULL(Market,'-') Market,
                 ISNULL(CASE WHEN N.STATUS = 'N' THEN '1' END, '-') NewInvoice,
                 ISNULL(CASE WHEN N.STATUS = 'C' THEN '1' END, '-') ChangeInvoice,
                 N.HEADER_TRANSACTION_VALUES InvoiceAmount,
@@ -16,14 +17,13 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Transaction.DailyPayment.Dividing
                 WHERE SI.DB_CODE = @DB_CODE AND M.DB_CODE = @DB_CODE) TAB ON TAB.ADD_CODE = N.CUSTOMER_CODE
                 WHERE D.STATUS = '1' AND N.DB_CODE = @DB_CODE AND D.DB_CODE = @DB_CODE
                 AND D.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND N.STATUS IN ('C','N');";
-            var param = new
-            {
-                DB_CODE = dbCode,
-                FROM_DATE = fromDate,
-                TO_DATE = toDate
-            };
-            var execute = await sqlDataAccess.LoadData<PaymentInvoiceModel, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode,
+            FROM_DATE = fromDate,
+            TO_DATE = toDate
+        };
+        var execute = await sqlDataAccess.LoadData<PaymentInvoiceModel, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

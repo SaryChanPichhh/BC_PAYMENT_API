@@ -1,7 +1,6 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.ReportDividedInvoice
+namespace BC.PAYMENT.APPLICATION.Interfaces.CommondityExchange.ReportDividedInvoice;
+
+public interface IReportDividedInvoiceRepository
 {
-    public interface IReportDividedInvoiceRepository
-    {
-        Task<List<ReportDividedInvoiceDto>> GetReportDividedInvoiceAsync(string dbCode,DateTime fromDate,DateTime toDate);
-    }
+    Task<List<ReportDividedInvoiceDto>> GetReportDividedInvoiceAsync(string dbCode, DateTime fromDate, DateTime toDate);
 }

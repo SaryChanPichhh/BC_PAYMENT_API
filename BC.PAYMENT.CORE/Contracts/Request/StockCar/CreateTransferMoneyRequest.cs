@@ -4,8 +4,7 @@ namespace BC.PAYMENT.CORE.Contracts.Request.StockCar;
 
 public class CreateTransferMoneyRequest
 {
-    [Required]
-    public DateTime TransactionDate { get; set; }
+    [Required] public DateTime TransactionDate { get; set; }
     public string Description { get; set; } = string.Empty;
     public int Amount { get; set; }
     public double DollarFromEmployee { get; set; }

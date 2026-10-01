@@ -14,6 +14,5 @@ public class MarketModel : BasedEntity
     public string ProvinceName { get; set; }
     public bool Status { get; set; }
     public byte[] Image { get; set; }
-    public string Other { get; set; }   
-    
+    public string Other { get; set; }
 }

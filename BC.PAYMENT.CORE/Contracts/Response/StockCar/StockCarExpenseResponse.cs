@@ -15,7 +15,21 @@ public class StockCarExpenseResponse
     public double ExchangeRate { get; set; }
     public DateTime ExpenseDate { get; set; }
 
-    public double RielFromEmployee { get => AmountRiel; set => AmountRiel = value; }
-    public double DollarFromEmployee { get => AmountDollar; set => AmountDollar = value; }
-    public double ExchangeRateEmployee { get => ExchangeRate; set => ExchangeRate = value; }
+    public double RielFromEmployee
+    {
+        get => AmountRiel;
+        set => AmountRiel = value;
+    }
+
+    public double DollarFromEmployee
+    {
+        get => AmountDollar;
+        set => AmountDollar = value;
+    }
+
+    public double ExchangeRateEmployee
+    {
+        get => ExchangeRate;
+        set => ExchangeRate = value;
+    }
 }

@@ -1,7 +1,6 @@
 ﻿namespace BC.PAYMENT.CORE.Contracts.TablesType;
 
-public record OldInvoiceTableType
-(
+public record OldInvoiceTableType(
     string DbCode,
     string Code,
     int Period,

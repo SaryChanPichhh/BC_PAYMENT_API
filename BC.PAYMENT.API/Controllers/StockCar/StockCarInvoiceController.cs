@@ -10,7 +10,8 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
 {
     [HttpGet]
     [Route("by-invoiceType")]
-    public async Task<ApiResponse<List<StockCarInvoiceResponse>>> PostSubmittedInvoiceAsync([FromQuery] int templateId,[FromQuery] InvoiceStatus invoiceStatus)
+    public async Task<ApiResponse<List<StockCarInvoiceResponse>>> PostSubmittedInvoiceAsync([FromQuery] int templateId,
+        [FromQuery] InvoiceStatus invoiceStatus)
     {
         var credential = Common.DecodeJwt(User);
         try
@@ -18,13 +19,11 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             var data = await unitOfWork.StockCarInvoice
                 .GetStockCarInvoicesByInvoiceTypeAsync(credential?.DbCode, templateId, invoiceStatus);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<StockCarInvoiceResponse>>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<StockCarInvoiceResponse>>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -38,7 +37,8 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
 
     [HttpGet]
     [Route("payment-invoices/by-template/{templateId:int}")]
-    public async Task<ApiResponse<List<PaymentInvoiceResponse>>> GetPaymentInvoicesByTemplateIdAsync([Required] int templateId)
+    public async Task<ApiResponse<List<PaymentInvoiceResponse>>> GetPaymentInvoicesByTemplateIdAsync(
+        [Required] int templateId)
     {
         var credential = Common.DecodeJwt(User);
         try
@@ -46,13 +46,11 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             var data = await unitOfWork.StockCarInvoice
                 .GetPaymentInvoicesByTemplateIdAsync(credential?.DbCode, templateId);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                     .WithMessage("data fetched successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                 .WithMessage("data fetched empty.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -63,7 +61,7 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             return GlobalExceptionHandler.ExceptionError<List<PaymentInvoiceResponse>>(ex.Message);
         }
     }
-    
+
     [HttpDelete]
     [Route("{id:int}")]
     public async Task<ApiResponse<int>> DeleteStockCarInvoiceByIdAsync([Required] int id)
@@ -74,13 +72,11 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             var affectedRow = await unitOfWork.StockCarInvoice
                 .DeleteStockCarInvoiceByIdAsync(id);
             if (affectedRow > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data deleted successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(affectedRow)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data deleted unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -91,7 +87,7 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
         }
     }
-    
+
     [HttpPost]
     [Route("")]
     public async Task<ApiResponse<int>> AddNewStockCarInvoiceASync([FromBody] CreateBcStockCarRequest request)
@@ -117,13 +113,11 @@ public class StockCarInvoiceController(IUnitOfWork unitOfWork) : BaseApiControll
             var affectedRow = await unitOfWork.StockCarInvoice
                 .AddNewStockCarInvoiceAsync(model);
             if (affectedRow > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("data added successfully.")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(affectedRow)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("data added unsuccessfully.")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)

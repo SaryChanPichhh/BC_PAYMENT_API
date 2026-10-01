@@ -113,7 +113,8 @@ public class StockCarPaymentInvoiceRepository(ISqlDataAccess sqlDataAccess) : IS
 
     public async Task<List<InvoicesPayment>> GetPaymentHistoryByInvoiceIdAsync(int invoiceId)
     {
-        const string sql = "SELECT ID Id,AMOUNT Amount,CREATED_DATE CreatedDate FROM BCSTOCK_CAR_INVOICE_PAYMENT WHERE INVOICE_ID = @InvoiceId";
+        const string sql =
+            "SELECT ID Id,AMOUNT Amount,CREATED_DATE CreatedDate FROM BCSTOCK_CAR_INVOICE_PAYMENT WHERE INVOICE_ID = @InvoiceId";
         var param = new
         {
             InvoiceId = invoiceId

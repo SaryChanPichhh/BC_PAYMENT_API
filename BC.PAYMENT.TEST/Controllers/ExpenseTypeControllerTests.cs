@@ -12,68 +12,67 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BC.PAYMENT.TEST.Controllers
+namespace BC.PAYMENT.TEST.Controllers;
+
+public class ExpenseTypeControllerTests
 {
-    public class ExpenseTypeControllerTests
+    private readonly Mock<IUnitOfWork> _mockUnitOfWork;
+    private readonly Mock<IExpenseTypeRepository> _mockRepo;
+    private readonly ExpenseTypeController _controller;
+
+    public ExpenseTypeControllerTests()
     {
-        private readonly Mock<IUnitOfWork> _mockUnitOfWork;
-        private readonly Mock<IExpenseTypeRepository> _mockRepo;
-        private readonly ExpenseTypeController _controller;
+        _mockUnitOfWork = new Mock<IUnitOfWork>();
+        _mockRepo = new Mock<IExpenseTypeRepository>();
 
-        public ExpenseTypeControllerTests()
+        _mockUnitOfWork.Setup(u => u.ExpenseTypes).Returns(_mockRepo.Object);
+
+        _controller = new ExpenseTypeController(_mockUnitOfWork.Object);
+
+        var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
         {
-            _mockUnitOfWork = new Mock<IUnitOfWork>();
-            _mockRepo = new Mock<IExpenseTypeRepository>();
+            new("DbCode", "TEST_DB"),
+            new("Username", "TEST_USER")
+        }, "mock"));
 
-            _mockUnitOfWork.Setup(u => u.ExpenseTypes).Returns(_mockRepo.Object);
-
-            _controller = new ExpenseTypeController(_mockUnitOfWork.Object);
-
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-            {
-                new Claim("DbCode", "TEST_DB"),
-                new Claim("Username", "TEST_USER")
-            }, "mock"));
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = new DefaultHttpContext { User = user }
-            };
-        }
-
-        [Fact]
-        public async Task CreateExpenseType_ShouldReturnCreated_WhenSuccessful()
+        _controller.ControllerContext = new ControllerContext
         {
-            var request = new CreateExpenseTypeRequest { ExpenseName = "Fuel" };
-            _mockRepo.Setup(r => r.CreateExpenseType(It.IsAny<ExpenseType>())).ReturnsAsync(true);
+            HttpContext = new DefaultHttpContext { User = user }
+        };
+    }
 
-            var result = await _controller.CreateExpenseType(request);
+    [Fact]
+    public async Task CreateExpenseType_ShouldReturnCreated_WhenSuccessful()
+    {
+        var request = new CreateExpenseTypeRequest { ExpenseName = "Fuel" };
+        _mockRepo.Setup(r => r.CreateExpenseType(It.IsAny<ExpenseType>())).ReturnsAsync(true);
 
-            Assert.Equal((int)HttpStatusCode.Created, result.StatusCode);
-            Assert.Equal("Fuel", result.Result.ExpenseName);
-        }
+        var result = await _controller.CreateExpenseType(request);
 
-        [Fact]
-        public async Task UpdateExpenseType_ShouldReturnOk_WhenSuccessful()
-        {
-            var request = new UpdateExpenseTypeRequest { ExpenseName = "Updated" };
-            _mockRepo.Setup(r => r.UpdateExpenseType(It.IsAny<ExpenseType>())).ReturnsAsync(true);
+        Assert.Equal((int)HttpStatusCode.Created, result.StatusCode);
+        Assert.Equal("Fuel", result.Result.ExpenseName);
+    }
 
-            var result = await _controller.UpdateExpenseType("E01", request);
+    [Fact]
+    public async Task UpdateExpenseType_ShouldReturnOk_WhenSuccessful()
+    {
+        var request = new UpdateExpenseTypeRequest { ExpenseName = "Updated" };
+        _mockRepo.Setup(r => r.UpdateExpenseType(It.IsAny<ExpenseType>())).ReturnsAsync(true);
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.Equal("Updated", result.Result.ExpenseName);
-        }
+        var result = await _controller.UpdateExpenseType("E01", request);
 
-        [Fact]
-        public async Task DeleteExpenseType_ShouldReturnOk_WhenSuccessful()
-        {
-            _mockRepo.Setup(r => r.DeleteExpenseType("E01")).ReturnsAsync(true);
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal("Updated", result.Result.ExpenseName);
+    }
 
-            var result = await _controller.DeleteExpenseType("E01");
+    [Fact]
+    public async Task DeleteExpenseType_ShouldReturnOk_WhenSuccessful()
+    {
+        _mockRepo.Setup(r => r.DeleteExpenseType("E01")).ReturnsAsync(true);
 
-            Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
-            Assert.True(result.Result);
-        }
+        var result = await _controller.DeleteExpenseType("E01");
+
+        Assert.Equal((int)HttpStatusCode.OK, result.StatusCode);
+        Assert.True(result.Result);
     }
 }

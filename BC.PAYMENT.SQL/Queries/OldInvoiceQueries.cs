@@ -3,22 +3,33 @@ namespace BC.PAYMENT.SQL.Queries;
 public static class OldInvoiceQueries
 {
     public const string SelectOldInv = "PM_SELECT_OLDINV";
-    public static string SelectAging(string dbCode) => $"{dbCode}PM_SELECT_AGING";
+
+    public static string SelectAging(string dbCode)
+    {
+        return $"{dbCode}PM_SELECT_AGING";
+    }
+
     public const string InsertOldInvoice = "INSERT_OLD_INVOICE";
-    public const string RecreateOldInvoice = @"IF EXISTS(SELECT * FROM OLD_INVOICE WHERE CODE = @CODE AND DB_CODE = @DB_CODE AND CREATE_DATE = CONVERT(DATE, GETDATE()))
+
+    public const string RecreateOldInvoice =
+        @"IF EXISTS(SELECT * FROM OLD_INVOICE WHERE CODE = @CODE AND DB_CODE = @DB_CODE AND CREATE_DATE = CONVERT(DATE, GETDATE()))
 	                        INSERT INTO NEW_INVOICE(DB_CODE, TRANSACTION_REF, CUSTOMER_CODE, ACC_NAME_KH, HEADER_TRANSACTION_VALUES,
 	                        STATUS, CREATED_DATE, CREATED_BY, IS_DIVIDED,ENTRIES_CODE) 
 	                        SELECT DB_CODE,  CODE,  CUSTOMER_CODE, ACC_NAME_KH, MONEY, 'O', CONVERT(DATE, GETDATE()), @USER_CREATED, 1, @ENTRIES_CODE 
 	                        FROM OLD_INVOICE WHERE CODE = @CODE AND DB_CODE = @DB_CODE AND STATUS = 1 AND CREATE_DATE = CONVERT(DATE, GETDATE()) 
                         IF @@ROWCOUNT > 0 
 	                        UPDATE OLD_INVOICE SET STATUS = 0 WHERE CODE = @CODE AND CREATE_DATE = CONVERT(DATE, GETDATE());";
-    public const string GetOldInvoiceByInvoiceCode= @"  SELECT ID InvoiceId, CODE TransactionCode, CUSTOMER_CODE CustomerCode, ACC_NAME_KH CustomerName, MONEY InvoiceValue, EMPLOYEE AnalysisT0, ISNULL(STORE, '-') 
+
+    public const string GetOldInvoiceByInvoiceCode =
+        @"  SELECT ID InvoiceId, CODE TransactionCode, CUSTOMER_CODE CustomerCode, ACC_NAME_KH CustomerName, MONEY InvoiceValue, EMPLOYEE AnalysisT0, ISNULL(STORE, '-') 
                Store, ISNULL(MARKET_KHMER_NAME, '-') Market, STATUS Status FROM(SELECT ID, CODE, CUSTOMER_CODE, ACC_NAME_KH, MONEY, ISNULL(LAST_NAME + ' ' + FIRST_NAME, EMPLOYEE)[EMPLOYEE],
                O.STATUS FROM OLD_INVOICE O LEFT JOIN BCUSERS S ON CONVERT(varchar, S.USER_ID) = O.EMPLOYEE WHERE DB_CODE = @DB_CODE AND O.CREATE_DATE = CONVERT(DATE, GETDATE()) AND CODE = @CODE)
                TAB1 LEFT JOIN(SELECT ADD_CODE, STORE, MARKET_KHMER_NAME FROM SIADD C INNER JOIN TB_BCMARKET M ON M.MARKET_ID = C.MARKET_ID WHERE STORE
                IS NOT NULL AND M.DB_CODE = @DB_CODE AND C.DB_CODE = @DB_CODE) TAB2
                ON TAB2.ADD_CODE = TAB1.CUSTOMER_CODE";
-    public const string UpdateStatus = @"UPDATE OLD_INVOICE SET IS_VERIFY = 0 WHERE CODE = @CODE AND DB_CODE = @DB_CODE AND CREATE_DATE = CONVERT(DATE,GETDATE())";
-    public const string DeleteOldInvoiceById = @"DELETE FROM OLD_INVOICE WHERE ID = @ID";
 
+    public const string UpdateStatus =
+        @"UPDATE OLD_INVOICE SET IS_VERIFY = 0 WHERE CODE = @CODE AND DB_CODE = @DB_CODE AND CREATE_DATE = CONVERT(DATE,GETDATE())";
+
+    public const string DeleteOldInvoiceById = @"DELETE FROM OLD_INVOICE WHERE ID = @ID";
 }

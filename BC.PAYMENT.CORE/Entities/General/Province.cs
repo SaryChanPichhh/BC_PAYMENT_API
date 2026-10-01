@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.CORE.Entities.General
+namespace BC.PAYMENT.CORE.Entities.General;
+
+public class Province
 {
-    public class Province
-    {
-        public int ProvinceId { get; set; }
-        public string? ProvinceName { get; set; }
-    }
+    public int ProvinceId { get; set; }
+    public string? ProvinceName { get; set; }
 }

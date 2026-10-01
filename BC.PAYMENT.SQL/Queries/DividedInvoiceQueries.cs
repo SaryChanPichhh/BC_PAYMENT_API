@@ -42,7 +42,8 @@ public static class DividedInvoiceQueries
                  WHERE P.CREATE_DATE = @DATE AND P.DB_CODE = @DB_CODE
                  GROUP BY DELIVERIES_NAME";
 
-    public static string GetDividedInvoiceDetail => $@"SELECT TRANSACTION_REF TransactionCode, CUSTOMER_CODE CustomerCode, ACC_NAME_KH CustomerName,ISNULL(Market,'-')Market,
+    public static string GetDividedInvoiceDetail =>
+        $@"SELECT TRANSACTION_REF TransactionCode, CUSTOMER_CODE CustomerCode, ACC_NAME_KH CustomerName,ISNULL(Market,'-')Market,
         ISNULL(CASE WHEN N.STATUS = 'N' THEN '1' END, '-') NewInvoice,
         ISNULL(CASE WHEN N.STATUS = 'C' THEN '1' END, '-') ChangeInvoice,
         N.HEADER_TRANSACTION_VALUES InvoiceValue,
@@ -54,7 +55,8 @@ public static class DividedInvoiceQueries
         WHERE D.STATUS = '1' AND N.DB_CODE = @DB_CODE AND D.DB_CODE = @DB_CODE
         AND D.CREATE_DATE BETWEEN @FROM_DATE AND @TO_DATE AND N.STATUS IN ('C','N');";
 
-    public static string GetDividedInvoiceStatus => $@"SELECT D.DIVIDED_INVOICE_ID DividedId,D.CREATE_DATE Date,Store,DL.DELIVERIES_KHMER DeliveryName, N.CUSTOMER_CODE CustomerCode,CUST.CUSTOMER_NAME CustomerName,
+    public static string GetDividedInvoiceStatus =>
+        $@"SELECT D.DIVIDED_INVOICE_ID DividedId,D.CREATE_DATE Date,Store,DL.DELIVERIES_KHMER DeliveryName, N.CUSTOMER_CODE CustomerCode,CUST.CUSTOMER_NAME CustomerName,
                 MARKET Market,AREA Area,N.TRANSACTION_REF TransactionCode,N.HEADER_TRANSACTION_VALUES InvoiceValue,CONVERT(BIT,CASE WHEN R.RETURN_ID IS NOT NULL THEN 1 ELSE 0 END) IsReturn,
                 CONVERT(BIT,CASE WHEN P.PAYMENT_ID IS NOT NULL THEN 1 ELSE 0 END) IsPaid,R.[DESCRIPTION] Description,P.AMOUNT PaidAmount,N.[STATUS] Status
                 FROM NEW_INVOICE N INNER JOIN PC_DIVIDED_INVOICE D ON D.INVOICE_ID = N.ID

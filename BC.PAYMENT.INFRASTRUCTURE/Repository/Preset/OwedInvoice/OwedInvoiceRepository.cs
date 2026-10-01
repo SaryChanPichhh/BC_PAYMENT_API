@@ -1,23 +1,24 @@
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.OwedInvoice
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.OwedInvoice;
+
+public class OwedInvoiceRepository : IOwedInvoiceRepository
 {
-    public class OwedInvoiceRepository : IOwedInvoiceRepository
+    private readonly ISqlDataAccess _sqlDataAccess;
+
+    public OwedInvoiceRepository(ISqlDataAccess sqlDataAccess)
     {
-        private readonly ISqlDataAccess _sqlDataAccess;
+        _sqlDataAccess = sqlDataAccess;
+    }
 
-        public OwedInvoiceRepository(ISqlDataAccess sqlDataAccess)
+    public async Task<List<SummaryAccountsReceivableModel>> GetAccountReceivableSummaries(
+        Dictionary<string, string> dbCodes, int page, int pageSize)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 1;
+        var offSet = (page - 1) * pageSize;
+        List<SummaryAccountsReceivableModel> accountsReceivableModels = new();
+        foreach (var dbCode in dbCodes)
         {
-            _sqlDataAccess = sqlDataAccess;
-        }
-
-        public async Task<List<SummaryAccountsReceivableModel>> GetAccountReceivableSummaries(Dictionary<string, string> dbCodes,int page,int pageSize)
-        {
-            if (page < 1) page = 1;
-            if (pageSize < 1) pageSize = 1;
-            var offSet = (page - 1) * pageSize;
-            List<SummaryAccountsReceivableModel> accountsReceivableModels = new();
-            foreach (var dbCode in dbCodes)
-            {
-                var sql = @$"IF @T=''
+            var sql = @$"IF @T=''
             BEGIN
                 SELECT N'{dbCode.Value}' Code,TAB.Reference TransactionCode, TAB.[Account Code] CustomerCode, CUS.[CustomerName] CustomerName, CUS.Area, CUS.Market, CUS.Store, TAB.Amount_Total InvoiceValue, [Analysis T0] AnalysisT0, U.username,
                     [Transaction Date] TransactionDate
@@ -233,37 +234,38 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.OwedInvoice
                     LEFT JOIN GET_CUSTOMERS_BY_DB_CODE() CUS ON CUS.CustomerCode = TAB.[Account Code]
                 WHERE [Amount_Total] >= 0 
             END";
-                var param = new
-                {
-                    DB_CODE = dbCode.Key,
-                    BY_DATE = "",
-                    ACC_TYPE = "D",
-                    T = "",
-                    FROM_ANAL = "",
-                    TO_ANAL = "",
-                    T0 = "%",
-                    T1 = "%",
-                    T2 = "%",
-                    T3 = "%",
-                    T4 = "%",
-                    T5 = "%",
-                    T6 = "%",
-                    T7 = "%",
-                    T8 = "%",
-                    T9 = "%",
-                };
-                var results = (await _sqlDataAccess.LoadData<SummaryAccountsReceivableModel,dynamic>(sql, param)).ToList();
-                if (results.Count > 0) accountsReceivableModels.AddRange(results);
-            }
-            return accountsReceivableModels;
+            var param = new
+            {
+                DB_CODE = dbCode.Key,
+                BY_DATE = "",
+                ACC_TYPE = "D",
+                T = "",
+                FROM_ANAL = "",
+                TO_ANAL = "",
+                T0 = "%",
+                T1 = "%",
+                T2 = "%",
+                T3 = "%",
+                T4 = "%",
+                T5 = "%",
+                T6 = "%",
+                T7 = "%",
+                T8 = "%",
+                T9 = "%"
+            };
+            var results = (await _sqlDataAccess.LoadData<SummaryAccountsReceivableModel, dynamic>(sql, param)).ToList();
+            if (results.Count > 0) accountsReceivableModels.AddRange(results);
         }
 
-        public async Task<List<OwedInvoiceDto>> GetAccountReceivableAmount(Dictionary<string, string> dbCodes)
+        return accountsReceivableModels;
+    }
+
+    public async Task<List<OwedInvoiceDto>> GetAccountReceivableAmount(Dictionary<string, string> dbCodes)
+    {
+        var owedInvoice = new List<OwedInvoiceDto>();
+        foreach (var dbCode in dbCodes)
         {
-            var owedInvoice = new List<OwedInvoiceDto>();
-            foreach (var dbCode in dbCodes)
-            {
-                var sql = @$"IF @T=''
+            var sql = @$"IF @T=''
             BEGIN
                 SELECT SUM(TAB.Amount_Total) Amount
                 FROM (
@@ -478,31 +480,31 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Preset.OwedInvoice
                     LEFT JOIN GET_CUSTOMERS_BY_DB_CODE() CUS ON CUS.CustomerCode = TAB.[Account Code]
                 WHERE [Amount_Total] >= 0
             END";
-                var param = new
-                {
-                    DB_CODE = dbCode.Key,
-                    BY_DATE = "",
-                    ACC_TYPE = "D",
-                    T = "",
-                    FROM_ANAL = "",
-                    TO_ANAL = "",
-                    T0 = "%",
-                    T1 = "%",
-                    T2 = "%",
-                    T3 = "%",
-                    T4 = "%",
-                    T5 = "%",
-                    T6 = "%",
-                    T7 = "%",
-                    T8 = "%",
-                    T9 = "%",
-                };
-                var execute = await _sqlDataAccess.LoadSingleData<OwedInvoiceDto, dynamic>(sql,param);
-                execute.BranchCode = dbCode.Key;
-                execute.BranchName = dbCode.Value;
-                owedInvoice.Add(execute);
-            }
-            return owedInvoice;
+            var param = new
+            {
+                DB_CODE = dbCode.Key,
+                BY_DATE = "",
+                ACC_TYPE = "D",
+                T = "",
+                FROM_ANAL = "",
+                TO_ANAL = "",
+                T0 = "%",
+                T1 = "%",
+                T2 = "%",
+                T3 = "%",
+                T4 = "%",
+                T5 = "%",
+                T6 = "%",
+                T7 = "%",
+                T8 = "%",
+                T9 = "%"
+            };
+            var execute = await _sqlDataAccess.LoadSingleData<OwedInvoiceDto, dynamic>(sql, param);
+            execute.BranchCode = dbCode.Key;
+            execute.BranchName = dbCode.Value;
+            owedInvoice.Add(execute);
         }
+
+        return owedInvoice;
     }
 }

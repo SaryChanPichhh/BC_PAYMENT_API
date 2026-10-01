@@ -1,43 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Datasources\" />
-    <Folder Include="Dtos\" />
-    <Folder Include="Services\AR\" />
-  </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Datasources\"/>
+        <Folder Include="Dtos\"/>
+        <Folder Include="Services\AR\"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Views\Home\Designer.cshtml" />
-    <None Include="Views\Home\Index.cshtml" />
-    <None Include="Views\Home\Login.cshtml" />
-    <None Include="Views\Home\Viewer.cshtml" />
-    <None Include="Views\Shared\_Layout.cshtml" />
-    <None Include="Views\_ViewImports.cshtml" />
-    <None Include="Views\_ViewStart.cshtml" />
-    <None Include="wwwroot\js\site.js" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="Views\Home\Designer.cshtml"/>
+        <None Include="Views\Home\Index.cshtml"/>
+        <None Include="Views\Home\Login.cshtml"/>
+        <None Include="Views\Home\Viewer.cshtml"/>
+        <None Include="Views\Shared\_Layout.cshtml"/>
+        <None Include="Views\_ViewImports.cshtml"/>
+        <None Include="Views\_ViewStart.cshtml"/>
+        <None Include="wwwroot\js\site.js"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="DevExpress.AspNetCore.Common.v24.2.7">
-      
-    </Reference>
-  </ItemGroup>
+    <ItemGroup>
+        <Reference Include="DevExpress.AspNetCore.Common.v24.2.7">
 
-  <ItemGroup>
-    <PackageReference Include="DevExpress.AspNetCore.Reporting" Version="24.2.7" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
-  </ItemGroup>
+        </Reference>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BC.PAYMENT.INFRASTRUCTURE\BC.PAYMENT.INFRASTRUCTURE.csproj" />
-    <ProjectReference Include="..\BC.PAYMENT.REPORT\BC.PAYMENT.REPORT.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="DevExpress.AspNetCore.Reporting" Version="24.2.7"/>
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BC.PAYMENT.INFRASTRUCTURE\BC.PAYMENT.INFRASTRUCTURE.csproj"/>
+        <ProjectReference Include="..\BC.PAYMENT.REPORT\BC.PAYMENT.REPORT.csproj"/>
+    </ItemGroup>
 
 </Project>

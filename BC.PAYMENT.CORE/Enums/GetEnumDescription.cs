@@ -1,14 +1,13 @@
-namespace BC.PAYMENT.CORE.Enums
+namespace BC.PAYMENT.CORE.Enums;
+
+public static class GetEnumDescription
 {
-    public static class GetEnumDescription
+    public static string GetDescription(this Enum value)
     {
-        public static string GetDescription(this Enum value)
-        {
-            var field = value.GetType().GetField(value.ToString());
+        var field = value.GetType().GetField(value.ToString());
 
-            var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
+        var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
 
-            return attribute?.Description ?? value.ToString();
-        }
+        return attribute?.Description ?? value.ToString();
     }
 }

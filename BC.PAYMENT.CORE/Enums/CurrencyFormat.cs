@@ -1,10 +1,7 @@
-namespace BC.PAYMENT.CORE.Enums
+namespace BC.PAYMENT.CORE.Enums;
+
+public enum CurrencyFormat
 {
-    public enum CurrencyFormat
-    {
-        [Description("KHR")]
-        KHR,
-        [Description("USD")]
-        USD,
-    }
+    [Description("KHR")] KHR,
+    [Description("USD")] USD
 }

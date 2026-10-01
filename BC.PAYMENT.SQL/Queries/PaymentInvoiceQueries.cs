@@ -3,14 +3,19 @@ namespace BC.PAYMENT.SQL.Queries;
 public static class PaymentInvoiceQueries
 {
     public const string SavePaymentInvoice = $@"SAVE_PAYMENT_INVOICE";
-    public static string IsExistsHeaderId => $@"SELECT CAST(COUNT(*) AS BIT) IsExists FROM PAYMENT_INVOICE_HEADER WHERE INVOICE_DIVIDEND_DATE = @INVOICE_DIVIDEND_DATE AND DELIVERY_ID = @DELIVERY_ID
+
+    public static string IsExistsHeaderId =>
+        $@"SELECT CAST(COUNT(*) AS BIT) IsExists FROM PAYMENT_INVOICE_HEADER WHERE INVOICE_DIVIDEND_DATE = @INVOICE_DIVIDEND_DATE AND DELIVERY_ID = @DELIVERY_ID
             AND DB_CODE = @DB_CODE;";
 
-    public const string CreatePaymentHeader = @"INSERT INTO PAYMENT_INVOICE_HEADER(DB_CODE,DELIVERY_ID,P_PERIOD,ENTRIES_CODE,CREATED_DATE,CREATED_BY,P_STATE,INVOICE_DIVIDEND_DATE)
+    public const string CreatePaymentHeader =
+        @"INSERT INTO PAYMENT_INVOICE_HEADER(DB_CODE,DELIVERY_ID,P_PERIOD,ENTRIES_CODE,CREATED_DATE,CREATED_BY,P_STATE,INVOICE_DIVIDEND_DATE)
             OUTPUT INSERTED.ID
             VALUES(@DB_CODE,@DELIVERY_ID,@PERIOD,@ENTRIES_CODE,@CREATED_DATE,@CREATED_BY,@STATUS,@INVOICE_DIVIDEND_DATE)";
 
-    public const string GetPaymentHeaderId = @"SELECT ID FROM PAYMENT_INVOICE_HEADER WHERE DB_CODE = @DB_CODE AND DELIVERY_ID = @DELIVERY_ID AND INVOICE_DIVIDEND_DATE = @INVOICE_DIVIDEND_DATE";
+    public const string GetPaymentHeaderId =
+        @"SELECT ID FROM PAYMENT_INVOICE_HEADER WHERE DB_CODE = @DB_CODE AND DELIVERY_ID = @DELIVERY_ID AND INVOICE_DIVIDEND_DATE = @INVOICE_DIVIDEND_DATE";
+
     public static string CreateBcPaymentDetail => @$"BEGIN TRANSACTION;
                 IF EXISTS
                 (
@@ -25,14 +30,18 @@ public static class PaymentInvoiceQueries
                 END
                 COMMIT TRANSACTION;";
 
-    public const string CreatePaymentInvoice = @"IF NOT EXISTS (SELECT 1 FROM PC_PAYMENT_INVOICE WHERE DB_CODE = @DB_CODE AND DIVDIE_INVOICE_ID = @DIVIDED_ID)
+    public const string CreatePaymentInvoice =
+        @"IF NOT EXISTS (SELECT 1 FROM PC_PAYMENT_INVOICE WHERE DB_CODE = @DB_CODE AND DIVDIE_INVOICE_ID = @DIVIDED_ID)
             BEGIN
                 INSERT INTO PC_PAYMENT_INVOICE(DB_CODE, DIVDIE_INVOICE_ID, PAYMENT_HEADER_ID, AMOUNT, CREATE_BY, CREATED_DATE, STATUS)
                 VALUES(@DB_CODE, @DIVIDED_ID, @PAYMENT_HEADER_ID, @AMOUNT, @CREATED_BY, @CREATED_DATE, '1');
             END
             UPDATE PC_DIVIDED_INVOICE SET STATUS = '0' WHERE DIVIDED_INVOICE_ID = @DIVIDED_ID AND DB_CODE = @DB_CODE;";
 
-    public static string GetPaymentInvoiceDetail(string criteria,string addOnFields = "",string addOnGroupBy="",string addReference="",string sortBy = "ORDER BY N.CUSTOMER_CODE") => @$"
+    public static string GetPaymentInvoiceDetail(string criteria, string addOnFields = "", string addOnGroupBy = "",
+        string addReference = "", string sortBy = "ORDER BY N.CUSTOMER_CODE")
+    {
+        return @$"
         SELECT P.DB_CODE DbCode, P.INVOICE_ID InvoiceId, D.DELIVERIES_KHMER DeliveryName, PAID.PAYMENT_ID PaymentId,
         P.DIVIDED_INVOICE_ID DividedId, N.CUSTOMER_CODE CustomerCode, N.ACC_NAME_KH CustomerName,
         N.TRANSACTION_REF InvoiceCode, 1.00 AS Amount,N.HEADER_TRANSACTION_VALUES InvoiceValue,
@@ -48,6 +57,7 @@ public static class PaymentInvoiceQueries
         N.ACC_NAME_KH,N.TRANSACTION_REF,N.HEADER_TRANSACTION_VALUES,
         P.DIVIDED_INVOICE_ID, PAID.PAYMENT_ID, PAID.AMOUNT,
         PAID.PAYMENT_ID, P.DIVIDED_INVOICE_ID {addOnGroupBy} {sortBy};";
+    }
 
     public const string DeletePaymentInvoice = @"
         DELETE FROM PC_PAYMENT_INVOICE WHERE PAYMENT_ID = @PAYMENT_ID;
@@ -57,7 +67,9 @@ public static class PaymentInvoiceQueries
                 UPDATE PC_DIVIDED_INVOICE SET STATUS = 1 WHERE DIVIDED_INVOICE_ID = @DII;
         END;";
 
-    public static string GetBcPaymentDetail(string condition) => @$"
+    public static string GetBcPaymentDetail(string condition)
+    {
+        return @$"
         SELECT ID Id,
             DB_CODE AS DbCode,
             DELIVERYID AS DeliveryId,
@@ -79,4 +91,5 @@ public static class PaymentInvoiceQueries
         WHERE DB_CODE = @DB_CODE
           {condition}
         ORDER BY CREATED_DATE DESC;";
+    }
 }

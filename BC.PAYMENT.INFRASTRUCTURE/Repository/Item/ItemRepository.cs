@@ -2,13 +2,13 @@ using BC.PAYMENT.CORE.Contracts.Response.Item;
 using BC.PAYMENT.CORE.Entities;
 using ItemDto = BC.PAYMENT.CORE.Contracts.Items.ItemDto;
 
-namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Item
+namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Item;
+
+public class ItemRepository(ISqlDataAccess sqlDataAccess) : IItemRepository
 {
-    public class ItemRepository(ISqlDataAccess sqlDataAccess) : IItemRepository
+    public async Task<List<ItemResponse>> GetItemListAsync(string dbCode)
     {
-        public async Task<List<ItemResponse>> GetItemListAsync(string dbCode)
-        {
-            var sql = $@"SELECT DB_CODE        AS DbCode
+        var sql = $@"SELECT DB_CODE        AS DbCode
           ,ITEM_CODE       AS ItemCode
           ,ITEM_BCODE      AS ItemBarcode
           ,ITEM_DESC       AS ItemDesc
@@ -42,12 +42,11 @@ namespace BC.PAYMENT.INFRASTRUCTURE.Repository.Item
           ,USER_UPDT       AS UserUpdated
           ,USER_CODE       AS UserCode
           ,IMG             AS Img FROM SIITEMS WHERE DB_CODE = @DB_CODE AND ITEM_STAT = 'A';";
-            var param = new
-            {
-                DB_CODE = dbCode,
-            };
-            var execute = await sqlDataAccess.LoadData<ItemResponse, dynamic>(sql, param);
-            return execute.ToList();
-        }
+        var param = new
+        {
+            DB_CODE = dbCode
+        };
+        var execute = await sqlDataAccess.LoadData<ItemResponse, dynamic>(sql, param);
+        return execute.ToList();
     }
 }

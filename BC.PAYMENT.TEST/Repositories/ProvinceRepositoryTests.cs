@@ -8,78 +8,79 @@ using System.Data;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace BC.PAYMENT.TEST.Repositories.Prepare.Preset
+namespace BC.PAYMENT.TEST.Repositories.Prepare.Preset;
+
+public class ProvinceRepositoryTests
 {
-    public class ProvinceRepositoryTests
+    private readonly Mock<ISqlDataAccess> _mockSqlDataAccess;
+    private readonly ProvinceRepository _repository;
+
+    public ProvinceRepositoryTests()
     {
-        private readonly Mock<ISqlDataAccess> _mockSqlDataAccess;
-        private readonly ProvinceRepository _repository;
+        _mockSqlDataAccess = new Mock<ISqlDataAccess>();
+        _repository = new ProvinceRepository(_mockSqlDataAccess.Object);
+    }
 
-        public ProvinceRepositoryTests()
-        {
-            _mockSqlDataAccess = new Mock<ISqlDataAccess>();
-            _repository = new ProvinceRepository(_mockSqlDataAccess.Object);
-        }
+    [Fact]
+    public async Task AddNewAsync_ExecutesSuccessfully()
+    {
+        var model = new ProvinceModel { Province = "Test Province" };
+        _mockSqlDataAccess
+            .Setup(db => db.ExecuteAsync<object>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+            .ReturnsAsync(1);
 
-        [Fact]
-        public async Task AddNewAsync_ExecutesSuccessfully()
-        {
-            var model = new ProvinceModel { Province = "Test Province" };
-            _mockSqlDataAccess
-                .Setup(db => db.ExecuteAsync<object>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
-                .ReturnsAsync(1);
+        var result = await _repository.AddNewAsync(model);
 
-            var result = await _repository.AddNewAsync(model);
+        Assert.True(result >= 0);
+    }
 
-            Assert.True(result >= 0);
-        }
+    [Fact]
+    public async Task UpdateAsync_ExecutesSuccessfully()
+    {
+        var model = new ProvinceModel { ProvinceId = 1, Province = "Test Province Updated" };
+        _mockSqlDataAccess
+            .Setup(db => db.ExecuteAsync<object>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+            .ReturnsAsync(1);
 
-        [Fact]
-        public async Task UpdateAsync_ExecutesSuccessfully()
-        {
-            var model = new ProvinceModel { ProvinceId = 1, Province = "Test Province Updated" };
-            _mockSqlDataAccess
-                .Setup(db => db.ExecuteAsync<object>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
-                .ReturnsAsync(1);
+        var result = await _repository.UpdateAsync(model);
 
-            var result = await _repository.UpdateAsync(model);
+        Assert.True(result >= 0);
+    }
 
-            Assert.True(result >= 0);
-        }
+    [Fact]
+    public async Task DeleteAsync_ExecutesSuccessfully()
+    {
+        _mockSqlDataAccess
+            .Setup(db => db.ExecuteAsync<object>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
+            .ReturnsAsync(1);
 
-        [Fact]
-        public async Task DeleteAsync_ExecutesSuccessfully()
-        {
-            _mockSqlDataAccess
-                .Setup(db => db.ExecuteAsync<object>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
-                .ReturnsAsync(1);
+        var result = await _repository.DeleteAsync("1");
 
-            var result = await _repository.DeleteAsync("1");
+        Assert.True(result >= 0);
+    }
 
-            Assert.True(result >= 0);
-        }
+    [Fact]
+    public async Task GetAllProvinces_ReturnsData()
+    {
+        var mockData = new List<ProvinceResponse> { new() };
+        _mockSqlDataAccess
+            .Setup(db =>
+                db.LoadData<ProvinceResponse, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text,
+                    "Default"))
+            .ReturnsAsync(mockData);
 
-        [Fact]
-        public async Task GetAllProvinces_ReturnsData()
-        {
-            var mockData = new List<ProvinceResponse> { new ProvinceResponse() };
-            _mockSqlDataAccess
-                .Setup(db => db.LoadData<ProvinceResponse, dynamic>(It.IsAny<string>(), It.IsAny<object>(), CommandType.Text, "Default"))
-                .ReturnsAsync(mockData);
+        var result = await _repository.GetAllProvinces();
 
-            var result = await _repository.GetAllProvinces();
+        Assert.NotNull(result);
+        Assert.Single(result);
+    }
 
-            Assert.NotNull(result);
-            Assert.Single(result);
-        }
+    [Fact]
+    public async Task GetAsync_ReturnsEmptyList()
+    {
+        var result = await _repository.GetAsync("DB01");
 
-        [Fact]
-        public async Task GetAsync_ReturnsEmptyList()
-        {
-            var result = await _repository.GetAsync("DB01");
-
-            Assert.NotNull(result);
-            Assert.Empty(result);
-        }
+        Assert.NotNull(result);
+        Assert.Empty(result);
     }
 }

@@ -22,6 +22,7 @@
         min-height: calc(100vh - 100px); /* Adjust for layout header/footer */
         padding: 20px;
     }
+
     .login-box {
         background: #ffffff;
         border-radius: 16px;
@@ -66,27 +67,27 @@
         <form id="loginForm">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
-                <input class="form-control" id="username" required />
+                <input class="form-control" id="username" required/>
             </div>
 
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input class="form-control" id="password" type="password" required />
+                <input class="form-control" id="password" type="password" required/>
             </div>
 
             <div class="mb-3">
                 <label for="companyCode" class="form-label">Company Code</label>
-                <input class="form-control" id="companyCode" required />
+                <input class="form-control" id="companyCode" required/>
             </div>
 
             <div class="mb-3">
                 <label for="appCode" class="form-label">App Code</label>
-                <input class="form-control" id="appCode" required />
+                <input class="form-control" id="appCode" required/>
             </div>
 
             <div class="mb-3">
                 <label for="dbCode" class="form-label">DB Code</label>
-                <input class="form-control" id="dbCode" required />
+                <input class="form-control" id="dbCode" required/>
             </div>
 
             <div class="error-msg" id="errorMessage"></div>
@@ -95,6 +96,7 @@
         </form>
     </div>
 </div>
+
 @section Scripts {
     <script>
         document.getElementById("loginForm").addEventListener("submit", async function (e) {
@@ -110,7 +112,7 @@
 
             const response = await fetch("/credentials", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(payload)
             });
 

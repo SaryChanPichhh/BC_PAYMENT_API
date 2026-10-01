@@ -33,14 +33,12 @@ public class SubmitExpenseController(IUnitOfWork unitOfWork) : BaseApiController
 
             var affectedRow = await unitOfWork.SubmitExpense.AddNewSubmitExpense(detail);
             if (affectedRow > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("Submit expense added successfully")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithSuccess(true)
                     .WithResult(affectedRow)
                     .Build();
-            }
 
             return ApiResponse<int>.Builder()
                 .WithMessage("Submit expense added unsuccessfully")
@@ -54,23 +52,24 @@ public class SubmitExpenseController(IUnitOfWork unitOfWork) : BaseApiController
             return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
         }
     }
+
     [HttpGet]
     [Route("by-date")]
-    public async Task<ApiResponse<List<SubmitExpenseDetailResponse>>> GetSubmitExpenseDetailByDateAsync([FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
+    public async Task<ApiResponse<List<SubmitExpenseDetailResponse>>> GetSubmitExpenseDetailByDateAsync(
+        [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
     {
         var credential = Common.DecodeJwt(User);
         try
         {
-            var data = await unitOfWork.SubmitExpense.GetSubmitExpenseDetailByDateAsync(credential?.DbCode,fromDate, toDate);
+            var data = await unitOfWork.SubmitExpense.GetSubmitExpenseDetailByDateAsync(credential?.DbCode, fromDate,
+                toDate);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<SubmitExpenseDetailResponse>>.Builder()
                     .WithMessage("Submit expense added successfully")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithSuccess(true)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<SubmitExpenseDetailResponse>>.Builder()
                 .WithMessage("Submit expense added unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -81,25 +80,26 @@ public class SubmitExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         catch (Exception ex)
         {
             return GlobalExceptionHandler.ExceptionError<List<SubmitExpenseDetailResponse>>(ex.Message);
-        }                    
+        }
     }
+
     [HttpGet]
     [Route("approved-expense-by-date")]
-    public async Task<ApiResponse<List<ApprovedSubmitExpenseDetailResponse>>> GetApprovedExpenseDetailByDateAsync([FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
+    public async Task<ApiResponse<List<ApprovedSubmitExpenseDetailResponse>>> GetApprovedExpenseDetailByDateAsync(
+        [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
     {
         var credential = Common.DecodeJwt(User);
         try
         {
-            var data = await unitOfWork.SubmitExpense.GetApprovedExpenseDetailByDateAsync(credential?.DbCode,fromDate, toDate);
+            var data = await unitOfWork.SubmitExpense.GetApprovedExpenseDetailByDateAsync(credential?.DbCode, fromDate,
+                toDate);
             if (data.Count > 0)
-            {
                 return ApiResponse<List<ApprovedSubmitExpenseDetailResponse>>.Builder()
                     .WithMessage("Submit expense added successfully")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithSuccess(true)
                     .WithResult(data)
                     .Build();
-            }
             return ApiResponse<List<ApprovedSubmitExpenseDetailResponse>>.Builder()
                 .WithMessage("Submit expense added unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -110,25 +110,24 @@ public class SubmitExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         catch (Exception ex)
         {
             return GlobalExceptionHandler.ExceptionError<List<ApprovedSubmitExpenseDetailResponse>>(ex.Message);
-        }                    
+        }
     }
 
     [HttpPut]
     [Route("update-expense-description")]
-    public async Task<ApiResponse<int>> UpdateSubmitExpenseDescriptionAsync([FromBody] UpdateSubmitExpenseDescriptionRequest request)
+    public async Task<ApiResponse<int>> UpdateSubmitExpenseDescriptionAsync(
+        [FromBody] UpdateSubmitExpenseDescriptionRequest request)
     {
         try
         {
             var affectedRow = await unitOfWork.SubmitExpense.UpdateSubmitExpenseDescriptionAsync(request);
             if (affectedRow > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("Submit expense description updated successfully")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithSuccess(true)
                     .WithResult(affectedRow)
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithMessage("Submit expense description updated unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -141,6 +140,7 @@ public class SubmitExpenseController(IUnitOfWork unitOfWork) : BaseApiController
             return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
         }
     }
+
     [HttpDelete]
     [Route("{submittedId}")]
     public async Task<ApiResponse<int>> DeleteSubmitExpenseAsync([Required] int submittedId)
@@ -149,14 +149,12 @@ public class SubmitExpenseController(IUnitOfWork unitOfWork) : BaseApiController
         {
             var affectedRow = await unitOfWork.SubmitExpense.DeleteSubmitExpenseAsync(submittedId);
             if (affectedRow > 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithMessage("Submit expense deleted successfully")
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithSuccess(true)
                     .WithResult(affectedRow)
                     .Build();
-            }
 
             return ApiResponse<int>.Builder()
                 .WithMessage("Submit expense deleted unsuccessfully")

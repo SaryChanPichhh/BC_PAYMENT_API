@@ -5,6 +5,7 @@ using BC.PAYMENT.CORE.Entities;
 using BC.PAYMENT.CORE.Entities.Invoice;
 
 namespace BC.PAYMENT.API.Controllers.Invoice;
+
 public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiController
 {
     [HttpPost]
@@ -15,12 +16,10 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
         {
             var rowsAffected = await unitOfWork.Invoices.SavePaymentInvoiceAsync(request);
             if (rowsAffected <= 0)
-            {
                 return ApiResponse<int>.Builder()
                     .WithStatusCode((int)HttpStatusCode.BadRequest)
                     .WithMessage("Payment invoice saved unsuccessfully.")
                     .Build();
-            }
             return ApiResponse<int>.Builder()
                 .WithStatusCode((int)HttpStatusCode.OK)
                 .WithMessage("Payment invoice saved successfully.")
@@ -33,22 +32,22 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
             return GlobalExceptionHandler.ExceptionError<int>(ex.Message);
         }
     }
-    
+
     [HttpGet]
     [Route("exists-headerId")]
-    public async Task<ApiResponse<bool>> IsExistsHeaderIdAsync([FromQuery] DateTime  invoiceDate, [FromQuery] string deliveryId )
+    public async Task<ApiResponse<bool>> IsExistsHeaderIdAsync([FromQuery] DateTime invoiceDate,
+        [FromQuery] string deliveryId)
     {
         try
         {
             var credential = Common.DecodeJwt(User);
-            var rowsAffected = await unitOfWork.PaymentInvoice.IsExistsPaymentHeaderId(credential?.DbCode, invoiceDate, deliveryId);
+            var rowsAffected =
+                await unitOfWork.PaymentInvoice.IsExistsPaymentHeaderId(credential?.DbCode, invoiceDate, deliveryId);
             if (rowsAffected)
-            {
                 return ApiResponse<bool>.Builder()
                     .WithStatusCode((int)HttpStatusCode.BadRequest)
                     .WithMessage("Header is exists.")
                     .Build();
-            }
             return ApiResponse<bool>.Builder()
                 .WithStatusCode((int)HttpStatusCode.OK)
                 .WithMessage("Header is not exists.")
@@ -64,7 +63,8 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
 
     [HttpPost]
     [Route("process-paid")]
-    public async Task<ApiResponse<bool>> PaidProcessingAsync([FromQuery] DateTime invoiceDate, [FromQuery] string deliveryId
+    public async Task<ApiResponse<bool>> PaidProcessingAsync([FromQuery] DateTime invoiceDate,
+        [FromQuery] string deliveryId
         , [FromBody] ProcessPaidInvoiceRequest request)
     {
         try
@@ -84,12 +84,15 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
                     DeliveryId = deliveryId,
                     EntriesCode = credential.InvoiceEntryCode,
                     Period = Convert.ToInt32(credential.Period),
-                    InvoiceDividendDate = invoiceDate,
+                    InvoiceDividendDate = invoiceDate
                 };
                 paymentHeaderId = await unitOfWork.PaymentInvoice.CreatePaymentHeader(paymentHeader);
             }
             else
-                paymentHeaderId = await unitOfWork.PaymentInvoice.GetPaymentHeaderId(invoiceDate, deliveryId, credential.DbCode);
+            {
+                paymentHeaderId =
+                    await unitOfWork.PaymentInvoice.GetPaymentHeaderId(invoiceDate, deliveryId, credential.DbCode);
+            }
 
             foreach (var expense in request.Expenses)
             {
@@ -104,10 +107,11 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
                     PaymentHeaderId = paymentHeaderId,
                     ExchangeRate = expense.ExchangeRate,
                     Total = expense.UnitPrice * 1,
-                    CreatedDate = DateTime.Today,
+                    CreatedDate = DateTime.Today
                 };
                 await unitOfWork.Expense.CreatePaymentExpense(expenseModel);
             }
+
             var paymentDetail = new BcPaymentDetail
             {
                 DbCode = credential.DbCode,
@@ -125,7 +129,7 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
                 MoneyBias = request.PaymentDetail.MoneyBias,
                 CreatedDate = invoiceDate,
                 CreatedBy = credential.Username,
-                EntriesCode = credential.InvoiceEntryCode,
+                EntriesCode = credential.InvoiceEntryCode
             };
             await unitOfWork.PaymentInvoice.CreatePaymentDetailAsync(paymentDetail);
             foreach (var payment in request.PaidInvoices)
@@ -138,9 +142,9 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
                     CreatedDate = DateTime.Today,
                     CreatedBy = credential.Username ?? string.Empty,
                     Status = true,
-                    PaymentHeaderId = paymentHeaderId,
+                    PaymentHeaderId = paymentHeaderId
                 };
-                await  unitOfWork.PaymentInvoice.CreatePcPaymentInvoiceAsync(paidInvoice);
+                await unitOfWork.PaymentInvoice.CreatePcPaymentInvoiceAsync(paidInvoice);
             }
 
             foreach (var returnInvoice in request.ReturnInvoices)
@@ -153,10 +157,11 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
                     CreatedDate = DateTime.Today,
                     CreatedBy = credential.Username ?? string.Empty,
                     Status = true,
-                    HeaderId = paymentHeaderId,
+                    HeaderId = paymentHeaderId
                 };
                 await unitOfWork.ReturnInvoice.CreatePcReturnInvoiceAsync(returnInvoiceModel);
             }
+
             return ApiResponse<bool>.Builder()
                 .WithStatusCode((int)HttpStatusCode.OK)
                 .WithMessage("Invoices saved successfully.")
@@ -179,16 +184,15 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
         var credential = Common.DecodeJwt(User);
         try
         {
-            var execute = await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailByDateAsync(credential.DbCode, fromDate, toDate);
+            var execute =
+                await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailByDateAsync(credential.DbCode, fromDate, toDate);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                     .WithMessage("Payment invoice details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                 .WithMessage("Payment invoice details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -200,7 +204,8 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
             return GlobalExceptionHandler.ExceptionError<List<PaymentInvoiceResponse>>(ex.Message);
         }
     }
-[HttpGet]
+
+    [HttpGet]
     [Route("by-date-exclude-submit")]
     public async Task<ApiResponse<List<PaymentInvoiceResponse>>> GetPaymentInvoiceDetailExcludeSubmitInvoiceAsync(
         [FromQuery] DateTime fromDate,
@@ -209,16 +214,16 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
         var credential = Common.DecodeJwt(User);
         try
         {
-            var execute = await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailExcludeSubmitInvoiceAsync(credential.DbCode, fromDate, toDate);
+            var execute =
+                await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailExcludeSubmitInvoiceAsync(credential.DbCode,
+                    fromDate, toDate);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                     .WithMessage("Payment invoice details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                 .WithMessage("Payment invoice details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -240,16 +245,15 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
         var credential = Common.DecodeJwt(User);
         try
         {
-            var execute = await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailByPeriodAsync(credential.DbCode, month, year);
+            var execute =
+                await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailByPeriodAsync(credential.DbCode, month, year);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                     .WithMessage("Payment invoice details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                 .WithMessage("Payment invoice details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -261,6 +265,7 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
             return GlobalExceptionHandler.ExceptionError<List<PaymentInvoiceResponse>>(ex.Message);
         }
     }
+
     [HttpGet]
     [Route("paid-history")]
     public async Task<ApiResponse<List<PaymentInvoiceResponse>>> GetPaymentInvoiceDetailByInvoiceCodeAsync(
@@ -270,16 +275,16 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
         var credential = Common.DecodeJwt(User);
         try
         {
-            var execute = await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailByInvoiceCodeAsync(credential.DbCode, date:date,invoiceCode:invoiceCode);
+            var execute =
+                await unitOfWork.PaymentInvoice.GetPaymentInvoiceDetailByInvoiceCodeAsync(credential.DbCode, date,
+                    invoiceCode);
             if (execute.Count > 0)
-            {
                 return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                     .WithMessage("Payment invoice details fetched successfully")
                     .WithSuccess(true)
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithResult(execute)
                     .Build();
-            }
             return ApiResponse<List<PaymentInvoiceResponse>>.Builder()
                 .WithMessage("Payment invoice details fetched unsuccessfully")
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -291,6 +296,7 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
             return GlobalExceptionHandler.ExceptionError<List<PaymentInvoiceResponse>>(ex.Message);
         }
     }
+
     [HttpPut]
     [Route("value")]
     public async Task<ApiResponse<bool>> UpdatePaymentInvoiceAsync([FromBody] UpdatePaymentInvoiceRequest request)
@@ -301,34 +307,34 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
 
             var newInvoice = new NewInvoiceModel
             {
-                DbCode =  credential.DbCode ?? string.Empty,
-                CreatedBy =  credential.Username ?? string.Empty,
+                DbCode = credential.DbCode ?? string.Empty,
+                CreatedBy = credential.Username ?? string.Empty,
                 CreatedDate = credential.CurrectDate,
                 Id = request.InvoiceId,
                 InvoiceId = request.InvoiceId,
-                InvoiceAmount = request.NewAmount,
-                
+                InvoiceAmount = request.NewAmount
             };
             var pcEditValue = new PcEditDividedInvoice
             {
                 CreateDate = credential.CurrectDate,
-                CreatedBy =  credential.Username ?? string.Empty,
+                CreatedBy = credential.Username ?? string.Empty,
                 DbCode = credential.DbCode ?? string.Empty,
-                DividedId =  request.DividedId,
+                DividedId = request.DividedId,
                 NewAmount = request.NewAmount,
                 OldAmount = request.OldAmount,
-                Description = request.Description,
+                Description = request.Description
             };
             var paymentInvoice = new PcPaymentInvoice
             {
                 Amount = request.NewAmount,
-                PaymentId =  request.PaymentId,
+                PaymentId = request.PaymentId,
                 DividedInvoiceId = request.DividedId,
                 DbCode = credential.DbCode,
-                CreatedBy =   credential.Username ?? string.Empty,
-                CreatedDate =  credential.CurrectDate,
+                CreatedBy = credential.Username ?? string.Empty,
+                CreatedDate = credential.CurrectDate
             };
-            var affectedRow = await unitOfWork.PaymentInvoice.UpdatePaidValueAsync(paymentInvoice, newInvoice, pcEditValue);
+            var affectedRow =
+                await unitOfWork.PaymentInvoice.UpdatePaidValueAsync(paymentInvoice, newInvoice, pcEditValue);
             return ApiResponse<bool>.Builder()
                 .WithStatusCode((int)HttpStatusCode.OK)
                 .WithMessage("Invoices saved successfully.")
@@ -350,14 +356,12 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
         {
             var affectedRows = await unitOfWork.PaymentInvoice.DeletePaymentInvoiceAsync(paymentId, dividedId);
             if (affectedRows > 0)
-            {
                 return ApiResponse<bool>.Builder()
                     .WithStatusCode((int)HttpStatusCode.OK)
                     .WithMessage("Payment invoice deleted successfully.")
                     .WithSuccess(true)
                     .WithResult(true)
                     .Build();
-            }
 
             return ApiResponse<bool>.Builder()
                 .WithStatusCode((int)HttpStatusCode.BadRequest)
@@ -371,5 +375,4 @@ public class PaymentInvoiceController(IUnitOfWork unitOfWork) : BaseApiControlle
             return GlobalExceptionHandler.ExceptionError<bool>(ex.Message);
         }
     }
-
 }

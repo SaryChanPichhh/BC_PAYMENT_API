@@ -9,60 +9,60 @@ using System.Net;
 using BC.PAYMENT.CORE.Contracts.General;
 using BC.PAYMENT.CORE.Contracts.Login;
 
-namespace BC.PAYMENT.API.Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class UsersController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : ControllerBase
-    {
-        #region ===[ Public Methods ]==============================================================
+namespace BC.PAYMENT.API.Controllers;
 
-        [HttpPost("credentials")]
-        public async Task<ApiResponse<LoginResponseDTO>> GetBcUserCredentialAsync([FromBody] LoginRequestDTO requestDto)
+[Route("api/[controller]")]
+[ApiController]
+public class UsersController(IUnitOfWork unitOfWork, IOptions<AppSettings> appSettings) : ControllerBase
+{
+    #region ===[ Public Methods ]==============================================================
+
+    [HttpPost("credentials")]
+    public async Task<ApiResponse<LoginResponseDTO>> GetBcUserCredentialAsync([FromBody] LoginRequestDTO requestDto)
+    {
+        try
         {
-            try
+            var data = await unitOfWork.Users.GetBcUserCredential(requestDto);
+            if (BCrypt.Net.BCrypt.Verify(requestDto.Password, data.UserPass))
             {
-                var data = await unitOfWork.Users.GetBcUserCredential(requestDto);
-                if (BCrypt.Net.BCrypt.Verify(requestDto.Password, data.UserPass))
+                var claimsDto = new ClaimDTO
                 {
-                    var claimsDto = new ClaimDTO
-                    {
-                        UserId = data.UserId,
-                        Username = data.Username!,
-                        CompanyCode = requestDto.CompanyCode!,
-                        AppCode = requestDto.AppCode!,
-                        DbCode = requestDto.DbCode!,
-                        CurrectDate = data.CurrentDate,
-                        InvoiceEntryCode = data.InvoiceEntryCode ?? "",
-                    };
-                    Common.GenerateJwtToken(claimsDto, appSettings.Value);
-                    var loginResponse = new LoginResponseDTO
-                    {
-                        Token = Common.GenerateJwtToken(claimsDto, appSettings.Value),
-                        UserId = data.UserId,
-                        Username = data.Username!,
-                        DbCode = data.DbCode!,
-                    };       
-                
-                    return ApiResponse<LoginResponseDTO>.Builder()
-                        .WithMessage("User fetched successfully!")
-                        .WithStatusCode((int)HttpStatusCode.OK)
-                        .WithResult(loginResponse)
-                        .Build();
-                }
-                else
+                    UserId = data.UserId,
+                    Username = data.Username!,
+                    CompanyCode = requestDto.CompanyCode!,
+                    AppCode = requestDto.AppCode!,
+                    DbCode = requestDto.DbCode!,
+                    CurrectDate = data.CurrentDate,
+                    InvoiceEntryCode = data.InvoiceEntryCode ?? ""
+                };
+                Common.GenerateJwtToken(claimsDto, appSettings.Value);
+                var loginResponse = new LoginResponseDTO
                 {
-                    return ApiResponse<LoginResponseDTO>.Builder()
-                        .WithStatusCode((int)HttpStatusCode.BadRequest)
-                        .WithMessage("Username or password is incorrect")
-                        .Build();
-                }
+                    Token = Common.GenerateJwtToken(claimsDto, appSettings.Value),
+                    UserId = data.UserId,
+                    Username = data.Username!,
+                    DbCode = data.DbCode!
+                };
+
+                return ApiResponse<LoginResponseDTO>.Builder()
+                    .WithMessage("User fetched successfully!")
+                    .WithStatusCode((int)HttpStatusCode.OK)
+                    .WithResult(loginResponse)
+                    .Build();
             }
-            catch (Exception ex)
+            else
             {
-                return GlobalExceptionHandler.ExceptionError<LoginResponseDTO>(ex.Message);
+                return ApiResponse<LoginResponseDTO>.Builder()
+                    .WithStatusCode((int)HttpStatusCode.BadRequest)
+                    .WithMessage("Username or password is incorrect")
+                    .Build();
             }
         }
-        #endregion
+        catch (Exception ex)
+        {
+            return GlobalExceptionHandler.ExceptionError<LoginResponseDTO>(ex.Message);
+        }
     }
+
+    #endregion
 }

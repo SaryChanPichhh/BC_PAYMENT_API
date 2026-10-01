@@ -1,16 +1,10 @@
-namespace BC.PAYMENT.CORE.DTO.Invoice
+namespace BC.PAYMENT.CORE.DTO.Invoice;
+
+public record IssueInvoiceDTO
 {
-    public record IssueInvoiceDTO
-    {
-        [JsonIgnore]
-        public string? DbCode { get; set; }
-        [Required]
-        public int InvoiceId { get; set; }
-        [Required]
-        public required string DeliveryId { get; set; }
-        [JsonIgnore]
-        public DateTime CreatedDate { get; set; }
-        [JsonIgnore]
-        public string? CreatedBy { get; set; }
-    }
+    [JsonIgnore] public string? DbCode { get; set; }
+    [Required] public int InvoiceId { get; set; }
+    [Required] public required string DeliveryId { get; set; }
+    [JsonIgnore] public DateTime CreatedDate { get; set; }
+    [JsonIgnore] public string? CreatedBy { get; set; }
 }

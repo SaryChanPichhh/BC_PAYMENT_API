@@ -1,7 +1,5 @@
-﻿
-namespace BC.PAYMENT.CORE.Entities.Items
+﻿namespace BC.PAYMENT.CORE.Entities.Items;
+
+public class ItemModel
 {
-    public class ItemModel
-    {
-    }
 }

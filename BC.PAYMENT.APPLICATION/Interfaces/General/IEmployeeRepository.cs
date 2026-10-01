@@ -1,8 +1,7 @@
-namespace BC.PAYMENT.APPLICATION.Interfaces.General
+namespace BC.PAYMENT.APPLICATION.Interfaces.General;
+
+public interface IEmployeeRepository
 {
-    public interface IEmployeeRepository
-    {
-        Task<List<EmployeeModel>> GetAllHasCompletedPayment();
-        Task<List<TemplateModel>> GetAllTemplateByEmployeId(int employeeId);
-    }
+    Task<List<EmployeeModel>> GetAllHasCompletedPayment();
+    Task<List<TemplateModel>> GetAllTemplateByEmployeId(int employeeId);
 }

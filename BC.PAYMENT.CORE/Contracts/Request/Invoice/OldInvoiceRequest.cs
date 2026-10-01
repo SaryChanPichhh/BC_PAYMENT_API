@@ -6,4 +6,4 @@ public record OldInvoiceRequest(
     string CustomerName,
     double InvoiceValue,
     string Employee
-    );
+);

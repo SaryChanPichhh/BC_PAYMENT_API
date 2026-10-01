@@ -1,6 +1,6 @@
 ﻿namespace BC.PAYMENT.CORE.Contracts.Response.Invoice;
 
-public class InvoiceResponse :Entities.General.Customer
+public class InvoiceResponse : Entities.General.Customer
 {
     public int InvoiceId { get; set; }
     public string DbCode { get; set; }

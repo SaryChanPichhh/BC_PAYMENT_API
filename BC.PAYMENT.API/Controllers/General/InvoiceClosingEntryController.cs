@@ -17,7 +17,8 @@ public class InvoiceClosingEntryController(IUnitOfWork unitOfWork) : BaseApiCont
     {
         var claim = Common.DecodeJwt(HttpContext.User);
         var result = await unitOfWork.InvoiceClosingEntry.CheckIsEntriesIsAlreadyOpenAsync(claim?.DbCode);
-        return ApiResponseFactory.SuccessResponse(result, result ? "Entries has already opened." : "Entries has not opened.");
+        return ApiResponseFactory.SuccessResponse(result,
+            result ? "Entries has already opened." : "Entries has not opened.");
     }
 
     [HttpPost]
@@ -26,7 +27,7 @@ public class InvoiceClosingEntryController(IUnitOfWork unitOfWork) : BaseApiCont
     {
         var claim = Common.DecodeJwt(HttpContext.User);
         var closingEntry = request.ToInvoiceClosingEntriesModel();
-        closingEntry.CreatedBy =  "System"; // Set creator from JWT
+        closingEntry.CreatedBy = "System"; // Set creator from JWT
         closingEntry.DbCode = claim?.DbCode;
         var result = await unitOfWork.InvoiceClosingEntry.CreateClosingEntryAsync(closingEntry);
         return ApiResponseFactory.SuccessResponse(result, "Closing entry created successfully.");

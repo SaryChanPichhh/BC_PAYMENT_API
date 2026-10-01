@@ -7,15 +7,13 @@ using Microsoft.Extensions.Configuration;
 
 public static class EncryptionHelper
 {
-
     private static readonly byte[] _key = Convert.FromBase64String("w+Vv73xKqu0q1BFlX9mHCWOr3w1jM7axPYoHhMwv92A=");
     private static readonly byte[] _iv = Convert.FromBase64String("Wm3g9eTb4D1w5kh79T8eJg==");
 
 
     public static string EncryptAES(string plainText)
     {
-       
-        using (Aes aesAlg = Aes.Create())
+        using (var aesAlg = Aes.Create())
         {
             aesAlg.Key = _key;
             aesAlg.IV = _iv;
@@ -37,9 +35,9 @@ public static class EncryptionHelper
 
     public static string DecryptAES(string cipherText)
     {
-        byte[] cipherBytes = Convert.FromBase64String(cipherText);
+        var cipherBytes = Convert.FromBase64String(cipherText);
 
-        using (Aes aesAlg = Aes.Create())
+        using (var aesAlg = Aes.Create())
         {
             aesAlg.Key = _key;
             aesAlg.IV = _iv;

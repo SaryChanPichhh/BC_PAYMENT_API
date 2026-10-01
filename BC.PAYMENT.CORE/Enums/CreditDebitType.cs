@@ -1,8 +1,7 @@
-﻿namespace BC.PAYMENT.CORE.Enums
+﻿namespace BC.PAYMENT.CORE.Enums;
+
+public enum CreditDebitType
 {
-    public enum CreditDebitType
-    {
-        Credit,
-        Debit
-    }
+    Credit,
+    Debit
 }
